@@ -27,21 +27,24 @@ The stable versions are placed in the Releases section of this repository. Multi
 # Requirements
 For Unity, you need to download the latest **2019.1 version or later**, as it's required to be able to use Unity DOTS.
 
-## Libraries and Packages
+## Packages
 To use this Framework, you gonna need the following stuffs :
+- **The XR Legacy Input Helpers** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on All Packages > XR Legacy Input Helpers > Install).
 - **The Entities Package** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install).
-- **VR Support** : In the Player Settings Window (Edit > Project Settings > Player), go to the last tab called XR Settings, set the Virtual Reality Supported toggle to true, and add the Oculus, OpenVR and None SDKs to the list.
-- **Scripting Runtime Version** : This one is normally set by default in the last versions of Unity, but we never know :  still in the Player Settings Window, go to the Other Settings tab and set the Scripting Runtime version to .NET 4.x Equivalent.
 
-## Optional Libraries
+## Optional Packages
 You still need to import some VR Packages, depending on your needs, to use this framework. Those are found in the Package Manager from Unity :
-- **Oculus for Desktop** : If you want to use the Rift or Rift S Support
-- **Oculus for Desktop** : If you want to use the Oculus Go, Gear VR or Oculus Quest Support
+- **Oculus (Desktop)** : If you want to use the Rift or Rift S Support
+- **Oculus (Android)** : If you want to use the Oculus Go, Gear VR or Oculus Quest Support
+- **OpenVR (Desktop)** : If you want to use the HTC Vive or HTC Focus (**WARNING :** MODELS FOR FOCUS CONTROLLERS NOT PROVIDED)
 - **Windows Mixed Reality** : If you want to use the WMR Headset
-- **OpenVR for Desktop** : If you want to use the HTC Vive or HTC Focus (**WARNING :** MODELS FOR FOCUS CONTROLLERS NOT PROVIDED)
 
 ### Oculus GO, Oculus Quest, Gear VR and HTC Focus Specifities
 If you need to build for a mobile platform, you need as well to download the Android Building support (File > Build Settings > Android) and to switch the platform to Android.
+
+## Other Settings
+- **VR Support** : In the Player Settings Window (Edit > Project Settings > Player), go to the last tab called XR Settings, set the Virtual Reality Supported toggle to true, and add the Oculus, OpenVR and None SDKs to the list.
+- **Scripting Runtime Version** : This one is normally set by default in the last versions of Unity, but we never know :  still in the Player Settings Window, go to the Other Settings tab and set the Scripting Runtime version to .NET 4.x Equivalent.
 
 
 
@@ -49,9 +52,9 @@ Once all of that is done, **Restart your project so everything can be recompiled
 
 
 
-## Basic Setup :
+# Basic Setup
 
-1. Import the different packages listed above
+1. Import the different packages and setup the settings listed above
 2. Relaunch the Editor to be sure that everything is correctly recompiled
 3. Import the VRSF_DOTS_Core package
 4. Import the other extension packages you need
@@ -65,14 +68,14 @@ Once all of that is done, **Restart your project so everything can be recompiled
 If you want to add anything more in your scene (Movements, UI, Gaze, ...), just check the prefabs in the different Extension Packages, or check the different scenes in the VRSF.Samples folder of this repository :)
 
 
-## Credits
+# Credits
 This repository is based on multiple repositories found online, and that's why I would like to thanks the following persons for their work that helped me through the development of this project :
 - The work of [Thorsten Jänichen](https://github.com/TJaenichen) and [Thomas Masquart](https://github.com/ThmsMsqrt), co-author of the Scriptable Framework used in this repository. Their work is as well based on the excellent Unite Talk 2017 from Ryan Hipple, [available here](https://youtu.be/raQ3iHhE_Kk), and on its [Scriptable Objects Github repository](https://github.com/roboryantron/Unite2017).
 - The EventCallbacks Plugin from [Quill18](https://www.youtube.com/watch?v=04wXkgfd9V8) and the rewriting of it by [CrazyFrog55](https://github.com/crazyfox55) and [FuzzyHobo](https://github.com/FuzzyHobo). I made my own version available [here](https://github.com/Jamy4000/UnityCallbackAndEventTutorial).
 - The Vive-Teleporter offered by [FlaFla2](https://github.com/Flafla2/Vive-Teleporter) for the calculation and display of the Parabole in the Curve Teleporter.
 
 
-## Documentation
+# Documentation
 For more info about this VR framework, please send me a message, as the Wiki is still a work in progress.
 
 For more info about the Scriptable Objects and the Framework created, please check the Github Repository given above as well as the Unite talk and Example project provided by Unity and Ryan Hipple.
