@@ -3,7 +3,6 @@ using VRSF.Core.Controllers;
 
 namespace VRSF.Core.SetupVR
 {
-    [RequireComponent(typeof(Unity.Entities.GameObjectEntity))]
     public class SetupVRComponents : MonoBehaviour
     {
         #region SERIALIZED_FIELDS

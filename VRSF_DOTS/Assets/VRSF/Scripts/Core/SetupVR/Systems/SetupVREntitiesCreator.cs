@@ -7,54 +7,40 @@ using VRSF.Core.Inputs;
 
 namespace VRSF.Core.SetupVR
 {
-    public class SetupVRSystems : ComponentSystem
+    [RequireComponent(typeof(SetupVRComponents))]
+    [RequiresEntityConversion]
+    public class SetupVREntitiesCreator : MonoBehaviour
     {
-        /// <summary>
-        /// The filter to find SetupVR entity
-        /// </summary>
-        struct Filter : IComponentData
-        {
-            public SetupVRComponents SetupVR;
-        }
+        private SetupVRComponents _vrComponents;
 
-        #region ComponentSystem_Methods
-        protected override void OnCreateManager()
+        #region MONOBEHAVIOUR_METHODS
+        private void Awake()
         {
-            base.OnCreateManager();
             SceneManager.sceneLoaded += OnSceneLoaded;
             OnSetupVRNeedToBeReloaded.Listeners += ReloadSetupVR;
+            _vrComponents = GetComponent<SetupVRComponents>();
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        protected override void OnStartRunning()
+        protected void OnStartRunning()
         {
-            base.OnStartRunning();
+            LoadVRSDK(_vrComponents);
+            SetupVRInScene(_vrComponents);
 
-            Entities.ForEach((ref Filter e) =>
-            {
-                LoadVRSDK(e.SetupVR);
-                SetupVRInScene(e.SetupVR);
-            });
-            
-            this.Enabled = !VRSF_Components.SetupVRIsReady;
+            this.enabled = !VRSF_Components.SetupVRIsReady;
         }
 
-        protected override void OnUpdate()
+        private void Update()
         {
-            Entities.ForEach((ref Filter e) =>
-            {
-                if (!e.SetupVR.IsLoaded && XRDevice.model != String.Empty)
-                    LoadVRSDK(e.SetupVR);
-                else if (e.SetupVR.IsLoaded && !VRSF_Components.SetupVRIsReady)
-                    SetupVRInScene(e.SetupVR);
+            if (!_vrComponents.IsLoaded && XRDevice.model != String.Empty)
+                LoadVRSDK(_vrComponents);
+            else if (_vrComponents.IsLoaded && !VRSF_Components.SetupVRIsReady)
+                SetupVRInScene(_vrComponents);
 
-                this.Enabled = !VRSF_Components.SetupVRIsReady;
-            });
+            this.enabled = !VRSF_Components.SetupVRIsReady;
         }
         
-        protected override void OnDestroyManager()
+        private void OnDestroy()
         {
-            base.OnDestroyManager();
             SceneManager.sceneLoaded -= OnSceneLoaded;
             OnSetupVRNeedToBeReloaded.Listeners -= ReloadSetupVR;
         }
@@ -188,7 +174,7 @@ namespace VRSF.Core.SetupVR
         private void ReloadSetupVR(OnSetupVRNeedToBeReloaded info)
         {
             VRSF_Components.SetupVRIsReady = false;
-            this.Enabled = true;
+            this.enabled = true;
         }
 #endregion
     }
