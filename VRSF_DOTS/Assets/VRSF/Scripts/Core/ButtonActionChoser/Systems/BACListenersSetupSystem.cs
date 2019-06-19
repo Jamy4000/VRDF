@@ -11,7 +11,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
         // Here's an example of a Filter struct you can use for your system
         // The Filter of your setup system need to at least have a BACGeneralComponent
         //
-        //struct Filter
+        //struct Filter : IComponentData
         //{
         //    public T1 Type1;
         //    public T2 Type2;

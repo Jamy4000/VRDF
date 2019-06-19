@@ -9,7 +9,7 @@ namespace VRSF.Core.Controllers
     /// </summary>
     public class PointerStateSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public PointerVisibilityComponents PointerVisibility;
             public ScriptableRaycastComponent ScriptableRaycast;
@@ -21,30 +21,30 @@ namespace VRSF.Core.Controllers
         {
             base.OnStartRunning();
             // Just check if there's at least one entity
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 ObjectWasHoveredEvent.Listeners += OnSomethingWasHit;
                 return;
-            }
+            });
         }
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.ScriptableRaycast.IsSetup)
                     CheckPointerState(e);
-            }
+            });
         }
 
         protected override void OnDestroyManager()
         {
             // Just check if there's at least one entity
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 ObjectWasHoveredEvent.Listeners -= OnSomethingWasHit;
                 return;
-            }
+            });
             base.OnDestroyManager();
         }
         #endregion ComponentSystem_Methods
@@ -53,11 +53,11 @@ namespace VRSF.Core.Controllers
         #region PRIVATE_METHODS
         private void OnSomethingWasHit(ObjectWasHoveredEvent info)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (info.RaycastOrigin == e.ScriptableRaycast.RayOrigin && info.ObjectHovered != null)
                     e.PointerVisibility.PointerState = EPointerState.ON;
-            }
+            });
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class CrossplatformInputSetupSystem : ComponentSystem
     {
-        private struct Filter
+        private struct Filter : IComponentData
         {
             public CrossplatformInputCapture InputCapture;
         }
@@ -33,7 +33,7 @@ namespace VRSF.Core.Inputs
         /// </summary>
         public void SetupControllersParameters(OnSetupVRReady info)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 // We give the references to the Scriptable variable containers in the Left Parameters variable
                 e.InputCapture.LeftParameters = new InputParameters
@@ -57,7 +57,7 @@ namespace VRSF.Core.Inputs
 
                 e.InputCapture.IsSetup = true;
                 new OnCrossplatformComponentIsSetup();
-            }
+            });
         }
         #endregion PRIVATE_METHODS
     }

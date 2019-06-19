@@ -19,12 +19,14 @@ namespace VRSF.Core.Utils.ButtonActionChoser
     /// </summary>
     public class BACTimerUpdateSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public BACTimerComponent BACTimer;
             public BACGeneralComponent BAC_Comp;
             public BACCalculationsComponent BAC_Calc;
         }
+
+        private delegate UnityAction ThumbAction(BACTimerComponent bacTimer);
 
         protected override void OnCreateManager()
         {
@@ -34,7 +36,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.BAC_Calc.ActionButtonIsReady && e.BAC_Calc.CanBeUsed)
                 {
@@ -62,18 +64,18 @@ namespace VRSF.Core.Utils.ButtonActionChoser
                         e.BACTimer.StartCoroutine(OnStopInteractingCallback(e.BACTimer));
                     }
                 }
-            }
+            });
         }
 
         protected override void OnDestroyManager()
         {
             base.OnDestroyManager();
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 // Remove the listeners for the ThumbCheckEvent if it's not null
                 e.BACTimer.ThumbCheckEvent?.RemoveListener(e.BACTimer.ThumbEventAction);
                 e.BACTimer.ThumbCheckEvent = null;
-            }
+            });
             OnSetupVRReady.Listeners -= Init;
         }
 
@@ -81,9 +83,10 @@ namespace VRSF.Core.Utils.ButtonActionChoser
         /// Update timer based on a fixed unscaled delta time when user interact with the button
         /// </summary>
         /// <param name="e"></param>
-        private void IsInteractingCallback(BACTimerComponent timer)
+        private UnityAction IsInteractingCallback(BACTimerComponent timer)
         {
             timer._Timer += Time.deltaTime;
+            return null;
         }
 
         /// <summary>
@@ -159,18 +162,21 @@ namespace VRSF.Core.Utils.ButtonActionChoser
 
         private void Init(OnSetupVRReady info)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 e.BAC_Comp.BACTimer = e.BACTimer;
                 // if we use a thumbstick
                 if (e.BAC_Comp.ActionButton == EControllersButton.TOUCHPAD && e.BACTimer.ThumbCheckEvent == null)
                 {
+                    // We create the delegate for the IsInteracting method that will be assign to the Thu,bCheckEvent
+                    ThumbAction thumbActionDelegate = IsInteractingCallback;
+                    e.BACTimer.ThumbEventAction = thumbActionDelegate(e.BACTimer);
+
                     // We create a new event that will be use in the CheckThumbstick method
                     e.BACTimer.ThumbCheckEvent = new UnityEvent();
-                    e.BACTimer.ThumbEventAction = delegate { IsInteractingCallback(e.BACTimer); };
                     e.BACTimer.ThumbCheckEvent.AddListenerExtend(e.BACTimer.ThumbEventAction);
                 }
-            }
+            });
         }
     }
 }

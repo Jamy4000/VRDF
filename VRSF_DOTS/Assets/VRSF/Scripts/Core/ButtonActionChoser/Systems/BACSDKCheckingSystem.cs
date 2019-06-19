@@ -10,7 +10,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
     /// </summary>
     public class BACSDKCheckingSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public SDKChoserComponent SDKComp;
             public BACGeneralComponent BAC_General_Comp;
@@ -72,11 +72,11 @@ namespace VRSF.Core.Utils.ButtonActionChoser
 
         private void Init(OnSetupVRReady setupVRReady)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 // Is put in an if method as the CanBeUsed is set in other script and we don't want to set it at true (true being is default value)
                 e.BAC_Calculations_Comp.CorrectSDK = CheckUseSDKToggles(e);
-            }
+            });
             new SDKChoserIsSetup();
         }
         #endregion PRIVATES_METHODS

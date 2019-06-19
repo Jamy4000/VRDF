@@ -7,7 +7,7 @@ namespace VRSF.Core.Inputs
 {
     public class WMRControllersInputCaptureSystem : ComponentSystem
     {
-        private struct Filter
+        private struct Filter : IComponentData
         {
             public WMRControllersInputCaptureComponent WMRControllersInput;
             public CrossplatformInputCapture InputCapture;
@@ -21,7 +21,7 @@ namespace VRSF.Core.Inputs
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.InputCapture.IsSetup)
                 {
@@ -31,7 +31,7 @@ namespace VRSF.Core.Inputs
                     // We check the Input for the Left controller
                     CheckLeftControllerInput(e.WMRControllersInput);
                 }
-            }
+            });
         }
 
         protected override void OnDestroyManager()

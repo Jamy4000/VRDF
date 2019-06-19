@@ -12,7 +12,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
     /// </summary>
     public class BACInputSetupSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public BACGeneralComponent BACGeneralComp;
             public BACCalculationsComponent BACCalculationsComp;
@@ -149,23 +149,23 @@ namespace VRSF.Core.Utils.ButtonActionChoser
 
         private void StartBACsSetup(SDKChoserIsSetup info)
         {
-            foreach (var entity in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 // We check on which hand is set the Action Button selected
-                CheckButtonHand(entity);
+                CheckButtonHand(e);
 
                 // We check that all the parameters are set correctly
-                if (entity.BACCalculationsComp.ParametersAreInvalid || !CheckParameters(entity))
+                if (e.BACCalculationsComp.ParametersAreInvalid || !CheckParameters(e))
                 {
-                    Debug.LogError("The Button Action Choser parameters for the ButtonActionChoserComponents on the " + entity.BACGeneralComp.transform.name + " object are invalid.\n" +
+                    Debug.LogError("The Button Action Choser parameters for the ButtonActionChoserComponents on the " + e.BACGeneralComp.transform.name + " object are invalid.\n" +
                         "Please specify valid values as displayed in the Help Boxes under your script. Setting CanBeUsed of ButtonActionChoserComponents to false.");
-                    entity.BACCalculationsComp.CanBeUsed = false;
+                    e.BACCalculationsComp.CanBeUsed = false;
                 }
                 else
                 {
-                    entity.BACCalculationsComp.ActionButtonIsReady = true;
+                    e.BACCalculationsComp.ActionButtonIsReady = true;
                 }
-            }
+            });
             new OnActionButtonIsReady();
         }
         #endregion PRIVATES_METHODS

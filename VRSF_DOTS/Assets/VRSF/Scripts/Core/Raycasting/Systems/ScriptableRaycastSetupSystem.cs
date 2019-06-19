@@ -10,7 +10,7 @@ namespace VRSF.Core.Raycast
     /// </summary>
     public class ScriptableRaycastSetupSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public ScriptableRaycastComponent RaycastComp;
         }
@@ -41,7 +41,7 @@ namespace VRSF.Core.Raycast
         {
             var interactionsContainer = InteractionVariableContainer.Instance;
 
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 e.RaycastComp._VRCamera = VRSF_Components.VRCamera.GetComponent<Camera>();
 
@@ -68,7 +68,7 @@ namespace VRSF.Core.Raycast
                 }
 
                 e.RaycastComp.IsSetup = true;
-            }
+            });
         }
         #endregion PRIVATES_METHODS
     }

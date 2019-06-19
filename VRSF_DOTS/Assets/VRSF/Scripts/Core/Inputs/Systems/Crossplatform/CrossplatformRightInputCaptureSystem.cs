@@ -10,7 +10,7 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class CrossplatformRightInputCaptureSystem : ComponentSystem
     {
-        private struct Filter
+        private struct Filter : IComponentData
         {
             public CrossplatformInputCapture InputCapture;
         }
@@ -23,12 +23,12 @@ namespace VRSF.Core.Inputs
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.InputCapture.IsSetup)
                     // We check the Input for the Right controller
                     CheckRightControllerInput(e.InputCapture);
-            }
+            });
         }
 
         protected override void OnDestroyManager()

@@ -10,7 +10,7 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class OculusRightControllerInputCaptureSystem : ComponentSystem
     {
-        private struct Filter
+        private struct Filter : IComponentData
         {
             public OculusControllersInputCaptureComponent OculusControllersInput;
             public CrossplatformInputCapture InputCapture;
@@ -24,14 +24,14 @@ namespace VRSF.Core.Inputs
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.InputCapture.IsSetup)
                 {
                     // We check the Input for the Right controller
                     CheckControllerInput(e.OculusControllersInput);
                 }
-            }
+            });
         }
 
         protected override void OnDestroyManager()

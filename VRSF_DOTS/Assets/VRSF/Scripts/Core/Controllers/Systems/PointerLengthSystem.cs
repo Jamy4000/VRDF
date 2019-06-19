@@ -9,7 +9,7 @@ namespace VRSF.Core.Controllers
     [UpdateAfter(typeof(Raycast.RaycastCalculationsSystems))]
     public class PointerLengthSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public PointerVisibilityComponents PointerComp;
             public Raycast.ScriptableRaycastComponent RaycastComp;
@@ -21,11 +21,11 @@ namespace VRSF.Core.Controllers
         // Update is called once per frame
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.RaycastComp.IsSetup)
                     SetControllerRayLength(e);
-            }
+            });
         }
         #endregion ComponentSystem_Methods
 

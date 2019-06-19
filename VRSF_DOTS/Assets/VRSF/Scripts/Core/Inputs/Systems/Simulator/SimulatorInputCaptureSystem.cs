@@ -13,7 +13,7 @@ namespace VRSF.Core.Inputs
         /// <summary>
         /// The filter for the entity component.
         /// </summary>
-        struct Filter
+        struct Filter : IComponentData
         {
             public CrossplatformInputCapture CrossplatformInput;
             public SimulatorInputCaptureComponent ControllersInputCapture;
@@ -39,11 +39,11 @@ namespace VRSF.Core.Inputs
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.CrossplatformInput.IsSetup)
                     CheckRightControllerInput(e.CrossplatformInput);
-            }
+            });
         }
 
         protected override void OnDestroyManager()

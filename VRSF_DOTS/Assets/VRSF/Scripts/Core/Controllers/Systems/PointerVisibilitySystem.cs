@@ -9,7 +9,7 @@ namespace VRSF.Core.Controllers
     /// </summary>
     public class PointerVisibilitySystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public ScriptableRaycastComponent RaycastComp;
             public PointerVisibilityComponents PointerVisibility;
@@ -22,20 +22,20 @@ namespace VRSF.Core.Controllers
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 e.PointerWidth._BaseStartWidth = e.PointerRenderer.startWidth;
                 e.PointerWidth._BaseEndWidth = e.PointerRenderer.endWidth;
-            }
+            });
         }
 
         // Update is called once per frame
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 SetPointerVisibility(e);
-            }
+            });
         }
         #endregion ComponentSystem_Methods
 

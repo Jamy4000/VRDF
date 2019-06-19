@@ -25,7 +25,6 @@ namespace VRSF.Core.SetupVR
                     GameObject.Destroy(setupVR.GetComponent<WMRControllersInputCaptureComponent>());
                     RemoveSimulatorStuffs(setupVR);
                     CheckControllersReferences(setupVR, setupVR.Rift_Controllers);
-                    setupVR.FloorOffset.localPosition = new Vector3(0, 1.7f, 0);
                     break;
                 case EDevice.OCULUS_RIFT_S:
                     GameObject.Destroy(setupVR.GetComponent<HtcControllersInputCaptureComponent>());
@@ -33,7 +32,6 @@ namespace VRSF.Core.SetupVR
                     GameObject.Destroy(setupVR.GetComponent<WMRControllersInputCaptureComponent>());
                     RemoveSimulatorStuffs(setupVR);
                     CheckControllersReferences(setupVR, setupVR.RiftS_And_Quest_Controllers);
-                    setupVR.FloorOffset.localPosition = new Vector3(0, 1.7f, 0);
                     break;
                 case EDevice.OCULUS_QUEST:
                     GameObject.Destroy(setupVR.GetComponent<HtcControllersInputCaptureComponent>());
@@ -41,7 +39,6 @@ namespace VRSF.Core.SetupVR
                     GameObject.Destroy(setupVR.GetComponent<WMRControllersInputCaptureComponent>());
                     RemoveSimulatorStuffs(setupVR);
                     CheckControllersReferences(setupVR, setupVR.RiftS_And_Quest_Controllers);
-                    setupVR.FloorOffset.localPosition = new Vector3(0, 1.7f, 0);
                     break;
                 case EDevice.OCULUS_GO:
                     GameObject.Destroy(setupVR.GetComponent<HtcControllersInputCaptureComponent>());
@@ -49,7 +46,6 @@ namespace VRSF.Core.SetupVR
                     GameObject.Destroy(setupVR.GetComponent<WMRControllersInputCaptureComponent>());
                     RemoveSimulatorStuffs(setupVR);
                     CheckControllersReferences(setupVR, setupVR.OculusGO_Controllers);
-                    setupVR.FloorOffset.localPosition = new Vector3(0, 1.7f, 0);
                     break;
                 case EDevice.GEAR_VR:
                     GameObject.Destroy(setupVR.GetComponent<HtcControllersInputCaptureComponent>());
@@ -57,7 +53,6 @@ namespace VRSF.Core.SetupVR
                     GameObject.Destroy(setupVR.GetComponent<WMRControllersInputCaptureComponent>());
                     RemoveSimulatorStuffs(setupVR);
                     CheckControllersReferences(setupVR, setupVR.GearVR_Controllers);
-                    setupVR.FloorOffset.localPosition = new Vector3(0, 1.7f, 0);
                     break;
 
                 case EDevice.HTC_VIVE:
@@ -92,7 +87,6 @@ namespace VRSF.Core.SetupVR
                     GameObject.Destroy(setupVR.GetComponent<HtcControllersInputCaptureComponent>());
                     GameObject.Destroy(setupVR.GetComponent<WMRControllersInputCaptureComponent>());
                     CheckControllersReferences(setupVR, setupVR.Simulator_Controllers);
-                    setupVR.FloorOffset.localPosition = new Vector3(0, 1.7f, 0);
                     setupVR.StartCoroutine(ResetVRCamera(setupVR));
                     break;
             }

@@ -12,7 +12,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
     /// </summary>
     public class BAC_SOsSetupSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public BACGeneralComponent BACGeneralComp;
             public BACCalculationsComponent BACCalculationsComp;
@@ -167,21 +167,21 @@ namespace VRSF.Core.Utils.ButtonActionChoser
         {
             UnregisterListeners();
 
-            foreach (var entity in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
-                var sdkChoser = entity.BACGeneralComp.GetComponent<SDKChoserComponent>();
+                var sdkChoser = e.BACGeneralComp.GetComponent<SDKChoserComponent>();
 
-                if (sdkChoser == null || (sdkChoser != null && entity.BACCalculationsComp.CorrectSDK))
+                if (sdkChoser == null || (sdkChoser != null && e.BACCalculationsComp.CorrectSDK))
                 {
-                    CheckInitSOs(entity);
+                    CheckInitSOs(e);
                 }
                 else
                 {
                     // SDK Choser is not using the correct SDK, feature can't be used
-                    entity.BACCalculationsComp.CanBeUsed = false;
-                    entity.BACCalculationsComp.IsSetup = true;
+                    e.BACCalculationsComp.CanBeUsed = false;
+                    e.BACCalculationsComp.IsSetup = true;
                 }
-            }
+            });
         }
         #endregion
     }

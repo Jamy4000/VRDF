@@ -11,14 +11,14 @@ namespace VRSF.Core.Raycast
     /// </summary>
     public class RaycastCalculationsSystems : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public ScriptableRaycastComponent RaycastComponents;
         }
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.RaycastComponents.IsSetup)
                 {
@@ -28,7 +28,7 @@ namespace VRSF.Core.Raycast
 
                     RaycastHitHandler(ray, e.RaycastComponents.MaxRaycastDistance, e.RaycastComponents.RayOrigin, ~e.RaycastComponents.ExcludedLayer, ref e.RaycastComponents.RaycastHitVar);
                 }
-            }
+            });
         }
 
 

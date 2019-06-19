@@ -6,7 +6,7 @@ namespace VRSF.Core.Inputs
 {
     public class SimulatorMovementSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public SimulatorMovementComponent cameraComponent;
         }
@@ -22,7 +22,7 @@ namespace VRSF.Core.Inputs
             float dt = Time.deltaTime;
             Vector2 mouseMovements = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 // Check for mouse scroll wheel going up or down, and set shift boost based on that
                 if (Input.GetAxis("Mouse Scrollwheel") > 0)
@@ -39,7 +39,7 @@ namespace VRSF.Core.Inputs
                     // Interpolate toward new position
                     Interpolate(e.cameraComponent, dt);
                 }
-            }
+            });
         }
 
         protected override void OnDestroyManager()
@@ -163,10 +163,10 @@ namespace VRSF.Core.Inputs
         {
             this.Enabled = VRSF_Components.DeviceLoaded == EDevice.SIMULATOR;
 
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 ResetCameraStateTransform(e.cameraComponent);
-            }
+            });
         }
     }
 }

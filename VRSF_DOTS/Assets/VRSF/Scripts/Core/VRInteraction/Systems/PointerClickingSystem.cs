@@ -9,7 +9,7 @@ namespace VRSF.Core.Interactions
 {
     public class PointerClickingSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public PointerClickComponent PointerClick;
             public Raycast.ScriptableRaycastComponent PointerRaycast;
@@ -29,12 +29,12 @@ namespace VRSF.Core.Interactions
         {
             base.OnStartRunning();
             // Just checking if there's entities in the scene
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 ButtonClickEvent.Listeners += CheckObjectClicked;
                 ButtonUnclickEvent.Listeners += ResetVariable;
                 return;
-            }
+            });
         }
 
         protected override void OnUpdate() {}
@@ -42,12 +42,12 @@ namespace VRSF.Core.Interactions
         protected override void OnDestroyManager()
         {
             // Just checking if there's entities in the scene
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 ButtonClickEvent.Listeners -= CheckObjectClicked;
                 ButtonUnclickEvent.Listeners -= ResetVariable;
                 return;
-            }
+            });
             base.OnDestroyManager();
         }
         #endregion
@@ -61,7 +61,7 @@ namespace VRSF.Core.Interactions
         {
             if (info.ButtonInteracting == EControllersButton.TRIGGER)
             {
-                foreach (var e in GetEntities<Filter>())
+                Entities.ForEach((ref Filter e) =>
                 {
                     if (info.HandInteracting == e.PointerClick.HandClicking)
                     {
@@ -74,10 +74,10 @@ namespace VRSF.Core.Interactions
                             case EHand.RIGHT:
                                 if (PointerClickComponent.RightTriggerCanClick)
                                     CheckHit(_interactionsVariables.RightHit, _interactionsVariables.HasClickSomethingRight, Raycast.ERayOrigin.RIGHT_HAND);
-                                    break;
+                                break;
                         }
                     }
-                }
+                });
             }
 
 
@@ -100,13 +100,13 @@ namespace VRSF.Core.Interactions
         {
             if (info.ButtonInteracting == EControllersButton.TRIGGER)
             {
-                foreach (var e in GetEntities<Filter>())
+                Entities.ForEach((ref Filter e) =>
                 {
                     if (info.HandInteracting == EHand.RIGHT)
                         _interactionsVariables.HasClickSomethingRight.SetValue(false);
                     else
                         _interactionsVariables.HasClickSomethingLeft.SetValue(false);
-                }
+                });
             }
         }
         #endregion PRIVATE_METHODS

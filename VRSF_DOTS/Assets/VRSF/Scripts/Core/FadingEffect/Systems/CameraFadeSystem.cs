@@ -6,7 +6,7 @@ namespace VRSF.Core.FadingEffect
 {
     public class CameraFadeSystem : ComponentSystem
     {
-        private struct Filter
+        private struct Filter : IComponentData
         {
             public UnityEngine.UI.Image FadingImage;
             public CameraFadeComponent CameraFade;
@@ -27,13 +27,13 @@ namespace VRSF.Core.FadingEffect
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.CameraFade.FadingInProgress)
                 {
                     HandleImageAlpha(e);
                 }
-            }
+            });
         }
 
         protected override void OnDestroyManager()
@@ -50,7 +50,7 @@ namespace VRSF.Core.FadingEffect
 
         private void StartFadeIn(StartFadingInEvent info)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 e.CameraFade.FadingInProgress = true;
                 e.CameraFade._IsFadingIn = true;
@@ -58,12 +58,12 @@ namespace VRSF.Core.FadingEffect
 
                 if (info.SpeedOverride != -1.0f)
                     e.CameraFade.FadingSpeed = info.SpeedOverride;
-            }
+            });
         }
 
         private void StartFadeOut(StartFadingOutEvent info)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 e.CameraFade.FadingInProgress = true;
                 e.CameraFade._IsFadingIn = false;
@@ -72,20 +72,20 @@ namespace VRSF.Core.FadingEffect
 
                 if (info.SpeedOverride != -1.0f)
                     e.CameraFade.FadingSpeed = info.SpeedOverride;
-            }
+            });
         }
 
         private void OnFadeInEnded(OnFadingInEndedEvent info)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 ResetParameters(e.CameraFade);
-            }
+            });
         }
 
         private void OnFadeOutEnded(OnFadingOutEndedEvent info)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 var overrideSpeed = e.CameraFade.FadingSpeed;
 
@@ -95,7 +95,7 @@ namespace VRSF.Core.FadingEffect
                     new StartFadingInEvent(overrideSpeed);
 
                 e.CameraFade._ShouldImmediatlyFadeIn = false;
-            }
+            });
         }
 
         /// <summary>
@@ -130,12 +130,12 @@ namespace VRSF.Core.FadingEffect
         
         private void StartFadingIn(OnSetupVRReady info)
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 var newColor = e.FadingImage.color;
                 newColor.a = 1;
                 e.FadingImage.color = newColor;
-            }
+            });
 
             new StartFadingInEvent(0.5f);
         }

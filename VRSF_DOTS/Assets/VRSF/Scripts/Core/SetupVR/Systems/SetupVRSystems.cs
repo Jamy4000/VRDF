@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.SpatialTracking;
 using UnityEngine.XR;
-using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 
 namespace VRSF.Core.SetupVR
@@ -15,7 +12,7 @@ namespace VRSF.Core.SetupVR
         /// <summary>
         /// The filter to find SetupVR entity
         /// </summary>
-        struct Filter
+        struct Filter : IComponentData
         {
             public SetupVRComponents SetupVR;
         }
@@ -33,26 +30,26 @@ namespace VRSF.Core.SetupVR
         {
             base.OnStartRunning();
 
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
-                LoadCorrespondingSDK(e.SetupVR);
+                LoadVRSDK(e.SetupVR);
                 SetupVRInScene(e.SetupVR);
-            }
+            });
             
             this.Enabled = !VRSF_Components.SetupVRIsReady;
         }
 
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (!e.SetupVR.IsLoaded && XRDevice.model != String.Empty)
-                    LoadCorrespondingSDK(e.SetupVR);
+                    LoadVRSDK(e.SetupVR);
                 else if (e.SetupVR.IsLoaded && !VRSF_Components.SetupVRIsReady)
                     SetupVRInScene(e.SetupVR);
 
                 this.Enabled = !VRSF_Components.SetupVRIsReady;
-            }
+            });
         }
         
         protected override void OnDestroyManager()
@@ -66,9 +63,9 @@ namespace VRSF.Core.SetupVR
 
         #region PRIVATE_METHODS
         /// <summary>
-        /// Will Instantiate and reference the SDK prefab to load thanks to the string field.
+        /// Load everything needed based on connected device or the one specified in the editor.
         /// </summary>
-        void LoadCorrespondingSDK(SetupVRComponents setupVR)
+        void LoadVRSDK(SetupVRComponents setupVR)
         {
             if (setupVR.CheckDeviceAtRuntime)
             {
@@ -100,7 +97,7 @@ namespace VRSF.Core.SetupVR
             if (setupVR.FloorOffset == null)
             {
                 Debug.LogError("<b>[VRSF] :</b> No Floor Offset was references in SetupVR. Trying to fetch it using the name Floor_Offset.");
-                setupVR.FloorOffset = GameObject.Find("Floor_Offset").transform;
+                setupVR.FloorOffset = setupVR.transform.Find("Floor_Offset").transform;
                 return;
             }
 

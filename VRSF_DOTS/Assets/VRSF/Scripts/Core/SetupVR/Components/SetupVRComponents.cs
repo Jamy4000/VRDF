@@ -37,7 +37,9 @@ namespace VRSF.Core.SetupVR
         public GameObject VRCamera;
 
 
-        // Check if we already instantiated the SDK in the past, useful if the SDK is re-instantiated after a new scene has been loaded
+        /// <summary>
+        /// Check if we already instantiated the SDK in the past, useful if the SDK is re-instantiated after a new scene has been loaded
+        /// </summary>
         [HideInInspector] public bool IsLoaded;
     }
 }

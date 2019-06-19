@@ -5,7 +5,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
 {
     public class BACUpdateSystem : ComponentSystem
     {
-        public struct Filter
+        public struct Filter : IComponentData
         {
             public BACGeneralComponent BAC_Comp;
             public BACCalculationsComponent BAC_Calc;
@@ -15,7 +15,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
         #region ComponentSystem_Methods
         protected override void OnUpdate()
         {
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 if (e.BAC_Calc.ActionButtonIsReady && e.BAC_Calc.CanBeUsed)
                 {
@@ -30,7 +30,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
                         StartActionIsClicking(e);
                     }
                 }
-            }
+            });
         }
         #endregion
 

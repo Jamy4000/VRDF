@@ -9,7 +9,7 @@ namespace VRSF.Core.Controllers
     /// </summary>
     public class DominantHandHandlerSystem : ComponentSystem
     {
-        private struct Filter
+        private struct Filter : IComponentData
         {
             public GoAndGearVRControllersInputCaptureComponent SingleControllerInputCapture;
         }
@@ -39,11 +39,11 @@ namespace VRSF.Core.Controllers
                 return;
             }
 
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 e.SingleControllerInputCapture.IsUserRightHanded = info.NewDominantHand == EHand.RIGHT;
                 DisableUnusedHand(e.SingleControllerInputCapture.IsUserRightHanded);
-            }
+            });
         }
 
         private void Setup(OnSetupVRReady info)
@@ -51,10 +51,10 @@ namespace VRSF.Core.Controllers
             if (VRSF_Components.DeviceLoaded != EDevice.GEAR_VR && VRSF_Components.DeviceLoaded != EDevice.OCULUS_GO)
                 return;
 
-            foreach (var e in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
                 DisableUnusedHand(e.SingleControllerInputCapture.IsUserRightHanded);
-            }
+            });
         }
 
         private void DisableUnusedHand(bool isUserRightHanded)

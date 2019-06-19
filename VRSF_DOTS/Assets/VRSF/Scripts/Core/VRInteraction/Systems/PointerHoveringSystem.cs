@@ -9,7 +9,7 @@ namespace VRSF.Core.Interactions
 {
     public class PointerHoveringSystem : ComponentSystem
     {
-        struct Filter
+        struct Filter : IComponentData
         {
             public ScriptableRaycastComponent ScriptableRaycast;
         }
@@ -25,9 +25,9 @@ namespace VRSF.Core.Interactions
 
         protected override void OnUpdate()
         {
-            foreach (var entity in GetEntities<Filter>())
+            Entities.ForEach((ref Filter e) =>
             {
-                switch (entity.ScriptableRaycast.RayOrigin)
+                switch (e.ScriptableRaycast.RayOrigin)
                 {
                     case ERayOrigin.LEFT_HAND:
                         HandleOver(ref _interactionsVariables.PreviousLeftHit, _interactionsVariables.IsOverSomethingLeft, _interactionsVariables.LeftHit, ERayOrigin.LEFT_HAND);
@@ -39,7 +39,7 @@ namespace VRSF.Core.Interactions
                         HandleOver(ref _interactionsVariables.PreviousGazeHit, _interactionsVariables.IsOverSomethingGaze, _interactionsVariables.GazeHit, ERayOrigin.CAMERA);
                         break;
                 }
-            }
+            });
         }
         #endregion
 
