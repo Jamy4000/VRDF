@@ -58,10 +58,10 @@ Once all of that is done, **Restart your project so everything can be recompiled
 2. Relaunch the Editor to be sure that everything is correctly recompiled
 3. Import the VRSF_DOTS_Core package
 4. Import the other VRSF_DOTS extension packages you need (Samples, Move Around, UI or Gaze)
-5. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
-6. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
-7. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
-8. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
+5. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
+6. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
+7. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
+8. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
 9. Set the Start Position of your CameraRig using the CameraRig object
 10. You should be good to go !
 

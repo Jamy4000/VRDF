@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 4077b95894cef3d45a0487bbd075708f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - RightMenuClick: {fileID: 11400000, guid: 943aa309455cfe7468387292491a4844, type: 2}
+  - LeftMenuClick: {fileID: 11400000, guid: 9dade4fd28099ec4da1fa839cacbe5de, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

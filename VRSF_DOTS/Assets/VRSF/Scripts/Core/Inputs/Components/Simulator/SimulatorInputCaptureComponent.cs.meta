@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 74515c706227a3b42a68b602f410e3c5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - ControllersParameters: {fileID: 11400000, guid: b33556e258c822f4bad6d480a986b094,
+      type: 2}
+  - GazeParameters: {fileID: 11400000, guid: d7d77718a3019d14ea92211ec7a1f83a, type: 2}
+  - InputContainer: {fileID: 11400000, guid: ed39f2e94e232bc43b8663e8689d3412, type: 2}
+  - TempEvent: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

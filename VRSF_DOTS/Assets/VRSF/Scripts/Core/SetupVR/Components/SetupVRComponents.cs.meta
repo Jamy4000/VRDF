@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 6de88c2fe982bf3458ecd418e8e17fe1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - OpenVR_SDK: {fileID: 3826804290082629976, guid: dc854d2610fa0334d9a77161578d4ed4,
+      type: 3}
+  - Rift_SDK: {fileID: 1197328801160216, guid: e8fead88eec9edd4dbc470366c3bdccc, type: 3}
+  - PortableOVR_SDK: {fileID: 1197328801160216, guid: c6dfd8b628d7a57468a0a866c2141995,
+      type: 3}
+  - Simulator_SDK: {fileID: 1972975401033530, guid: 1530362e0fb285449b6aef1d50bb8a7f,
+      type: 3}
+  - CameraRigScripts: {instanceID: 0}
+  - LeftControllerScripts: {instanceID: 0}
+  - RightControllerScripts: {instanceID: 0}
+  - VRCameraScripts: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
