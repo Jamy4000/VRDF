@@ -1,0 +1,9 @@
+/*
+ * ----------------------------------------------------------------------------
+ * "THE BEER-WARE LICENSE" (Revision 42):
+ * <arnaudbriche1994@gmail.com> wrote this file.  As long as you retain this notice you
+ * can do whatever you want with this stuff. If we meet some day, and you think
+ * this stuff is worth it, you can buy me a beer in return.   Arnaud Briche.
+ * License based on Poul-Henning Kamp idea. https://people.freebsd.org/~phk/
+ * ----------------------------------------------------------------------------
+ */
