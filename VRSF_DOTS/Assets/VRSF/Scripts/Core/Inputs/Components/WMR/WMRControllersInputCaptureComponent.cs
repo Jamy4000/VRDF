@@ -1,22 +1,20 @@
-﻿using ScriptableFramework.Variables;
-using UnityEngine;
+﻿using Unity.Entities;
 
 namespace VRSF.Core.Inputs
 {
     /// <summary>
     /// Required to have the references to the controllers parameters and capture the inputs
     /// </summary>
-    [RequireComponent(typeof(Unity.Entities.GameObjectEntity))]
-    public class WMRControllersInputCaptureComponent : MonoBehaviour
+    public struct WMRControllersInputCaptureComponent : IComponentData
     {
         /// <summary>
         /// Set in the Script Inspector (not the instance, but the script itself in the Assets Folder)
         /// </summary>
-        [HideInInspector] public BoolVariable RightMenuClick;
+        public static bool RightMenuClick;
 
         /// <summary>
         /// Set in the Script Inspector (not the instance, but the script itself in the Assets Folder)
         /// </summary>
-        [HideInInspector] public BoolVariable LeftMenuClick;
+        public static bool LeftMenuClick;
     }
 }

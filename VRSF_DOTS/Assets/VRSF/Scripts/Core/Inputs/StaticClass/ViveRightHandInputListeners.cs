@@ -5,18 +5,16 @@ namespace VRSF.Core.Inputs
 {
     public static class ViveRightHandInputListeners
     {
-        public static InputParameters RightInputParam;
-
         #region TRIGGER
         public static void OnRightTriggerDown()
         {
-            RightInputParam.ClickBools.Get("TriggerIsDown").SetValue(true);
+            RightInputsParameters.TriggerClick = true;
             new ButtonClickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
         }
 
         public static void OnRightTriggerUp()
         {
-            RightInputParam.ClickBools.Get("TriggerIsDown").SetValue(false);
+            RightInputsParameters.TriggerClick = false;
             new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
         }
         #endregion TRIGGER
@@ -24,13 +22,13 @@ namespace VRSF.Core.Inputs
         #region GRIP
         public static void OnRightGripDown()
         {
-            RightInputParam.ClickBools.Get("GripIsDown").SetValue(true);
+            RightInputsParameters.GripClick = true;
             new ButtonClickEvent(EHand.RIGHT, EControllersButton.GRIP);
         }
 
         public static void OnRightGripUp()
         {
-            RightInputParam.ClickBools.Get("GripIsDown").SetValue(false);
+            RightInputsParameters.GripClick = false;
             new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.GRIP);
         }
         #endregion GRIP
@@ -38,45 +36,45 @@ namespace VRSF.Core.Inputs
         #region TOUCHPAD
         public static void OnRightTouchpadDown()
         {
-            RightInputParam.ClickBools.Get("ThumbIsDown").SetValue(true);
-            RightInputParam.TouchBools.Get("ThumbIsTouching").SetValue(false);
+            RightInputsParameters.TouchpadClick = true;
+            RightInputsParameters.TouchpadTouch = false;
             new ButtonClickEvent(EHand.RIGHT, EControllersButton.TOUCHPAD);
         }
 
         public static void OnRightTouchpadUp()
         {
-            RightInputParam.ClickBools.Get("ThumbIsDown").SetValue(false);
+            RightInputsParameters.TouchpadClick = false;
             new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.TOUCHPAD);
         }
 
         public static void OnRightTouchpadTouch()
         {
-            RightInputParam.TouchBools.Get("ThumbIsTouching").SetValue(true);
+            RightInputsParameters.TouchpadTouch = true;
             new ButtonTouchEvent(EHand.RIGHT, EControllersButton.TOUCHPAD);
         }
 
         public static void OnRightTouchpadUntouch()
         {
-            RightInputParam.TouchBools.Get("ThumbIsTouching").SetValue(false);
+            RightInputsParameters.TouchpadTouch = false;
             new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.TOUCHPAD);
         }
 
         public static void OnRightTouchpadAxisChanged(Vector2 newAxis)
         {
-            RightInputParam.ThumbPosition.SetValue(newAxis);
+            RightInputsParameters.ThumbPosition = newAxis;
         }
         #endregion TOUCHPAD
 
         #region MENU
         public static void OnRightMenuDown()
         {
-            RightInputParam.ClickBools.Get("GripIsDown").SetValue(true);
+            RightInputsParameters.GripClick = true;
             new ButtonClickEvent(EHand.RIGHT, EControllersButton.GRIP);
         }
 
         public static void OnRightMenuUp()
         {
-            RightInputParam.ClickBools.Get("GripIsDown").SetValue(false);
+            RightInputsParameters.GripClick = false;
             new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.GRIP);
         }
         #endregion MENU

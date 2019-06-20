@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using Unity.Entities;
+using UnityEngine;
 
 namespace VRSF.Core.Inputs
 {
-    [RequireComponent(typeof(Unity.Entities.GameObjectEntity))]
-    public class SimulatorInputCaptureComponent : MonoBehaviour
+    public struct SimulatorInputCaptureComponent : IComponentData
     {
     }
 }
