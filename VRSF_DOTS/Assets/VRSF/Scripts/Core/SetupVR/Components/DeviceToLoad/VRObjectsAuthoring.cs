@@ -57,7 +57,6 @@ namespace VRSF.Core.SetupVR
             VRSF_Components.RightController = RightController;
 
             VRSF_Components.SetupVRIsReady = true;
-            new OnSetupVRReady();
         }
     }
 }

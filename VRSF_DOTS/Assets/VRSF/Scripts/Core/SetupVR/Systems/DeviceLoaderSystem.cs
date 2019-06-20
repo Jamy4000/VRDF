@@ -65,7 +65,7 @@ namespace VRSF.Core.SetupVR
             VRSF_Components.DeviceLoaded = deviceToLoad.Device;
             VRSF_Components.CameraRig.transform.name = "[VRSF] " + deviceToLoad.Device.ToString();
             DeviceToLoad.IsLoaded = true;
-            new OnDeviceLoaded();
+            new OnSetupVRReady();
         }
 
         /// <summary>
