@@ -18,5 +18,17 @@ namespace VRSF.Core.Inputs
         public static bool GripClick;
         public static bool GripTouch;
         public static float GripSqueezeValue;
+
+        public static bool MenuClick;
+
+        public static bool A_Click;
+        public static bool A_Touch;
+
+        public static bool B_Click;
+        public static bool B_Touch;
+
+        public static bool ThumbrestTouch;
+
+        public static bool BackButtonClick;
     }
 }

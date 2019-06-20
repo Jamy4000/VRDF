@@ -1,6 +1,4 @@
-﻿using ScriptableFramework.Variables;
-using Unity.Entities;
-using UnityEngine;
+﻿using Unity.Entities;
 
 namespace VRSF.Core.Inputs
 {

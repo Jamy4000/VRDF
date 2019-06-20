@@ -7,6 +7,6 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public struct CrossplatformInputCapture : IComponentData
     {
-        public bool IsSetup;
+        public bool test;
     }
 }

@@ -19,12 +19,12 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var triggerJob = new TriggerInputCapture
+            var job = new TriggerInputCapture
             {
                 TriggerSqueezeValue = Input.GetAxis("LeftTriggerSqueeze")
             };
 
-            return triggerJob.Schedule(this, inputDeps);
+            return job.Schedule(this, inputDeps);
         }
 
         protected override void OnDestroyManager()
