@@ -8,7 +8,7 @@ namespace VRSF.Core.Raycast
     /// Check the Raycast of the two controllers and the Camera/Gaze, and reference them in RaycastHit and Ray static classes
     /// Cannot be jobify as we need to be in the MainThread to get the physic from Unity (the Hit and colliders)
     /// </summary>
-    public class RaycastHitCalculationsSystems : ComponentSystem
+    public class RaycastHitCalculationsSystem : ComponentSystem
     {
         protected override void OnUpdate()
         {
