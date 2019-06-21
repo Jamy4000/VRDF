@@ -36,6 +36,7 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
+        [Unity.Burst.BurstCompile]
         struct TouchpadInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public float2 ThumbPosition;

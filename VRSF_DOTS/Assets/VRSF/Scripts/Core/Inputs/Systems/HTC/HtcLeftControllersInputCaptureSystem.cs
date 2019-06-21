@@ -32,6 +32,7 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
+        [Unity.Burst.BurstCompile]
         [RequireComponentTag(typeof(HtcControllersInputCaptureComponent))]
         struct MenuInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {

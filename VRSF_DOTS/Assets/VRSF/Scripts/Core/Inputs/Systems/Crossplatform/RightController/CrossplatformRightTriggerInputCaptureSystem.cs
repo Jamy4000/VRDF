@@ -31,6 +31,7 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
+        [Unity.Burst.BurstCompile]
         struct TriggerInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public float TriggerSqueezeValue;

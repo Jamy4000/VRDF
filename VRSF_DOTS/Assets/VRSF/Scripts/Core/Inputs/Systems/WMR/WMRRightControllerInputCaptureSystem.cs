@@ -29,6 +29,7 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
+        [Unity.Burst.BurstCompile]
         [RequireComponentTag(typeof(WMRControllersInputCaptureComponent))]
         struct MenuInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {

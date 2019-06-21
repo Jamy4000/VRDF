@@ -33,6 +33,7 @@ namespace VRSF.Core.Inputs
         }
 
         #region PRIVATE_METHODS
+        [Unity.Burst.BurstCompile]
         [RequireComponentTag(typeof(HtcControllersInputCaptureComponent))]
         struct MenuInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {

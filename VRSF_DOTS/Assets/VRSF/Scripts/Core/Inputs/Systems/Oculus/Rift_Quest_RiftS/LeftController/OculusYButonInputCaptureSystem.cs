@@ -34,6 +34,7 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
+        [Unity.Burst.BurstCompile]
         [RequireComponentTag(typeof(OculusControllersInputCaptureComponent))]
         struct YButtonInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {

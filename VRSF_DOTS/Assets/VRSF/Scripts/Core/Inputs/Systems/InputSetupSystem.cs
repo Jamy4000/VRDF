@@ -5,26 +5,12 @@ namespace VRSF.Core.Inputs
 {
     public class InputSetupSystem : ComponentSystem
     {
-        //protected override void OnCreate()
-        //{
-        //    OnSetupVRReady.Listeners += ReloadSystem;
-        //    base.OnCreate();
-        //}
-
         protected override void OnUpdate()
         {
             if (VRSF_Components.SetupVRIsReady)
-            {
                 CreateInputEntity();
-            }
         }
-
-        //protected override void OnDestroy()
-        //{
-        //    OnSetupVRReady.Listeners -= ReloadSystem;
-        //    base.OnDestroy();
-        //}
-
+        
         /// <summary>
         /// Create the entity responsible to hold the Input Data.
         /// </summary>
@@ -103,10 +89,5 @@ namespace VRSF.Core.Inputs
                 }
             }
         }
-
-        //private void ReloadSystem(OnSetupVRReady info)
-        //{
-        //    this.Enabled = true;
-        //}
     }
 }

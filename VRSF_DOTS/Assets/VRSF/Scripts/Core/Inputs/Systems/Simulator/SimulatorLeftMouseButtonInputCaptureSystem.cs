@@ -37,6 +37,7 @@ namespace VRSF.Core.Inputs
         #endregion
 
 
+        [Unity.Burst.BurstCompile]
         [RequireComponentTag(typeof(SimulatorInputCaptureComponent))]
         struct SimulatorInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {

@@ -4,7 +4,7 @@ namespace VRSF.Core.Utils
 {
     public class RuntimeDestroyer : MonoBehaviour
     {
-        [Header("If False, Destroy on Awake")]
+        [Header("If false, Destroy on Awake")]
         [SerializeField] private bool _destroyOnStart = true;
 
         private void Awake()

@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-namespace ScriptableFramework.Variables
+namespace VRSF.Core.Raycast
 {
-    [CreateAssetMenu(menuName = "Variables/RaycastHit")]
-    public class RaycastHitVariable : VariableBase<RaycastHit>
+    public class RaycastHitVariable
     {
+        public RaycastHit Value = new RaycastHit();
         public bool IsNull = true;
 
         public void SetIsNull(bool value)

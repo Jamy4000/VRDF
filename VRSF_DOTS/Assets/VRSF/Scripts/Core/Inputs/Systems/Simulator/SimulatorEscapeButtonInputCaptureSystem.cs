@@ -37,8 +37,7 @@ namespace VRSF.Core.Inputs
         }
         #endregion
 
-
-        #region PRIVATE_METHODS
+        [Unity.Burst.BurstCompile]
         [RequireComponentTag(typeof(SimulatorInputCaptureComponent))]
         struct SimulatorInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
@@ -60,6 +59,7 @@ namespace VRSF.Core.Inputs
             }
         }
 
+        #region PRIVATE_METHODS
         private void CheckDevice(OnSetupVRReady info)
         {
             this.Enabled = VRSF_Components.DeviceLoaded == EDevice.SIMULATOR;
