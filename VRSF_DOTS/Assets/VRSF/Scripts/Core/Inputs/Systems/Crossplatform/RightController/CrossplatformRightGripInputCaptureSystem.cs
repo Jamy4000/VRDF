@@ -11,42 +11,40 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class CrossplatformRightGripInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var gripJob = new GripInputCapture()
+            return new GripInputCaptureJob()
             {
                 GripSqueezeValue = Input.GetAxis("RightGripSqueeze")
-            };
-
-            return gripJob.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
-        struct GripInputCapture : IJobForEach<CrossplatformInputCapture>
+        struct GripInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public float GripSqueezeValue;
 
-            public void Execute(ref CrossplatformInputCapture c0)
+            public void Execute(ref CrossplatformInputCapture crossplatformInput)
             {
                 // Check Click Events
-                if (!RightInputsParameters.GripClick && GripSqueezeValue > 0.95f)
+                if (!RightInputsParameters.GripClick && GripSqueezeValue > crossplatformInput.SqueezeClickThreshold)
                 {
                     RightInputsParameters.GripClick = true;
                     RightInputsParameters.GripTouch = false;
                     new ButtonClickEvent(EHand.RIGHT, EControllersButton.GRIP);
                 }
-                else if (RightInputsParameters.GripClick && GripSqueezeValue < 0.95f)
+                else if (RightInputsParameters.GripClick && GripSqueezeValue < crossplatformInput.SqueezeClickThreshold)
                 {
                     RightInputsParameters.GripClick = false;
                     new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.GRIP);
@@ -66,9 +64,13 @@ namespace VRSF.Core.Inputs
         }
 
         #region PRIVATE_METHODS
+        /// <summary>
+        /// Do not activate this system for the Simulator Go and GearVR
+        /// </summary>
+        /// <param name="info"></param>
         private void CheckDevice(OnSetupVRReady info)
         {
-            this.Enabled = VRSF_Components.DeviceLoaded != EDevice.SIMULATOR;
+            this.Enabled = VRSF_Components.DeviceLoaded != EDevice.SIMULATOR && VRSF_Components.DeviceLoaded != EDevice.GEAR_VR && VRSF_Components.DeviceLoaded != EDevice.OCULUS_GO;
         }
         #endregion PRIVATE_METHODS
     }

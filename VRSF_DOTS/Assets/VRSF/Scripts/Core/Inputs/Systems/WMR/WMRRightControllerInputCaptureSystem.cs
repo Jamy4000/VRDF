@@ -8,31 +8,29 @@ namespace VRSF.Core.Inputs
 {
     public class WMRRightControllerInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var touchpadJob = new MenuInputCapture()
+            return new MenuInputCaptureJob()
             {
                 MenuButtonDown = Input.GetButtonDown("WMRRightMenuClick"),
                 MenuButtonUp = Input.GetButtonUp("WMRRightMenuClick")
-            };
-
-            return touchpadJob.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
         [RequireComponentTag(typeof(WMRControllersInputCaptureComponent))]
-        struct MenuInputCapture : IJobForEach<CrossplatformInputCapture>
+        struct MenuInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public bool MenuButtonDown;
             public bool MenuButtonUp;

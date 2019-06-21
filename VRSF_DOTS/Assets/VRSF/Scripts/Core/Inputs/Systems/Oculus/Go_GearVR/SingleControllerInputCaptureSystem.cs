@@ -11,30 +11,28 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class SignleControllerInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var touchpadJob = new MenuInputCapture()
+            return new BackButtonInputCaptureJob()
             {
                 MenuButtonDown = Input.GetButtonDown("BackButtonClick"),
                 MenuButtonUp = Input.GetButtonUp("BackButtonClick")
-            };
-
-            return touchpadJob.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
-        struct MenuInputCapture : IJobForEach<GoAndGearVRControllersInputCaptureComponent>
+        struct BackButtonInputCaptureJob : IJobForEach<GoAndGearVRControllersInputCaptureComponent>
         {
             public bool MenuButtonDown;
             public bool MenuButtonUp;

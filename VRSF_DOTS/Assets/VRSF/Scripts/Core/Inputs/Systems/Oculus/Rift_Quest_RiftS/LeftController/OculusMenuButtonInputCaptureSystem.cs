@@ -11,31 +11,29 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class OculusMenuButtonInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var job = new MenuButtonInputCapture()
+            return new MenuButtonInputCaptureJob()
             {
                 MenuClickButtonDown = Input.GetButtonDown("OculusMenuButtonClick"),
                 MenuClickButtonUp = Input.GetButtonUp("OculusMenuButtonClick"),
-            };
-
-            return job.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
         [RequireComponentTag(typeof(OculusControllersInputCaptureComponent))]
-        struct MenuButtonInputCapture : IJobForEach<CrossplatformInputCapture>
+        struct MenuButtonInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public bool MenuClickButtonDown;
             public bool MenuClickButtonUp;

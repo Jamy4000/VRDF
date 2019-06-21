@@ -7,14 +7,5 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public struct HtcControllersInputCaptureComponent : IComponentData
     {
-        /// <summary>
-        /// Set in the Script Inspector (not the instance, but the script itself in the Assets Folder)
-        /// </summary>
-        public static bool RightMenuClick;
-
-        /// <summary>
-        /// Set in the Script Inspector (not the instance, but the script itself in the Assets Folder)
-        /// </summary>
-        public static bool LeftMenuClick;
     }
 }

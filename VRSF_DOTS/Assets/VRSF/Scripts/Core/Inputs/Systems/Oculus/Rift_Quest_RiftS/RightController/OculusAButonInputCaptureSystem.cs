@@ -11,33 +11,31 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class OculusAButonInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var touchpadJob = new AButtonInputCapture()
+            return new AButtonInputCaptureJob()
             {
                 AClickButtonDown = Input.GetButtonDown("OculusAButtonClick"),
                 AClickButtonUp = Input.GetButtonUp("OculusAButtonClick"),
                 ATouchButtonDown = Input.GetButtonDown("OculusAButtonTouch"),
                 ATouchButtonUp = Input.GetButtonUp("OculusAButtonTouch")
-            };
-
-            return touchpadJob.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
         [RequireComponentTag(typeof(OculusControllersInputCaptureComponent))]
-        struct AButtonInputCapture : IJobForEach<CrossplatformInputCapture>
+        struct AButtonInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public bool AClickButtonDown;
             public bool AClickButtonUp;

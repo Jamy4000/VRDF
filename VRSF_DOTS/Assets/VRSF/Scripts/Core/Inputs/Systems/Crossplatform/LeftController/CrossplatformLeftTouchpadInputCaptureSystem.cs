@@ -12,33 +12,31 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class CrossplatformLeftTouchpadInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var touchpadJob = new TouchpadInputCapture()
+            return new TouchpadInputCaptureJob()
             {
                 ThumbPosition = new float2(Input.GetAxis("HorizontalLeft"), Input.GetAxis("VerticalLeft")),
                 LeftThumbClickDown = Input.GetButtonDown("LeftThumbClick"),
                 LeftThumbClickUp = Input.GetButtonUp("LeftThumbClick"),
                 LeftThumbTouchDown = Input.GetButtonDown("LeftThumbTouch"),
                 LeftThumbTouchUp = Input.GetButtonUp("LeftThumbTouch")
-            };
-
-            return touchpadJob.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
-        struct TouchpadInputCapture : IJobForEach<CrossplatformInputCapture>
+        struct TouchpadInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public float2 ThumbPosition;
 

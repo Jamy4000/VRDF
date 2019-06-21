@@ -11,42 +11,40 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class CrossplatformRightTriggerInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var triggerJob = new TriggerInputCapture
+            return new TriggerInputCaptureJob
             {
                 TriggerSqueezeValue = Input.GetAxis("RightTriggerSqueeze")
-            };
-
-            return triggerJob.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
-        struct TriggerInputCapture : IJobForEach<CrossplatformInputCapture>
+        struct TriggerInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public float TriggerSqueezeValue;
 
-            public void Execute(ref CrossplatformInputCapture c0)
+            public void Execute(ref CrossplatformInputCapture crossplatformInput)
             {
                 // Check Click Events
-                if (!RightInputsParameters.TriggerClick && TriggerSqueezeValue > 0.95f)
+                if (!RightInputsParameters.TriggerClick && TriggerSqueezeValue > crossplatformInput.SqueezeClickThreshold)
                 {
                     RightInputsParameters.TriggerClick  = true;
                     RightInputsParameters.TriggerTouch = false;
                     new ButtonClickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
                 }
-                else if (RightInputsParameters.TriggerClick && TriggerSqueezeValue < 0.95f)
+                else if (RightInputsParameters.TriggerClick && TriggerSqueezeValue < crossplatformInput.SqueezeClickThreshold)
                 {
                     RightInputsParameters.TriggerClick = false;
                     new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.TRIGGER);

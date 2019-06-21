@@ -16,7 +16,7 @@ namespace VRSF.Core.SetupVR
         /// </summary>
         public static bool SetupVRIsReady = false;
 
-        public static Transform FloorOffset;
+        public static GameObject FloorOffset;
         public static GameObject CameraRig;
         public static GameObject LeftController;
         public static GameObject RightController;

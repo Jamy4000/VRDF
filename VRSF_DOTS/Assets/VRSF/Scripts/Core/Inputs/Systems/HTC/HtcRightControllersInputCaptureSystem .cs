@@ -11,32 +11,30 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class HtcRightControllersInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var touchpadJob = new MenuInputCapture()
+            return new MenuInputCaptureJob()
             {
                 MenuButtonDown = Input.GetButtonDown("HtcRightMenuClick"),
                 MenuButtonUp = Input.GetButtonUp("HtcRightMenuClick")
-            };
-
-            return touchpadJob.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
         #region PRIVATE_METHODS
         [RequireComponentTag(typeof(HtcControllersInputCaptureComponent))]
-        struct MenuInputCapture : IJobForEach<CrossplatformInputCapture>
+        struct MenuInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public bool MenuButtonDown;
             public bool MenuButtonUp;

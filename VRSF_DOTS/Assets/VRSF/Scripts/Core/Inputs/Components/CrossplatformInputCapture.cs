@@ -7,6 +7,9 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public struct CrossplatformInputCapture : IComponentData
     {
-        public bool test;
+        /// <summary>
+        /// Until which point do we consider a squeeze on the grip and trigger as touch or as click
+        /// </summary>
+        public float SqueezeClickThreshold;
     }
 }

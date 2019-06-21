@@ -11,31 +11,29 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class OculusLeftThumbrestInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
-            base.OnCreateManager();
+            base.OnCreate();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var touchpadJob = new ThumbrestButtonInputCapture()
+            return new ThumbrestButtonInputCaptureJob()
             {
                 ThumbrestTouchButtonDown = Input.GetButtonDown("OculusLeftThumbrestTouch"),
                 ThumbrestTouchButtonUp = Input.GetButtonUp("OculusLeftThumbrestTouch")
-            };
-
-            return touchpadJob.Schedule(this, inputDeps);
+            }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= CheckDevice;
-            base.OnDestroyManager();
+            base.OnDestroy();
         }
 
         [RequireComponentTag(typeof(OculusControllersInputCaptureComponent))]
-        struct ThumbrestButtonInputCapture : IJobForEach<CrossplatformInputCapture>
+        struct ThumbrestButtonInputCaptureJob : IJobForEach<CrossplatformInputCapture>
         {
             public bool ThumbrestTouchButtonDown;
             public bool ThumbrestTouchButtonUp;
