@@ -1,6 +1,5 @@
 ﻿using Unity.Entities;
 using UnityEngine;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Raycast
 {
@@ -43,7 +42,7 @@ namespace VRSF.Core.Raycast
 
 #if UNITY_EDITOR
             // Set the name of the entity in Editor Mode for the Entity Debugger Window
-            entityManager.SetName(raycastEntity, string.Format("Raycast Entity " + RayOrigin.ToString(), raycastEntity.Index));
+            entityManager.SetName(raycastEntity, string.Format("Raycast " + RayOrigin.ToString(), raycastEntity.Index));
 #endif
 
             // We destroy this component as we don't need it anymore
