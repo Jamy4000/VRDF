@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace VRSF.Core.Raycast
 {
-    public class VRRaycastAuthoring : MonoBehaviour
+    [RequiresEntityConversion]
+    public class VRRaycastAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
         [Header("The Raycast Origin for this script")]
         public ERayOrigin RayOrigin = ERayOrigin.NONE;
@@ -11,38 +12,26 @@ namespace VRSF.Core.Raycast
         [Header("Maximum distance of the Raycast")]
         public float MaxRaycastDistance = 200.0f;
 
-        [Tooltip("Layer(s) to exclude from the Raycast System.")]
+        [Header("Layer(s) to exclude from the Raycast System.")]
         public LayerMask ExcludedLayer = new LayerMask();
 
-        public void Awake()
+        public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
-            // We get the EntityManager
-            EntityManager entityManager = World.Active.EntityManager;
-
-            EntityArchetype archetype = entityManager.CreateArchetype
-            (
-                typeof(VRRaycastParameters),
-                typeof(VRRaycastOrigin)
-            );
-            
-            // We create the entity based on the archetype we juste created
-            Entity raycastEntity = entityManager.CreateEntity(archetype);
-
             // We add the VRRaycastParameters as a struct to the newly created entity
-            entityManager.SetComponentData(raycastEntity, new VRRaycastParameters
+            dstManager.AddComponentData(entity, new VRRaycastParameters
             {
                 MaxRaycastDistance = MaxRaycastDistance,
                 ExcludedLayer = ExcludedLayer
             });
 
-            entityManager.SetComponentData(raycastEntity, new VRRaycastOrigin
+            dstManager.AddComponentData(entity, new VRRaycastOrigin
             {
                 RayOrigin = RayOrigin
             });
 
 #if UNITY_EDITOR
             // Set the name of the entity in Editor Mode for the Entity Debugger Window
-            entityManager.SetName(raycastEntity, string.Format("Raycast " + RayOrigin.ToString(), raycastEntity.Index));
+            dstManager.SetName(entity, string.Format("Raycast " + RayOrigin.ToString(), entity.Index));
 #endif
 
             // We destroy this component as we don't need it anymore

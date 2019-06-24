@@ -1,4 +1,4 @@
-﻿namespace VRSF.Core.Controllers
+﻿namespace VRSF.Core.LaserPointer
 {
     /// <summary>
     /// List the possible state for the Left and Right pointers and the Gaze

@@ -3,6 +3,7 @@
     /// <summary>
     /// Contain all possible interaction type for Oculus and Vive controllers
     /// In our case, only concerns the Touch and Click Interaction
+    /// TODO Add it to te BAC, only used there
     /// </summary>
     public enum EControllerInteractionType
     {

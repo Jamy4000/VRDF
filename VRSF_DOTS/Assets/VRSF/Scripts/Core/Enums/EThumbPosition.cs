@@ -1,7 +1,8 @@
 ﻿namespace VRSF.Core.Inputs
 {
     /// <summary>
-    /// Contain all possible position of the thumb for the VR Interactions and ButtonActionChoser
+    /// Contain all possible position of the thumb for the ButtonActionChoser
+    /// TODO Add it to te BAC, only used there
     /// </summary>
 	public enum EThumbPosition
     {
