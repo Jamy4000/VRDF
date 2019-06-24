@@ -30,7 +30,8 @@ For Unity, you need to download the latest **2019.1 version or later**, as it's 
 ## Packages
 To use this Framework, you gonna need the following stuffs :
 - **The XR Legacy Input Helpers** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on All Packages > XR Legacy Input Helpers > Install).
-- **The Entities Package** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install).
+- **The Entities Package 0.0.12 preview-33** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install). 
+- **The Hybrid Renderer Package 0.0.1 preview-13** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Hybrid Renderer > Install). 
 
 ## Optional Packages
 You still need to import some VR Packages, depending on your needs, to use this framework. Those are found in the Package Manager from Unity :
