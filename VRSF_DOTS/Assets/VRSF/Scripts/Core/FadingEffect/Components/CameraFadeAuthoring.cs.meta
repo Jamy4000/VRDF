@@ -4,9 +4,8 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - _fadeMaterial: {fileID: 2100000, guid: 5ba70d58d085f2b44b315edf2d739376, type: 2}
-  - _fadeMaterialInstance: {instanceID: 0}
-  - _planeMesh: {instanceID: 0}
+  - _mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+  - _fadeMaterial: {fileID: 2100000, guid: e45bf7f964a15b64b85470033fa72d78, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

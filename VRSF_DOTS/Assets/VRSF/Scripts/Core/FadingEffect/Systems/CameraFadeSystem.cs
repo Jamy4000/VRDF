@@ -1,106 +1,77 @@
 ﻿using UnityEngine;
 using Unity.Entities;
-using VRSF.Core.SetupVR;
+using Unity.Rendering;
+using Unity.Collections;
 
 namespace VRSF.Core.FadingEffect
 {
     public class CameraFadeSystem : ComponentSystem
     {
-        protected override void OnCreateManager()
+        private EntityManager _entityManager;
+        private NativeArray<Entity> _entities;
+        private RenderMesh _renderMesh;
+
+        protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += StartFadingIn;
+            StartFadingInEvent.Listeners += OnStartFadingIn;
+            StartFadingOutEvent.Listeners += OnStartFadingOut;
 
-            StartFadingInEvent.Listeners += StartFadeIn;
-            StartFadingOutEvent.Listeners += StartFadeOut;
+            base.OnCreate();
+            _entityManager = World.Active.EntityManager;
+        }
 
-            OnFadingInEndedEvent.Listeners += OnFadeInEnded;
-            OnFadingOutEndedEvent.Listeners += OnFadeOutEnded;
-
-            base.OnCreateManager();
+        protected override void OnStartRunning()
+        {
+            base.OnStartRunning();
+            int cameraFadeEntities = GetEntityQuery(typeof(CameraFade)).CalculateLength();
+            _entities = new NativeArray<Entity>(cameraFadeEntities, Allocator.Persistent);
+            Entities.ForEach((Entity e, ref CameraFade cameraFade) =>
+            {
+                _renderMesh = _entityManager.GetSharedComponentData<RenderMesh>(e);
+                return;
+            });
         }
 
         protected override void OnUpdate()
         {
-            var componentArray = GetEntityQuery(typeof(UnityEngine.UI.Image), typeof(CameraFadeComponent)).ToComponentArray<CameraFadeComponent>();
-            foreach (var cameraFade in componentArray)
+            int index = 0;
+            bool materialWasSet = false;
+
+            Entities.ForEach((Entity e, ref CameraFade cameraFade) =>
             {
-                if (cameraFade.FadingInProgress)
-                    HandleImageAlpha(cameraFade);
+                _entities[index] = e;
+                if (!materialWasSet && cameraFade.FadingInProgress)
+                {
+                    RenderMesh newRend = _renderMesh;
+                    newRend.material = HandlePlaneAlpha(ref cameraFade, newRend);
+                    _renderMesh = newRend;
+                    materialWasSet = true;
+                }
+                index++;
+            });
+
+            for (int i = 0; i < _entities.Length; i++)
+            {
+                _entityManager.SetSharedComponentData(_entities[i], _renderMesh);
             }
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
-            base.OnCreateManager();
-            OnSetupVRReady.Listeners -= StartFadingIn;
+            StartFadingInEvent.Listeners -= OnStartFadingIn;
+            StartFadingOutEvent.Listeners -= OnStartFadingOut;
 
-            StartFadingInEvent.Listeners -= StartFadeIn;
-            StartFadingOutEvent.Listeners -= StartFadeOut;
-
-            OnFadingInEndedEvent.Listeners -= OnFadeInEnded;
-            OnFadingOutEndedEvent.Listeners -= OnFadeOutEnded;
-        }
-
-        private void StartFadeIn(StartFadingInEvent info)
-        {
-            var componentArray = GetEntityQuery(typeof(UnityEngine.UI.Image), typeof(CameraFadeComponent)).ToComponentArray<CameraFadeComponent>();
-            foreach (var cameraFade in componentArray)
-            {
-                cameraFade.FadingInProgress = true;
-                cameraFade.IsFadingIn = true;
-                cameraFade.OldFadingSpeedFactor = cameraFade.FadingSpeed;
-
-                if (info.SpeedOverride != -1.0f)
-                    cameraFade.FadingSpeed = info.SpeedOverride;
-            }
-        }
-
-        private void StartFadeOut(StartFadingOutEvent info)
-        {
-            var componentArray = GetEntityQuery(typeof(UnityEngine.UI.Image), typeof(CameraFadeComponent)).ToComponentArray<CameraFadeComponent>();
-            foreach (var cameraFade in componentArray)
-            {
-                cameraFade.FadingInProgress = true;
-                cameraFade.IsFadingIn = false;
-                cameraFade.ShouldImmediatlyFadeIn = info.ShouldFadeInWhenDone;
-                cameraFade.OldFadingSpeedFactor = cameraFade.FadingSpeed;
-
-                if (info.SpeedOverride != -1.0f)
-                    cameraFade.FadingSpeed = info.SpeedOverride;
-            }
-        }
-
-        private void OnFadeInEnded(OnFadingInEndedEvent info)
-        {
-            var componentArray = GetEntityQuery(typeof(UnityEngine.UI.Image), typeof(CameraFadeComponent)).ToComponentArray<CameraFadeComponent>();
-            foreach (var cameraFade in componentArray)
-            {
-                ResetParameters(cameraFade);
-            }
-        }
-
-        private void OnFadeOutEnded(OnFadingOutEndedEvent info)
-        {
-            var componentArray = GetEntityQuery(typeof(UnityEngine.UI.Image), typeof(CameraFadeComponent)).ToComponentArray<CameraFadeComponent>();
-            foreach (var cameraFade in componentArray)
-            {
-                var overrideSpeed = cameraFade.FadingSpeed;
-
-                ResetParameters(cameraFade);
-
-                if (cameraFade.ShouldImmediatlyFadeIn)
-                    new StartFadingInEvent(overrideSpeed);
-
-                cameraFade.ShouldImmediatlyFadeIn = false;
-            }
+            _entities.Dispose();
+            base.OnDestroy();
         }
 
         /// <summary>
         /// Change the alpha of the fading canvas and set the current teleporting state if the fade in/out is done
         /// </summary>
-        private void HandleImageAlpha(CameraFadeComponent cameraFade)
+        private Material HandlePlaneAlpha(ref CameraFade cameraFade, RenderMesh renderMesh)
         {
-            var color = cameraFade.FadingImage.color;
+            Material newMat = renderMesh.material;
+            Color color = newMat.color;
 
             // If we are currently Fading In
             if (cameraFade.IsFadingIn)
@@ -109,7 +80,10 @@ namespace VRSF.Core.FadingEffect
 
                 // If the fadingIn is finished
                 if (color.a < 0)
+                {
                     new OnFadingInEndedEvent();
+                    this.Enabled = false;
+                }
             }
             // If we are currently Fading Out
             else
@@ -118,34 +92,30 @@ namespace VRSF.Core.FadingEffect
 
                 // if the alpha is completely dark, we're done with the fade Out
                 if (color.a > 1)
+                {
                     new OnFadingOutEndedEvent();
+                    this.Enabled = !cameraFade.ShouldImmediatlyFadeIn;
+                }
             }
 
-            // We set the new alpha of the black image
-            cameraFade.FadingImage.color = color;
-        }
-        
-        private void StartFadingIn(OnSetupVRReady info)
-        {
-            Debug.LogError("CANNOT DO THAT as CameraFadeComponent is not a ComponentData.");
-            var componentArray = GetEntityQuery(typeof(CameraFadeComponent)).ToComponentArray<CameraFadeComponent>();
-            Debug.Log("componentArray " + componentArray.Length);
-            foreach (var cameraFade in componentArray)
-            {
-                Debug.Log("cameraFade " + cameraFade.transform.name);
-                cameraFade.FadingImage = cameraFade.GetComponent<UnityEngine.UI.Image>();
-                var newColor = cameraFade.FadingImage.color;
-                newColor.a = 1;
-                cameraFade.FadingImage.color = newColor;
-            }
-
-            new StartFadingInEvent(0.5f);
+            newMat.color = color;
+            return newMat;
         }
 
-        private void ResetParameters(CameraFadeComponent fadeComponent)
+        public static void ResetParameters(ref CameraFade cameraFade)
         {
-            fadeComponent.FadingInProgress = false;
-            fadeComponent.FadingSpeed = fadeComponent.OldFadingSpeedFactor;
+            cameraFade.FadingInProgress = false;
+            cameraFade.FadingSpeed = cameraFade.OldFadingSpeedFactor;
+        }
+
+        protected void OnStartFadingIn(StartFadingInEvent info)
+        {
+            this.Enabled = true;
+        }
+
+        protected void OnStartFadingOut(StartFadingOutEvent info)
+        {
+            this.Enabled = true;
         }
     }
 }
