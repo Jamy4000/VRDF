@@ -27,7 +27,9 @@ namespace VRSF.Core.Interactions
             // We add a new pointer click to store
             dstManager.AddComponentData(entity, new PointerClick
             {
-                HandClicking = HandClicking
+                HandClicking = HandClicking,
+                CanClick = true,
+                ClickEventWasFired = false
             });
         }
     }
