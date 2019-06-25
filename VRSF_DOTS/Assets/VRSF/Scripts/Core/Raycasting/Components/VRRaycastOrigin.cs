@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using Unity.Entities;
-using VRSF.Core.SetupVR;
-using Unity.Mathematics;
+﻿using Unity.Entities;
 
 namespace VRSF.Core.Raycast
 {

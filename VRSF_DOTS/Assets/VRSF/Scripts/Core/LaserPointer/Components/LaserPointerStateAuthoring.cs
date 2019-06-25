@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Raycast;
 
@@ -8,8 +9,8 @@ namespace VRSF.Core.LaserPointer
     public class LaserPointerStateAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
         [Header("Laser Renderering Parameters")]
-        [Tooltip("The material to render the line.")]
-        public Material LineMaterial;
+        [Tooltip("The prefab for the line renderer in ECS.")]
+        public GameObject LineRendererPrefab;
         [Tooltip("The base width for this pointer when you are pointing at something.")]
         public float PointerWidth = 0.01f;
 
@@ -18,8 +19,12 @@ namespace VRSF.Core.LaserPointer
         public EPointerState BaseState = EPointerState.ON;
         [Tooltip("How fast the pointer is disappearing when not hitting something. Set it to zero to stop the fade out of the laser.")]
         public float DisappearanceSpeed = 1.0f;
-        
 
+        private void Awake()
+        {
+            
+        }
+        
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             dstManager.AddComponentData(entity, new LaserPointerState
@@ -47,7 +52,6 @@ namespace VRSF.Core.LaserPointer
             });
 
             var drawer = gameObject.AddComponent<LaserPointerDrawer>();
-            drawer.LineMaterial = LineMaterial;
             drawer.LineZPosition = (int)maxDistance;
 
             Destroy(this);

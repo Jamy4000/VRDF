@@ -11,18 +11,18 @@ namespace VRSF.Core.Interactions
         #region ComponentSystem_Methods
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref VRRaycastOrigin raycastOrigin) =>
+            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs) =>
             {
                 switch (raycastOrigin.RayOrigin)
                 {
                     case ERayOrigin.LEFT_HAND:
-                        HandleOver(ref InteractionVariableContainer.PreviousLeftHit, ref InteractionVariableContainer.IsOverSomethingLeft, LeftControllerRaycastData.RaycastHitVar, ERayOrigin.LEFT_HAND);
+                        HandleOver(ref InteractionVariableContainer.PreviousLeftHit, ref InteractionVariableContainer.IsOverSomethingLeft, raycastOutputs.RaycastHitVar, ERayOrigin.LEFT_HAND);
                         break;
                     case ERayOrigin.RIGHT_HAND:
-                        HandleOver(ref InteractionVariableContainer.PreviousRightHit, ref InteractionVariableContainer.IsOverSomethingRight, RightControllerRaycastData.RaycastHitVar, ERayOrigin.RIGHT_HAND);
+                        HandleOver(ref InteractionVariableContainer.PreviousRightHit, ref InteractionVariableContainer.IsOverSomethingRight, raycastOutputs.RaycastHitVar, ERayOrigin.RIGHT_HAND);
                         break;
                     case ERayOrigin.CAMERA:
-                        HandleOver(ref InteractionVariableContainer.PreviousGazeHit, ref InteractionVariableContainer.IsOverSomethingGaze, CameraRaycastData.RaycastHitVar, ERayOrigin.CAMERA);
+                        HandleOver(ref InteractionVariableContainer.PreviousGazeHit, ref InteractionVariableContainer.IsOverSomethingGaze, raycastOutputs.RaycastHitVar, ERayOrigin.CAMERA);
                         break;
                 }
             });

@@ -29,29 +29,29 @@ namespace VRSF.Core.Raycast
 
         private void AssignRay()
         {
-            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters) =>
+            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
             {
+                Transform originTransform = VRSF_Components.VRCamera.transform;
+
                 // Depending on the RayOring, we provide references to different ray and raycastHit variables
                 switch (raycastOrigin.RayOrigin)
                 {
                     case ERayOrigin.LEFT_HAND:
-                        Transform originTransform = VRSF_Components.LeftController.transform;
-                        LeftControllerRaycastData.RayVar = new Ray(originTransform.position, originTransform.TransformDirection(Vector3.forward));
+                        originTransform = VRSF_Components.LeftController.transform;
                         break;
                     case ERayOrigin.RIGHT_HAND:
                         originTransform = VRSF_Components.RightController.transform;
-                        RightControllerRaycastData.RayVar = new Ray(originTransform.position, originTransform.TransformDirection(Vector3.forward));
                         break;
                     case ERayOrigin.CAMERA:
                         originTransform = VRSF_Components.VRCamera.transform;
-                        CameraRaycastData.RayVar = new Ray(originTransform.position, originTransform.TransformDirection(Vector3.forward));
                         break;
-
                     default:
                         Debug.LogError("[b]VRSF :[\b] An error has occured in the RayCalculationsSystems. " +
-                            "Please check that the RayOrigin for your VRRaycatAuthoring Components are set correctly.");
+                            "Please check that the RayOrigin for your VRRaycatAuthoring Components are set correctly. Using Camera as Origin.");
                         break;
                 }
+
+                raycastOutputs.RayVar = new Ray(originTransform.position, originTransform.TransformDirection(Vector3.forward));
             });
         }
 

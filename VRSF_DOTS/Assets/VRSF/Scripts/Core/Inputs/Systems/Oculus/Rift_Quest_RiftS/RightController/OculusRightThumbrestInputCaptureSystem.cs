@@ -13,7 +13,7 @@ namespace VRSF.Core.Inputs
     {
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += CheckDevice;
+            OnSetupVRReady.Listeners += CheckForComponents;
             base.OnCreate();
         }
 
@@ -28,36 +28,63 @@ namespace VRSF.Core.Inputs
 
         protected override void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= CheckDevice;
+            OnSetupVRReady.Listeners -= CheckForComponents;
             base.OnDestroy();
         }
 
         [Unity.Burst.BurstCompile]
-        [RequireComponentTag(typeof(OculusControllersInputCaptureComponent))]
-        struct ThumbrestButtonInputCaptureJob : IJobForEach<CrossplatformInputCapture>
+        struct ThumbrestButtonInputCaptureJob : IJobForEach<ThumbrestInputCapture>
         {
             public bool ThumbrestTouchButtonDown;
             public bool ThumbrestTouchButtonUp;
 
-            public void Execute(ref CrossplatformInputCapture c0)
+            public void Execute(ref ThumbrestInputCapture thumbrestCapture)
             {
-                if (ThumbrestTouchButtonDown)
+                if (thumbrestCapture.Hand == EHand.RIGHT)
                 {
-                    RightInputsParameters.ThumbrestTouch = true;
-                    new ButtonTouchEvent(EHand.RIGHT, EControllersButton.THUMBREST);
-                }
-                else if (ThumbrestTouchButtonUp)
-                {
-                    RightInputsParameters.ThumbrestTouch = false;
-                    new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.THUMBREST);
+                    if (ThumbrestTouchButtonDown)
+                    {
+                        thumbrestCapture.ThumbrestTouch = true;
+                        new ButtonTouchEvent(EHand.RIGHT, EControllersButton.THUMBREST);
+                    }
+                    else if (ThumbrestTouchButtonUp)
+                    {
+                        thumbrestCapture.ThumbrestTouch = false;
+                        new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.THUMBREST);
+                    }
                 }
             }
         }
 
         #region PRIVATE_METHODS
-        private void CheckDevice(OnSetupVRReady info)
+        /// <summary>
+        /// Check if there's at least one ThumbrestInputCapture component and that it has the RIGHT as Hand
+        /// </summary>
+        /// <param name="info"></param>
+        private void CheckForComponents(OnSetupVRReady info)
         {
-            this.Enabled = IsOculusHeadset();
+            if (IsOculusHeadset())
+            {
+                var entityQuery = GetEntityQuery(typeof(ThumbrestInputCapture)).ToComponentDataArray<ThumbrestInputCapture>(Unity.Collections.Allocator.TempJob, out JobHandle jobHandle);
+                if (entityQuery.Length > 0)
+                {
+                    foreach (var tic in entityQuery)
+                    {
+                        if (tic.Hand == EHand.RIGHT)
+                        {
+                            this.Enabled = true;
+                            jobHandle.Complete();
+                            entityQuery.Dispose();
+                            return;
+                        }
+                    }
+                }
+                jobHandle.Complete();
+                entityQuery.Dispose();
+            }
+
+            this.Enabled = false;
+
 
             bool IsOculusHeadset()
             {

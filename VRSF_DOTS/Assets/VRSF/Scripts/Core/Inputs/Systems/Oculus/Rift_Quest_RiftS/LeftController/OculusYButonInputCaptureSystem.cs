@@ -13,7 +13,7 @@ namespace VRSF.Core.Inputs
     {
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += CheckDevice;
+            OnSetupVRReady.Listeners += CheckForComponents;
             base.OnCreate();
         }
 
@@ -30,13 +30,12 @@ namespace VRSF.Core.Inputs
 
         protected override void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= CheckDevice;
+            OnSetupVRReady.Listeners -= CheckForComponents;
             base.OnDestroy();
         }
 
         [Unity.Burst.BurstCompile]
-        [RequireComponentTag(typeof(OculusControllersInputCaptureComponent))]
-        struct YButtonInputCaptureJob : IJobForEach<CrossplatformInputCapture>
+        struct YButtonInputCaptureJob : IJobForEach<YButtonInputCapture>
         {
             public bool YClickButtonDown;
             public bool YClickButtonUp;
@@ -44,37 +43,41 @@ namespace VRSF.Core.Inputs
             public bool YTouchButtonDown;
             public bool YTouchButtonUp;
 
-            public void Execute(ref CrossplatformInputCapture c0)
+            public void Execute(ref YButtonInputCapture yButtonInput)
             {
                 // Check Click Events
                 if (YClickButtonDown)
                 {
-                    LeftInputsParameters.Y_Click = true;
+                    yButtonInput.Y_Click = true;
                     new ButtonClickEvent(EHand.LEFT, EControllersButton.Y_BUTTON);
                 }
                 else if (YClickButtonUp)
                 {
-                    LeftInputsParameters.Y_Click = false;
+                    yButtonInput.Y_Click = false;
                     new ButtonUnclickEvent(EHand.LEFT, EControllersButton.Y_BUTTON);
                 }
                 // Check Touch Events if user is not clicking
-                else if (!LeftInputsParameters.Y_Click && YTouchButtonDown)
+                else if (!yButtonInput.Y_Click && YTouchButtonDown)
                 {
-                    LeftInputsParameters.Y_Touch = true;
+                    yButtonInput.Y_Touch = true;
                     new ButtonTouchEvent(EHand.LEFT, EControllersButton.Y_BUTTON);
                 }
                 else if (YTouchButtonUp)
                 {
-                    LeftInputsParameters.Y_Touch = false;
+                    yButtonInput.Y_Touch = false;
                     new ButtonUntouchEvent(EHand.LEFT, EControllersButton.Y_BUTTON);
                 }
             }
         }
 
         #region PRIVATE_METHODS
-        private void CheckDevice(OnSetupVRReady info)
+        /// <summary>
+        /// Check if there's at least one AButtonInputCapture component and that it has the RIGHT as Hand
+        /// </summary>
+        /// <param name="info"></param>
+        private void CheckForComponents(OnSetupVRReady info)
         {
-            this.Enabled = IsOculusHeadset();
+            this.Enabled = IsOculusHeadset() && GetEntityQuery(typeof(YButtonInputCapture)).CalculateLength() > 0;
 
             bool IsOculusHeadset()
             {

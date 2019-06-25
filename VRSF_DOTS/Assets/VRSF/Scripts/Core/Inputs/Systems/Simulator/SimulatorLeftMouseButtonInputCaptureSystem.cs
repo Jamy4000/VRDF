@@ -38,26 +38,25 @@ namespace VRSF.Core.Inputs
 
 
         [Unity.Burst.BurstCompile]
-        [RequireComponentTag(typeof(SimulatorInputCaptureComponent))]
-        struct SimulatorInputCaptureJob : IJobForEach<CrossplatformInputCapture>
+        struct SimulatorInputCaptureJob : IJobForEach<TriggerInputCapture>
         {
             public bool LeftMouseButtonIsClicking;
 
-            public void Execute(ref CrossplatformInputCapture c0)
+            public void Execute(ref TriggerInputCapture triggerInput)
             {
-                LeftInputsParameters.TriggerSqueezeValue = LeftMouseButtonIsClicking ? 1 : 0;
+                triggerInput.TriggerSqueezeValue = LeftMouseButtonIsClicking ? 1 : 0;
 
                 // Check Click Events
-                if (!LeftInputsParameters.TriggerClick && LeftMouseButtonIsClicking)
+                if (!triggerInput.TriggerClick && LeftMouseButtonIsClicking)
                 {
-                    LeftInputsParameters.TriggerClick = true;
-                    LeftInputsParameters.TriggerTouch = true;
+                    triggerInput.TriggerClick = true;
+                    triggerInput.TriggerTouch = true;
                     new ButtonClickEvent(EHand.LEFT, EControllersButton.TRIGGER);
                 }
-                else if (LeftInputsParameters.TriggerClick && !LeftMouseButtonIsClicking)
+                else if (triggerInput.TriggerClick && !LeftMouseButtonIsClicking)
                 {
-                    LeftInputsParameters.TriggerClick = false;
-                    LeftInputsParameters.TriggerTouch = false;
+                    triggerInput.TriggerClick = false;
+                    triggerInput.TriggerTouch = false;
                     new ButtonUnclickEvent(EHand.LEFT, EControllersButton.TRIGGER);
                 }
             }

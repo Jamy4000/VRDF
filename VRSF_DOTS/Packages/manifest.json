@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.e7.ecs.line-renderer": "https://github.com/5argon/ECSLineRenderer.git",
     "com.unity.entities": "0.0.12-preview.33",
     "com.unity.package-manager-ui": "2.1.2",
     "com.unity.rendering.hybrid": "0.0.1-preview.13",
@@ -39,5 +40,11 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
+  },
+  "lock": {
+    "com.e7.ecs.line-renderer": {
+      "hash": "4ff83b9787b319f1d3f7c3896bc9956cec7b42ac",
+      "revision": "HEAD"
+    }
   }
 }

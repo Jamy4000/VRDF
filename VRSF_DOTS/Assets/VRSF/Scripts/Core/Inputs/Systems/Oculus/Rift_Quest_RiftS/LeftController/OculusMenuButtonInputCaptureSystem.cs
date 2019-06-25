@@ -13,7 +13,7 @@ namespace VRSF.Core.Inputs
     {
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += CheckDevice;
+            OnSetupVRReady.Listeners += CheckForComponents;
             base.OnCreate();
         }
 
@@ -28,37 +28,64 @@ namespace VRSF.Core.Inputs
 
         protected override void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= CheckDevice;
+            OnSetupVRReady.Listeners -= CheckForComponents;
             base.OnDestroy();
         }
 
         [Unity.Burst.BurstCompile]
-        [RequireComponentTag(typeof(OculusControllersInputCaptureComponent))]
-        struct MenuButtonInputCaptureJob : IJobForEach<CrossplatformInputCapture>
+        struct MenuButtonInputCaptureJob : IJobForEach<MenuInputCapture>
         {
             public bool MenuClickButtonDown;
             public bool MenuClickButtonUp;
 
-            public void Execute(ref CrossplatformInputCapture c0)
+            public void Execute(ref MenuInputCapture menuInput)
             {
-                // Check Click Events
-                if (MenuClickButtonDown)
+                if (menuInput.Hand == EHand.LEFT)
                 {
-                    LeftInputsParameters.MenuClick = true;
-                    new ButtonClickEvent(EHand.LEFT, EControllersButton.MENU);
-                }
-                else if (MenuClickButtonUp)
-                {
-                    LeftInputsParameters.MenuClick = false;
-                    new ButtonUnclickEvent(EHand.LEFT, EControllersButton.MENU);
+                    // Check Click Events
+                    if (MenuClickButtonDown)
+                    {
+                        menuInput.MenuClick = true;
+                        new ButtonClickEvent(EHand.LEFT, EControllersButton.MENU);
+                    }
+                    else if (MenuClickButtonUp)
+                    {
+                        menuInput.MenuClick = false;
+                        new ButtonUnclickEvent(EHand.LEFT, EControllersButton.MENU);
+                    }
                 }
             }
         }
 
         #region PRIVATE_METHODS
-        private void CheckDevice(OnSetupVRReady info)
+        /// <summary>
+        /// Check if there's at least one MenuInputCapture component and that it has the LEFT as Hand
+        /// </summary>
+        /// <param name="info"></param>
+        private void CheckForComponents(OnSetupVRReady info)
         {
-            this.Enabled = IsOculusHeadset();
+            if (IsOculusHeadset())
+            {
+                var entityQuery = GetEntityQuery(typeof(MenuInputCapture)).ToComponentDataArray<MenuInputCapture>(Unity.Collections.Allocator.TempJob, out JobHandle jobHandle);
+                if (entityQuery.Length > 0)
+                {
+                    foreach (var tic in entityQuery)
+                    {
+                        if (tic.Hand == EHand.LEFT)
+                        {
+                            this.Enabled = true;
+                            jobHandle.Complete();
+                            entityQuery.Dispose();
+                            return;
+                        }
+                    }
+                }
+                jobHandle.Complete();
+                entityQuery.Dispose();
+            }
+
+            this.Enabled = false;
+
 
             bool IsOculusHeadset()
             {

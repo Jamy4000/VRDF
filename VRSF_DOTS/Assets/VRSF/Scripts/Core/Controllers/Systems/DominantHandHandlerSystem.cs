@@ -11,7 +11,7 @@ namespace VRSF.Core.Controllers
     {
         private struct Filter
         {
-            public GoAndGearVRControllersInputCaptureComponent SingleControllerInputCapture;
+            public GoAndGearVRInputCapture SingleControllerInputCapture;
         }
 
         protected override void OnCreateManager()

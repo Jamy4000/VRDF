@@ -32,29 +32,10 @@ namespace VRSF.Core.Raycast
 
         private void AssignRay()
         {
-            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters) =>
+            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
             {
                 // We set the ray based on the raycastOrigin if not simulator, and the ScreenPointToRay method if we use the Simulator
-                Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-                
-                // Depending on the RayOring, we provide references to different ray and raycastHit variables
-                switch (raycastOrigin.RayOrigin)
-                {
-                    case ERayOrigin.LEFT_HAND:
-                        LeftControllerRaycastData.RayVar = ray;
-                        break;
-                    case ERayOrigin.RIGHT_HAND:
-                        RightControllerRaycastData.RayVar = ray;
-                        break;
-                    case ERayOrigin.CAMERA:
-                        CameraRaycastData.RayVar = ray;
-                        break;
-
-                    default:
-                        Debug.LogError("[b]VRSF :[\b] An error has occured in the RayCalculationsSystems. " +
-                            "Please check that the RayOrigin for your VRRaycatAuthoring Components are set correctly.");
-                        break;
-                }
+                raycastOutputs.RayVar = _mainCamera.ScreenPointToRay(Input.mousePosition);
             });
         }
 

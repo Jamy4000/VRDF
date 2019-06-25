@@ -13,7 +13,7 @@ namespace VRSF.Core.Inputs
     {
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += CheckDevice;
+            OnSetupVRReady.Listeners += CheckForComponents;
             base.OnCreate();
         }
 
@@ -28,53 +28,41 @@ namespace VRSF.Core.Inputs
 
         protected override void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= CheckDevice;
+            OnSetupVRReady.Listeners -= CheckForComponents;
             base.OnDestroy();
         }
 
         [Unity.Burst.BurstCompile]
-        struct BackButtonInputCaptureJob : IJobForEach<GoAndGearVRControllersInputCaptureComponent>
+        struct BackButtonInputCaptureJob : IJobForEach<GoAndGearVRInputCapture>
         {
             public bool MenuButtonDown;
             public bool MenuButtonUp;
 
-            public void Execute(ref GoAndGearVRControllersInputCaptureComponent c0)
+            public void Execute(ref GoAndGearVRInputCapture goAndGearInput)
             {
                 // Check Click Events
                 if (MenuButtonDown)
                 {
-                    if (c0.IsUserRightHanded)
-                    {
-                        RightInputsParameters.BackButtonClick = true;
-                        new ButtonClickEvent(EHand.RIGHT, EControllersButton.BACK_BUTTON);
-                    }
-                    else
-                    {
-                        LeftInputsParameters.BackButtonClick = true;
-                        new ButtonClickEvent(EHand.LEFT, EControllersButton.BACK_BUTTON);
-                    }
+                    goAndGearInput.BackButtonClick = true;
+                    new ButtonClickEvent(goAndGearInput.IsUserRightHanded ? EHand.RIGHT : EHand.LEFT, EControllersButton.BACK_BUTTON);
                 }
                 else if (MenuButtonUp)
                 {
-                    if (c0.IsUserRightHanded)
-                    {
-                        RightInputsParameters.BackButtonClick = false;
-                        new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.BACK_BUTTON);
-                    }
-                    else
-                    {
-                        LeftInputsParameters.BackButtonClick = false;
-                        new ButtonUnclickEvent(EHand.LEFT, EControllersButton.BACK_BUTTON);
-                    }
+                    goAndGearInput.BackButtonClick = false;
+                    new ButtonUnclickEvent(goAndGearInput.IsUserRightHanded ? EHand.RIGHT : EHand.LEFT, EControllersButton.BACK_BUTTON);
                 }
             }
         }
 
         #region PRIVATE_METHODS
-        private void CheckDevice(OnSetupVRReady info)
+        /// <summary>
+        /// Check if there's at least one AButtonInputCapture component and that it has the RIGHT as Hand
+        /// </summary>
+        /// <param name="info"></param>
+        private void CheckForComponents(OnSetupVRReady info)
         {
-            this.Enabled = IsSingleControllerHeadset();
-            
+            this.Enabled = IsSingleControllerHeadset() && GetEntityQuery(typeof(GoAndGearVRInputCapture)).CalculateLength() > 0;
+
             bool IsSingleControllerHeadset()
             {
                 return VRSF_Components.DeviceLoaded == EDevice.GEAR_VR || VRSF_Components.DeviceLoaded == EDevice.OCULUS_GO;

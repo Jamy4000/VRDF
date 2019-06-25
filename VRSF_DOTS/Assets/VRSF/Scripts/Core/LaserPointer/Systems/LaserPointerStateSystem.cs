@@ -16,31 +16,16 @@ namespace VRSF.Core.LaserPointer
         }
         #endregion ComponentSystem_Methods
 
-        
-        struct CheckPointerStateJob : IJobForEach<LaserPointerState, VRRaycastOrigin, LaserPointerVisibility>
+        [Unity.Burst.BurstCompile]
+        struct CheckPointerStateJob : IJobForEach<LaserPointerState, VRRaycastOutputs, LaserPointerVisibility>
         {
             public void Execute
                 (ref LaserPointerState stateComp,
-                 ref VRRaycastOrigin raycastOrigin, 
+                 ref VRRaycastOutputs raycastOutputs, 
                  ref LaserPointerVisibility visibilityComp)
             {
-                if (stateComp.State == EPointerState.ON)
-                {
-                    switch (raycastOrigin.RayOrigin)
-                    {
-                        case ERayOrigin.LEFT_HAND:
-                            if (LeftControllerRaycastData.RaycastHitVar.IsNull)
-                                stateComp.State = EPointerState.DISAPPEARING;
-                            break;
-                        case ERayOrigin.RIGHT_HAND:
-                            if (RightControllerRaycastData.RaycastHitVar.IsNull)
-                                stateComp.State = EPointerState.DISAPPEARING;
-                            break;
-                        default:
-                            UnityEngine.Debug.LogError("[b]VRSF :[\b] Please specify a correct parameter for all your Raycast Origin.");
-                            break;
-                    }
-                }
+                if (stateComp.State == EPointerState.ON && raycastOutputs.RaycastHitVar.IsNull)
+                    stateComp.State = EPointerState.DISAPPEARING;
             }
         }
     }

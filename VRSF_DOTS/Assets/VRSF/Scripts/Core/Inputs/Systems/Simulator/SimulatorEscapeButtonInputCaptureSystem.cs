@@ -38,22 +38,21 @@ namespace VRSF.Core.Inputs
         #endregion
 
         [Unity.Burst.BurstCompile]
-        [RequireComponentTag(typeof(SimulatorInputCaptureComponent))]
-        struct SimulatorInputCaptureJob : IJobForEach<CrossplatformInputCapture>
+        struct SimulatorInputCaptureJob : IJobForEach<MenuInputCapture>
         {
             public bool EscapeButtonWasClick;
 
-            public void Execute(ref CrossplatformInputCapture c0)
+            public void Execute(ref MenuInputCapture menuInput)
             {
                 // Check Click Events
-                if (!LeftInputsParameters.MenuClick && EscapeButtonWasClick)
+                if (!menuInput.MenuClick && EscapeButtonWasClick)
                 {
-                    LeftInputsParameters.MenuClick = true;
+                    menuInput.MenuClick = true;
                     new ButtonClickEvent(EHand.LEFT, EControllersButton.MENU);
                 }
-                else if (LeftInputsParameters.MenuClick && !EscapeButtonWasClick)
+                else if (menuInput.MenuClick && !EscapeButtonWasClick)
                 {
-                    LeftInputsParameters.MenuClick = false;
+                    menuInput.MenuClick = false;
                     new ButtonUnclickEvent(EHand.LEFT, EControllersButton.MENU);
                 }
             }

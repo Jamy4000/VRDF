@@ -2,6 +2,9 @@
 
 namespace VRSF.Interactions
 {
+    /// <summary>
+    /// TODO Refactor, static classes shouldn't be used in Jobs
+    /// </summary>
 	public static class InteractionVariableContainer
     {
         /// <summary>

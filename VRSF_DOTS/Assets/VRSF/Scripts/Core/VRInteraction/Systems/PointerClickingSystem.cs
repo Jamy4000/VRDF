@@ -14,8 +14,6 @@ namespace VRSF.Core.Interactions
     /// </summary>
     public class PointerClickingSystem : ComponentSystem
     {
-        private EHand _handInteracting = EHand.NONE;
-
         #region ComponentSystem_Methods
         protected override void OnCreate()
         {
@@ -25,24 +23,25 @@ namespace VRSF.Core.Interactions
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref PointerClick pointerClick) =>
+            Entities.ForEach((ref PointerClick pointerClick, ref TriggerInputCapture triggerInputCapture, ref VRRaycastOutputs raycastOutputs) =>
             {
-                if (_handInteracting == pointerClick.HandClicking)
+                if (!pointerClick.ClickEventWasFired && pointerClick.CanClick && triggerInputCapture.TriggerClick)
                 {
-                    switch (_handInteracting)
+                    switch (triggerInputCapture.Hand)
                     {
                         case EHand.LEFT:
-                            if (PointerClick.LeftTriggerCanClick)
-                                CheckHit(LeftControllerRaycastData.RaycastHitVar, InteractionVariableContainer.HasClickSomethingLeft, ERayOrigin.LEFT_HAND);
+                            CheckHit(raycastOutputs.RaycastHitVar, InteractionVariableContainer.HasClickSomethingLeft, ERayOrigin.LEFT_HAND);
                             break;
                         case EHand.RIGHT:
-                            if (PointerClick.RightTriggerCanClick)
-                                CheckHit(RightControllerRaycastData.RaycastHitVar, InteractionVariableContainer.HasClickSomethingRight, ERayOrigin.RIGHT_HAND);
+                            CheckHit(raycastOutputs.RaycastHitVar, InteractionVariableContainer.HasClickSomethingRight, ERayOrigin.RIGHT_HAND);
                             break;
                     }
 
-                    // Reset the variable
-                    _handInteracting = EHand.NONE;
+                    pointerClick.ClickEventWasFired = true;
+                }
+                else if (pointerClick.ClickEventWasFired && !triggerInputCapture.TriggerClick)
+                {
+                    pointerClick.ClickEventWasFired = false;
                 }
             });
         }
@@ -51,11 +50,9 @@ namespace VRSF.Core.Interactions
         {
             OnSetupVRReady.Listeners -= Setup;
             // Just checking if the callbacks were indeed registered
-            if (ButtonClickEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
-            {
-                ButtonClickEvent.Listeners -= CheckObjectClicked;
+            if (ButtonUnclickEvent.IsMethodAlreadyRegistered(ResetVariable))
                 ButtonUnclickEvent.Listeners -= ResetVariable;
-            }
+
             base.OnDestroy();
         }
         #endregion
@@ -76,15 +73,6 @@ namespace VRSF.Core.Interactions
             }
         }
 
-        /// <summary>
-        /// Reset the HasClickSomethingRight bool if the user is not clicking anymore
-        /// </summary>
-        void CheckObjectClicked(ButtonClickEvent info)
-        {
-            if (info.ButtonInteracting == EControllersButton.TRIGGER)
-                _handInteracting = info.HandInteracting;
-        }
-
         void ResetVariable(ButtonUnclickEvent info)
         {
             if (info.ButtonInteracting == EControllersButton.TRIGGER)
@@ -99,9 +87,8 @@ namespace VRSF.Core.Interactions
         private void Setup(OnSetupVRReady info)
         {
             // Just checking if there's entities in the scene
-            if (GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0 && !ButtonClickEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
+            if (GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0 && !ButtonUnclickEvent.IsMethodAlreadyRegistered(ResetVariable))
             {
-                ButtonClickEvent.Listeners += CheckObjectClicked;
                 ButtonUnclickEvent.Listeners += ResetVariable;
             }
             else

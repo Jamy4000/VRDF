@@ -10,52 +10,26 @@ namespace VRSF.Core.Raycast
     /// </summary>
     public class RaycastHitCalculationsSystem : ComponentSystem
     {
+        /// <summary>
+        /// Check every frame if the Ray from a controller/the camera is hitting something
+        /// </summary>
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters) =>
+            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
             {
-                // Depending on the RayOring, we provide references to different ray and raycastHit variables
-                switch (raycastOrigin.RayOrigin)
-                {
-                    case ERayOrigin.LEFT_HAND:
-                        RaycastHitHandler(parameters, LeftControllerRaycastData.RayVar, ref LeftControllerRaycastData.RaycastHitVar);
-                        break;
-                    case ERayOrigin.RIGHT_HAND:
-                        RaycastHitHandler(parameters, RightControllerRaycastData.RayVar, ref RightControllerRaycastData.RaycastHitVar);
-                        break;
-                    case ERayOrigin.CAMERA:
-                        RaycastHitHandler(parameters, CameraRaycastData.RayVar, ref CameraRaycastData.RaycastHitVar);
-                        break;
+                var hits = Physics.RaycastAll(raycastOutputs.RayVar, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
 
-                    default:
-                        Debug.LogError("[b]VRSF :[\b] An error has occured in the RaycastHitCalculationsSystems. " +
-                            "Please check that the RayOrigin for your VRRaycatAuthoring Components are set correctly.");
-                        break;
+                if (hits.Length > 0)
+                {
+                    var first3DHit = hits.OrderBy(x => x.distance).First();
+                    raycastOutputs.RaycastHitVar.Value = first3DHit;
+                    raycastOutputs.RaycastHitVar.SetIsNull(false);
+                }
+                else
+                {
+                    raycastOutputs.RaycastHitVar.SetIsNull(true);
                 }
             });
-        }
-
-
-        /// <summary>
-        /// Check if the Ray from a controller/the camera is hitting something
-        /// </summary>
-        /// <param name="parameters"></param>
-        /// <param name="ray">The ray to check</param>
-        /// <param name="hitVariable">The RaycastHitVariable in which we store the hit value</param>
-        private void RaycastHitHandler(VRRaycastParameters parameters, Ray ray, ref RaycastHitVariable hitVariable)
-        {
-            var hits = Physics.RaycastAll(ray, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
-
-            if (hits.Length > 0)
-            {
-                var first3DHit = hits.OrderBy(x => x.distance).First();
-                hitVariable.Value = first3DHit;
-                hitVariable.SetIsNull(false);
-            }
-            else
-            {
-                hitVariable.SetIsNull(true);
-            }
         }
     }
 }

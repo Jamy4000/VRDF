@@ -2,10 +2,10 @@
 
 namespace VRSF.Core.Raycast
 {
-    public class RaycastHitVariable
+    public struct RaycastHitVariable
     {
-        public RaycastHit Value = new RaycastHit();
-        public bool IsNull = true;
+        public RaycastHit Value;
+        public bool IsNull;
 
         public void SetIsNull(bool value)
         {
