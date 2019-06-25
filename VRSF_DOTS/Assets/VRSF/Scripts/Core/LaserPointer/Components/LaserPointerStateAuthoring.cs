@@ -1,16 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using E7.ECS.LineRenderer;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 using VRSF.Core.Raycast;
 
 namespace VRSF.Core.LaserPointer
 {
-    [RequiresEntityConversion]
     public class LaserPointerStateAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
         [Header("Laser Renderering Parameters")]
-        [Tooltip("The prefab for the line renderer in ECS.")]
-        public GameObject LineRendererPrefab;
+        [Tooltip("The material used for the line renderer in ECS.")]
+        public Material LineRendererMaterial;
         [Tooltip("The base width for this pointer when you are pointing at something.")]
         public float PointerWidth = 0.01f;
 
@@ -20,13 +21,13 @@ namespace VRSF.Core.LaserPointer
         [Tooltip("How fast the pointer is disappearing when not hitting something. Set it to zero to stop the fade out of the laser.")]
         public float DisappearanceSpeed = 1.0f;
 
-        private void Awake()
-        {
-            
-        }
-        
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
+            dstManager.RemoveComponent(entity, ComponentType.ReadOnly<Translation>());
+            dstManager.RemoveComponent(entity, ComponentType.ReadOnly<Rotation>());
+            dstManager.RemoveComponent(entity, ComponentType.ReadOnly<NonUniformScale>());
+            dstManager.RemoveComponent(entity, ComponentType.ReadOnly<LocalToWorld>());
+
             dstManager.AddComponentData(entity, new LaserPointerState
             {
                 State = BaseState
@@ -39,20 +40,35 @@ namespace VRSF.Core.LaserPointer
 
             dstManager.AddComponentData(entity, new LaserPointerWidth
             {
-                CurrentWidth = PointerWidth,
                 BaseWidth = PointerWidth
             });
 
-            float maxDistance = GetComponent<VRRaycastAuthoring>().MaxRaycastDistance;
+            VRRaycastAuthoring raycastAuthoring = GetComponent<VRRaycastAuthoring>();
 
             dstManager.AddComponentData(entity, new LaserPointerLength
             {
-                CurrentLength = maxDistance,
-                BaseLength = maxDistance
+                BaseLength = raycastAuthoring.MaxRaycastDistance
             });
 
-            var drawer = gameObject.AddComponent<LaserPointerDrawer>();
-            drawer.LineZPosition = (int)maxDistance;
+            dstManager.AddComponentData(entity, new LineSegment
+            (
+                transform.position,
+                new float3(0, 0, raycastAuthoring.MaxRaycastDistance),
+                PointerWidth
+            ));
+
+#if UNITY_EDITOR
+            if (LineRendererMaterial == null)
+                LineRendererMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>("Assets/ECSLineRenderer/SampleLineMaterial.mat");
+
+            // Set the name of the entity in Editor Mode for the Entity Debugger Window
+            dstManager.SetName(entity, string.Format("Laser Pointer " + raycastAuthoring.RayOrigin.ToString(), entity.Index));
+#endif
+
+            dstManager.AddSharedComponentData(entity, new LineStyle
+            {
+                material = LineRendererMaterial
+            });
 
             Destroy(this);
         }

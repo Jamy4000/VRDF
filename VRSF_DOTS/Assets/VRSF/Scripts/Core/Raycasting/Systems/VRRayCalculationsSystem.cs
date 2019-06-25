@@ -27,6 +27,7 @@ namespace VRSF.Core.Raycast
             base.OnDestroy();
         }
 
+        [Unity.Burst.BurstCompile]
         private void AssignRay()
         {
             Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
@@ -51,6 +52,7 @@ namespace VRSF.Core.Raycast
                         break;
                 }
 
+                raycastOrigin.RayOriginPosition = originTransform.position;
                 raycastOutputs.RayVar = new Ray(originTransform.position, originTransform.TransformDirection(Vector3.forward));
             });
         }

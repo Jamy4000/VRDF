@@ -7,7 +7,6 @@ namespace VRSF.Core.LaserPointer
     [RequireComponentTag(typeof(VRRaycastOrigin))]
     public struct LaserPointerLength : IComponentData
     {
-        [HideInInspector] public float CurrentLength;
         [HideInInspector] public float BaseLength;
     }
 }

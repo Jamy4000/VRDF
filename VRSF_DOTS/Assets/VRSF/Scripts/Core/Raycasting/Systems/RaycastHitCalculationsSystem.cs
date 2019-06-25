@@ -15,7 +15,7 @@ namespace VRSF.Core.Raycast
         /// </summary>
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
+            Entities.ForEach((ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
             {
                 var hits = Physics.RaycastAll(raycastOutputs.RayVar, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
 

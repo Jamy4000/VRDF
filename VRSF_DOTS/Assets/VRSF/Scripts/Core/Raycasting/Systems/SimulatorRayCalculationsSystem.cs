@@ -36,6 +36,7 @@ namespace VRSF.Core.Raycast
             {
                 // We set the ray based on the raycastOrigin if not simulator, and the ScreenPointToRay method if we use the Simulator
                 raycastOutputs.RayVar = _mainCamera.ScreenPointToRay(Input.mousePosition);
+                raycastOrigin.RayOriginPosition = VRSF_Components.VRCamera.transform.position;
             });
         }
 

@@ -1,68 +1,40 @@
-﻿using Unity.Entities;
-using UnityEngine;
+﻿using E7.ECS.LineRenderer;
+using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
+using VRSF.Core.Raycast;
 
 namespace VRSF.Core.LaserPointer
 {
     /// <summary>
     /// Handle the Length of the Pointer depending on if the raycast is hitting something
     /// </summary>
-    public class LaserPointerLengthSystem : ComponentSystem
+    public class LaserPointerLengthSystem : JobComponentSystem
     {
-        struct Filter
-        {
-            public LaserPointerVisibility PointerComp;
-            public LineRenderer PointerRenderer;
-        }
-
-
         #region ComponentSystem_Methods
         // Update is called once per frame
-        protected override void OnUpdate()
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            //foreach (var e in GetEntities<Filter>())
-            //{
-            //    if (e.RaycastComp.IsSetup)
-            //        SetControllerRayLength(e);
-            //}
+            return new SetLineSegmentPositionsJob().Schedule(this, inputDeps);
         }
         #endregion ComponentSystem_Methods
 
-
-        #region PRIVATE_METHODS
-        /// <summary>
-        /// Set the size of the line renderer depending on the hit from the RayCast.
-        /// </summary>
-        /// <param name="hit">The RaycastHitVariable containing the RaycastHit for the controller</param>
-        /// <param name="controller">The controller GameObject from which the ray started</param>
-        /// <param name="hand">The hand rom which we are checking the raycastHit</param>
-        private void SetControllerRayLength(Filter e)
+        [Unity.Burst.BurstCompile]
+        struct SetLineSegmentPositionsJob : IJobForEach<LaserPointerLength, LineSegment, VRRaycastOrigin, VRRaycastOutputs>
         {
-            try
+            public void Execute(ref LaserPointerLength laserLength, ref LineSegment lineSegment, ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs)
             {
-                //if (!e.RaycastComp.RaycastHitVar.IsNull)
-                //{
-                //    //Reduce lineRenderer from the controllers position to the object that was hit
-                //    e.PointerRenderer.SetPositions(new Vector3[]
-                //    {
-                //        Vector3.zero,
-                //        e.RaycastComp.RayOriginTransform.InverseTransformPoint(e.RaycastComp.RaycastHitVar.Value.point),
-                //    });
-                //}
-                //else
-                //{
-                //    //put back lineRenderer to its normal length if nothing was hit
-                //    e.PointerRenderer.SetPositions(new Vector3[]
-                //    {
-                //        Vector3.zero,
-                //        new Vector3(0, 0, e.RaycastComp.MaxRaycastDistance),
-                //    });
-                //}
-            }
-            catch (System.Exception exception)
-            {
-                Debug.Log("<b>[VRSF] :</b> VR Components not setup yet, waiting for next frame.\n" + exception.ToString());
+                lineSegment.from = raycastOrigin.RayOriginPosition;
+
+                if (raycastOutputs.RaycastHitVar.IsNull)
+                {
+                    UnityEngine.Debug.Log("IS NULL");
+                }
+
+                // Reduce lineRenderer from the controllers position to the object that was hit
+                // OR put back lineRenderer to its normal length if nothing was hit
+                lineSegment.to = raycastOutputs.RaycastHitVar.IsNull ? new float3(0.0f, 0.0f, laserLength.BaseLength) : (float3)raycastOutputs.RaycastHitVar.Value.point;
             }
         }
-        #endregion PRIVATE_METHODS
     }
 }

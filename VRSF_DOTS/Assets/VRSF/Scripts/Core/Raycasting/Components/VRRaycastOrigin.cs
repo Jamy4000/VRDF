@@ -8,5 +8,10 @@ namespace VRSF.Core.Raycast
         /// The origin of the raycast for this component
         /// </summary>
         public ERayOrigin RayOrigin;
+
+        /// <summary>
+        /// The position of the origin for this ray
+        /// </summary>
+        public Unity.Mathematics.float3 RayOriginPosition;
     }
 }

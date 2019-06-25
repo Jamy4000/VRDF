@@ -17,15 +17,21 @@ namespace VRSF.Core.LaserPointer
         #endregion ComponentSystem_Methods
 
         [Unity.Burst.BurstCompile]
-        struct CheckPointerStateJob : IJobForEach<LaserPointerState, VRRaycastOutputs, LaserPointerVisibility>
+        struct CheckPointerStateJob : IJobForEach<LaserPointerState, VRRaycastOutputs>
         {
-            public void Execute
-                (ref LaserPointerState stateComp,
-                 ref VRRaycastOutputs raycastOutputs, 
-                 ref LaserPointerVisibility visibilityComp)
+            public void Execute (ref LaserPointerState stateComp, ref VRRaycastOutputs raycastOutputs)
             {
-                if (stateComp.State == EPointerState.ON && raycastOutputs.RaycastHitVar.IsNull)
-                    stateComp.State = EPointerState.DISAPPEARING;
+                switch (stateComp.State)
+                {
+                    case EPointerState.ON:
+                        if (raycastOutputs.RaycastHitVar.IsNull)
+                            stateComp.State = EPointerState.DISAPPEARING;
+                        break;
+                    default:
+                        if (!raycastOutputs.RaycastHitVar.IsNull)
+                            stateComp.State = EPointerState.ON;
+                        break;
+                }
             }
         }
     }
