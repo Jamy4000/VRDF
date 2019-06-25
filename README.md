@@ -1,7 +1,9 @@
 # VR Scriptable Framework using Unity DOTS
-This repository is a Virtual Reality Framework using Scriptable Objects, the Unity Input Manager for Inputs and Interaction, an Event System as seen in [Quill18 video](https://www.youtube.com/watch?v=04wXkgfd9V8) and the DOTS from Unity3D. It aims to ease the use of Virtual Reality in a project, and to have a light tool for that, while integrating a cross-platform project, some basic VR features and being as fast as possible. 
+This repository is a Virtual Reality Framework using the Unity Input Manager for Inputs and Interaction, an Event System as seen in [Quill18 video](https://www.youtube.com/watch?v=04wXkgfd9V8) and the DOTS from Unity3D. It aims to ease the use of Virtual Reality in a project, and to have a light tool for that, while integrating a cross-platform project, some basic VR features and being as fast as possible. 
 
 
+There's still a couple of systems using MonoBehaviour during the PlayMode (Example : the LaserLengthSetter and the LaserWidthSetter), and by that I mean that they're not used to setup any Entity. 
+Those cases are rare, but are most of the time used to link an Event, set on Awake, to a Unity Component that is still not implemented in ECS (Example : the LineRenderer for the LaserPointer).
 If you have any in question on how to use this tool, I'll be glad to answer you, just send me an email to arnaudbriche1994@gmail.com ! :)
 
 
