@@ -10,7 +10,7 @@ namespace VRSF.Core.Inputs
     {
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += CheckForComponents;
+            OnSetupVRReady.Listeners += CheckDevice;
             base.OnCreate();
         }
 
@@ -25,7 +25,7 @@ namespace VRSF.Core.Inputs
 
         protected override void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= CheckForComponents;
+            OnSetupVRReady.Listeners -= CheckDevice;
             base.OnDestroy();
         }
 
@@ -56,31 +56,12 @@ namespace VRSF.Core.Inputs
 
         #region PRIVATE_METHODS
         /// <summary>
-        /// Check if there's at least one MenuInputCapture component and that it has the RIGHT as Hand
+        /// Check if we use the good device
         /// </summary>
         /// <param name="info"></param>
-        private void CheckForComponents(OnSetupVRReady info)
+        private void CheckDevice(OnSetupVRReady info)
         {
-            if (VRSF_Components.DeviceLoaded == EDevice.WMR)
-            {
-                var entityQuery = GetEntityQuery(typeof(MenuInputCapture)).ToComponentDataArray<MenuInputCapture>(Unity.Collections.Allocator.TempJob, out JobHandle jobHandle);
-                if (entityQuery.Length > 0)
-                {
-                    foreach (var tic in entityQuery)
-                    {
-                        if (tic.Hand == EHand.RIGHT)
-                        {
-                            this.Enabled = true;
-                            jobHandle.Complete();
-                            entityQuery.Dispose();
-                            return;
-                        }
-                    }
-                }
-                jobHandle.Complete();
-                entityQuery.Dispose();
-            }
-            this.Enabled = false;
+            this.Enabled = VRSF_Components.DeviceLoaded == EDevice.WMR;
         }
         #endregion PRIVATE_METHODS
     }

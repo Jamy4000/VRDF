@@ -13,7 +13,7 @@ namespace VRSF.Core.Inputs
     {
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += CheckForComponents;
+            OnSetupVRReady.Listeners += CheckDevice;
             base.OnCreate();
         }
 
@@ -30,7 +30,7 @@ namespace VRSF.Core.Inputs
 
         protected override void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= CheckForComponents;
+            OnSetupVRReady.Listeners -= CheckDevice;
             base.OnDestroy();
         }
 
@@ -72,12 +72,12 @@ namespace VRSF.Core.Inputs
 
         #region PRIVATE_METHODS
         /// <summary>
-        /// Check if there's at least one AButtonInputCapture component and that it has the RIGHT as Hand
+        /// Check if we use the good device
         /// </summary>
         /// <param name="info"></param>
-        private void CheckForComponents(OnSetupVRReady info)
+        private void CheckDevice(OnSetupVRReady info)
         {
-            this.Enabled = IsOculusHeadset() && GetEntityQuery(typeof(YButtonInputCapture)).CalculateLength() > 0;
+            this.Enabled = IsOculusHeadset();
 
             bool IsOculusHeadset()
             {

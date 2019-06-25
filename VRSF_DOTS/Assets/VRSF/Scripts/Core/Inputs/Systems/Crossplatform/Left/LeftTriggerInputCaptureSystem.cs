@@ -2,7 +2,6 @@
 using Unity.Jobs;
 using UnityEngine;
 using VRSF.Core.Controllers;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs
 {
@@ -11,24 +10,12 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class LeftTriggerInputCaptureSystem : JobComponentSystem
     {
-        protected override void OnCreate()
-        {
-            OnSetupVRReady.Listeners += CheckForComponents;
-            base.OnCreate();
-        }
-
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             return new TriggerInputCaptureJob
             {
                 TriggerSqueezeValue = Input.GetAxis("LeftTriggerSqueeze")
             }.Schedule(this, inputDeps);
-        }
-
-        protected override void OnDestroy()
-        {
-            OnSetupVRReady.Listeners -= CheckForComponents;
-            base.OnDestroy();
         }
 
         [Unity.Burst.BurstCompile]
@@ -67,32 +54,5 @@ namespace VRSF.Core.Inputs
                 }
             }
         }
-
-        #region PRIVATE_METHODS
-        /// <summary>
-        /// Check if there's at least one TriggerInputCapture component and that it has the LEFT as Hand
-        /// </summary>
-        /// <param name="info"></param>
-        private void CheckForComponents(OnSetupVRReady info)
-        {
-            var entityQuery = GetEntityQuery(typeof(TriggerInputCapture)).ToComponentDataArray<TriggerInputCapture>(Unity.Collections.Allocator.TempJob, out JobHandle jobHandle);
-            if (entityQuery.Length > 0)
-            {
-                foreach (var tic in entityQuery)
-                {
-                    if (tic.Hand == EHand.LEFT)
-                    {
-                        this.Enabled = true;
-                        jobHandle.Complete();
-                        entityQuery.Dispose();
-                        return;
-                    }
-                }
-            }
-            jobHandle.Complete();
-            entityQuery.Dispose();
-            this.Enabled = false;
-        }
-        #endregion PRIVATE_METHODS
     }
 }

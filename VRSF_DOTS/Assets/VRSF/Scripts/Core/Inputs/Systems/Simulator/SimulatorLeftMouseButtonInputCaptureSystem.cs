@@ -44,25 +44,32 @@ namespace VRSF.Core.Inputs
 
             public void Execute(ref TriggerInputCapture triggerInput)
             {
-                triggerInput.TriggerSqueezeValue = LeftMouseButtonIsClicking ? 1 : 0;
+                if (triggerInput.Hand == EHand.LEFT)
+                {
+                    triggerInput.TriggerSqueezeValue = LeftMouseButtonIsClicking ? 1 : 0;
 
-                // Check Click Events
-                if (!triggerInput.TriggerClick && LeftMouseButtonIsClicking)
-                {
-                    triggerInput.TriggerClick = true;
-                    triggerInput.TriggerTouch = true;
-                    new ButtonClickEvent(EHand.LEFT, EControllersButton.TRIGGER);
-                }
-                else if (triggerInput.TriggerClick && !LeftMouseButtonIsClicking)
-                {
-                    triggerInput.TriggerClick = false;
-                    triggerInput.TriggerTouch = false;
-                    new ButtonUnclickEvent(EHand.LEFT, EControllersButton.TRIGGER);
+                    // Check Click Events
+                    if (!triggerInput.TriggerClick && LeftMouseButtonIsClicking)
+                    {
+                        triggerInput.TriggerClick = true;
+                        triggerInput.TriggerTouch = true;
+                        new ButtonClickEvent(EHand.LEFT, EControllersButton.TRIGGER);
+                    }
+                    else if (triggerInput.TriggerClick && !LeftMouseButtonIsClicking)
+                    {
+                        triggerInput.TriggerClick = false;
+                        triggerInput.TriggerTouch = false;
+                        new ButtonUnclickEvent(EHand.LEFT, EControllersButton.TRIGGER);
+                    }
                 }
             }
         }
 
         #region PRIVATE_METHODS
+        /// <summary>
+        /// Check if we use the good device
+        /// </summary>
+        /// <param name="info"></param>
         private void CheckDevice(OnSetupVRReady info)
         {
             this.Enabled = VRSF_Components.DeviceLoaded == EDevice.SIMULATOR;

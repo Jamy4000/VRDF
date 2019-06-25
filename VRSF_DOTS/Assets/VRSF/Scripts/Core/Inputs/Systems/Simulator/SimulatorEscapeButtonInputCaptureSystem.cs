@@ -59,6 +59,10 @@ namespace VRSF.Core.Inputs
         }
 
         #region PRIVATE_METHODS
+        /// <summary>
+        /// Check if we use the good device
+        /// </summary>
+        /// <param name="info"></param>
         private void CheckDevice(OnSetupVRReady info)
         {
             this.Enabled = VRSF_Components.DeviceLoaded == EDevice.SIMULATOR;
