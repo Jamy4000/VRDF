@@ -1,47 +1,42 @@
-﻿using E7.ECS.LineRenderer;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
+using VRSF.Core.Raycast;
 
 namespace VRSF.Core.LaserPointer
 {
     /// <summary>
     /// Make the Pointer appear only when it's hitting something
     /// </summary>
-    public class LaserPointerVisibilitySystem : JobComponentSystem
+    public class LaserPointerVisibilitySystem : ComponentSystem
     {
         #region ComponentSystem_Methods
-        // Update is called once per frame
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
-        {
-            return new SetLineWidthJob
-            {
-                DeltaTime = Time.deltaTime
-            }.Schedule(this, inputDeps);
-        }
-        #endregion ComponentSystem_Methods
-
         [Unity.Burst.BurstCompile]
-        struct SetLineWidthJob : IJobForEach<LaserPointerState, LineSegment, LaserPointerVisibility, LaserPointerWidth>
+        protected override void OnUpdate()
         {
-            public float DeltaTime;
-
-            public void Execute(ref LaserPointerState stateComp, ref LineSegment lineSegment, ref LaserPointerVisibility visibilityComp, ref LaserPointerWidth widthComp)
+            Entities.ForEach((ref LaserPointerState stateComp, ref LaserPointerVisibility visibilityComp, ref LaserPointerWidth widthComp, ref VRRaycastOrigin raycastOrigin) =>
             {
                 switch (stateComp.State)
                 {
                     case EPointerState.ON:
-                        lineSegment.lineWidth = widthComp.BaseWidth;
+                        if (stateComp.StateJustChangedToOn)
+                        {
+                            stateComp.StateJustChangedToOn = false;
+                            new OnLaserWidthChanged(raycastOrigin.RayOrigin, widthComp.BaseWidth);
+                        }
                         break;
 
                     case EPointerState.DISAPPEARING:
-                        lineSegment.lineWidth -= (DeltaTime * visibilityComp.DisappearanceSpeed) / 1000;
+                        var newWidth = (Time.deltaTime * visibilityComp.DisappearanceSpeed) / 1000;
 
-                        if (lineSegment.lineWidth < 0.0f)
+                        if (newWidth < 0.0f)
                             stateComp.State = EPointerState.OFF;
+
+                        new OnLaserWidthChanged(raycastOrigin.RayOrigin, newWidth);
                         break;
                 }
-            }
+            });
         }
+        #endregion ComponentSystem_Methods
     }
 }

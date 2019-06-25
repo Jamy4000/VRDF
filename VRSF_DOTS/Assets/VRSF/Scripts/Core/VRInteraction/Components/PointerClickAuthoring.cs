@@ -31,6 +31,8 @@ namespace VRSF.Core.Interactions
                 CanClick = true,
                 ClickEventWasFired = false
             });
+
+            Destroy(this);
         }
     }
 

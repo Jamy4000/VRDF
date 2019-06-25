@@ -28,8 +28,11 @@ namespace VRSF.Core.LaserPointer
                             stateComp.State = EPointerState.DISAPPEARING;
                         break;
                     default:
-                        if (!raycastOutputs.RaycastHitVar.IsNull)
+                        if (!raycastOutputs.RaycastHitVar.IsNull && !stateComp.StateJustChangedToOn)
+                        {
                             stateComp.State = EPointerState.ON;
+                            stateComp.StateJustChangedToOn = true;
+                        }
                         break;
                 }
             }
