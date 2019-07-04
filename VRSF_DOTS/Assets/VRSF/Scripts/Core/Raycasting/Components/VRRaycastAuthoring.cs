@@ -38,11 +38,6 @@ namespace VRSF.Core.Raycast
                 RayVar = new Ray()
             });
 
-//#if UNITY_EDITOR
-//            // Set the name of the entity in Editor Mode for the Entity Debugger Window
-//            dstManager.SetName(entity, string.Format("Raycast " + RayOrigin.ToString(), entity.Index));
-//#endif
-
             // We destroy this component as we don't need it anymore
             Destroy(this);
         }

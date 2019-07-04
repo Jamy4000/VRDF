@@ -2,7 +2,6 @@
 using UnityEngine;
 using VRSF.Core.Events;
 using VRSF.Core.Raycast;
-using VRSF.Interactions;
 
 namespace VRSF.Core.Interactions
 {

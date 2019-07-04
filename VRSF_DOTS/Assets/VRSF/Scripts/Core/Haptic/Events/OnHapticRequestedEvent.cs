@@ -22,12 +22,6 @@
 
         public OnHapticRequestedEvent(EHand hand, EHapticDuration hapticDuration, EHapticAmplitude hapticAmplitude = EHapticAmplitude.MEDIUM) : base("Event to call when you want to launch haptic in the controller of the user.")
         {
-            if (hand.Equals(EHand.NONE))
-            {
-                UnityEngine.Debug.LogError("The specified hand for the Haptic Request is not vqlid. Please give right or left hand as parameter of the event. Returning.");
-                return;
-            }
-
             Hand = hand;
             HapticDuration = GetBaseDuration(hapticDuration);
             HapticAmplitude = GetBaseAmplitude(hapticAmplitude);
@@ -36,12 +30,6 @@
 
         public OnHapticRequestedEvent(EHand hand, float hapticDuration = 1.0f, float hapticAmplitude = 1.0f) : base("Event to call when you want to launch haptic in the controller of the user.")
         {
-            if (hand.Equals(EHand.NONE))
-            {
-                UnityEngine.Debug.LogError("The specified hand for the Haptic Request is not vqlid. Please give right or left hand as parameter of the event. Returning.");
-                return;
-            }
-
             Hand = hand;
             HapticDuration = hapticDuration;
             HapticAmplitude = hapticAmplitude;

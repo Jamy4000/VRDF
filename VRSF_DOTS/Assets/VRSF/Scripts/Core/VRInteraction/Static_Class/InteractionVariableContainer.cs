@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VRSF.Interactions
+namespace VRSF.Core.Interactions
 {
     /// <summary>
     /// TODO Refactor, static classes shouldn't be used in Jobs

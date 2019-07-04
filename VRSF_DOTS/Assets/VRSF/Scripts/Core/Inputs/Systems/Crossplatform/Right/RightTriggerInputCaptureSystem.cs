@@ -31,7 +31,6 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        [Unity.Burst.BurstCompile]
         struct TriggerInputCaptureJob : IJobForEach<TriggerInputCapture>
         {
             public float TriggerSqueezeValue;

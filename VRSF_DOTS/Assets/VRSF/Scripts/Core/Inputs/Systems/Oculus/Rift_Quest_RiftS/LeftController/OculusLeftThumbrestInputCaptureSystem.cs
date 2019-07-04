@@ -32,7 +32,6 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        [Unity.Burst.BurstCompile]
         struct ThumbrestButtonInputCaptureJob : IJobForEach<ThumbrestInputCapture>
         {
             public bool ThumbrestTouchButtonDown;

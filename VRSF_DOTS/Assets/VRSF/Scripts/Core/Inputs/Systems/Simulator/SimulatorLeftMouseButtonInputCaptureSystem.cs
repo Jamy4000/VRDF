@@ -37,7 +37,6 @@ namespace VRSF.Core.Inputs
         #endregion
 
 
-        [Unity.Burst.BurstCompile]
         struct SimulatorInputCaptureJob : IJobForEach<TriggerInputCapture>
         {
             public bool LeftMouseButtonIsClicking;

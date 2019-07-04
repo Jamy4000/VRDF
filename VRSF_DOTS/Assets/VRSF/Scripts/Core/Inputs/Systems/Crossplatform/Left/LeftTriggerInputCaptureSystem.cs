@@ -18,7 +18,6 @@ namespace VRSF.Core.Inputs
             }.Schedule(this, inputDeps);
         }
 
-        [Unity.Burst.BurstCompile]
         struct TriggerInputCaptureJob : IJobForEach<TriggerInputCapture>
         {
             public float TriggerSqueezeValue;

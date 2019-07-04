@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Events;
 using VRSF.Core.Controllers;
-using VRSF.Interactions;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;

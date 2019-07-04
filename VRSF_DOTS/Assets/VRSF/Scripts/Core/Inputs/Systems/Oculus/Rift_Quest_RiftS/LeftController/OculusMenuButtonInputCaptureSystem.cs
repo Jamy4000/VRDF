@@ -32,7 +32,6 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        [Unity.Burst.BurstCompile]
         struct MenuButtonInputCaptureJob : IJobForEach<MenuInputCapture>
         {
             public bool MenuClickButtonDown;

@@ -9,15 +9,29 @@
 - [ ] Controllers Models Setup Systems
 - [ ] ButtonActionChoser Systems
 
+### OPTIONAL
+- [ ] Redo LaserPointer using mesh generation, like DrawMesh, and a simple plane (Welcome to my life).
+
+
+
 ## MOVE AROUND Package
 - [ ] Fly Away Systems
 - [ ] SBS Teleport Systems
 - [ ] Curve Teleport Systems
+
+### OPTIONAL
 - [ ] LongRange Teleport Systems
+
+
 
 ## GAZE Package
 - [ ] Core Systems
 - [ ] Reticle Systems
+
+### OPTIONAL
+
+
+
 
 ## UI Package
 I'm not sure I'm gonna take care of that, as long as Unity didn't switch to the new version.

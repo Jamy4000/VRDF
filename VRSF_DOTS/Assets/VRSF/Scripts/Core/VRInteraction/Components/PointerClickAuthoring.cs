@@ -14,20 +14,20 @@ namespace VRSF.Core.Interactions
     {
         [Header("The Hand attached to this click interaction")]
         [Tooltip("We always use the trigger for clicking on stuff. If you wanna modify that, check the TriggerInputCapture component in script by the one you want to use.")]
-        public EHand HandClicking = EHand.NONE;
+        [SerializeField] private EHand _handClicking;
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             // We add a new trigger input capture as we click using this trigger
             dstManager.AddComponentData(entity, new TriggerInputCapture
             {
-                Hand = HandClicking
+                Hand = _handClicking
             });
 
             // We add a new pointer click to store
             dstManager.AddComponentData(entity, new PointerClick
             {
-                HandClicking = HandClicking,
+                HandClicking = _handClicking,
                 CanClick = true,
                 ClickEventWasFired = false
             });
