@@ -6,7 +6,7 @@
 - [x] Haptic Effect
 - [x] Fading Effect
 - [x] LaserPointer Systems
-- [ ] Controllers Models Setup Systems
+- [x] Controllers Models Setup Systems
 - [ ] ButtonActionChoser Systems
 
 ### OPTIONAL
