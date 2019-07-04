@@ -1,5 +1,4 @@
-﻿using Unity.Entities;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace VRSF.Core.SetupVR
 { 
@@ -14,7 +13,7 @@ namespace VRSF.Core.SetupVR
         [SerializeField]
         public bool CheckDeviceAtRuntime = true;
 
-        public void Awake()
+        public void Start()
         {
             if (CheckDeviceAtRuntime)
             {

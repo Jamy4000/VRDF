@@ -10,6 +10,10 @@ namespace VRSF.Core.LaserPointer
         [Header("Laser Renderering Parameters")]
         [Tooltip("The base width for this pointer when you are pointing at something.")]
         [SerializeField] private float _pointerWidth = 0.001f;
+        [Tooltip("If you want the pointer to set its endpoint to the center of the 3D object it just hit.")]
+        [SerializeField] private bool _shouldPointTo3DObjectCenter;
+        [Tooltip("If you want the pointer to set its endpoint to the center of the UI element it just hit. WARNING : UI Colliders needs to be on the UI Layer.")]
+        [SerializeField] private bool _shouldPointToUICenter;
 
         [Header("Disappearance Parameters")]
         [Tooltip("The base state of the Pointer.")]
@@ -39,7 +43,9 @@ namespace VRSF.Core.LaserPointer
 
             dstManager.AddComponentData(entity, new LaserPointerLength
             {
-                BaseLength = raycastAuthoring.MaxRaycastDistance
+                BaseLength = raycastAuthoring.MaxRaycastDistance,
+                ShouldPointTo3DObjectsCenter = _shouldPointTo3DObjectCenter,
+                ShouldPointToUICenter = _shouldPointToUICenter
             });
 
 #if UNITY_EDITOR

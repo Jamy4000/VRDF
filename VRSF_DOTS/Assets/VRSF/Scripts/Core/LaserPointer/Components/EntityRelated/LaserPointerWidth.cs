@@ -7,5 +7,6 @@ namespace VRSF.Core.LaserPointer
     public struct LaserPointerWidth : IComponentData
     {
         [HideInInspector] public float BaseWidth;
+        [HideInInspector] public float CurrentWidth;
     }
 }

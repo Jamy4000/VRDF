@@ -7,6 +7,12 @@ namespace VRSF.Core.Raycast
         public RaycastHit Value;
         public bool IsNull;
 
+        public RaycastHitVariable(bool isNullOnStart = true)
+        {
+            Value = new RaycastHit();
+            IsNull = isNullOnStart;
+        }
+
         public void SetIsNull(bool value)
         {
             IsNull = value;

@@ -22,17 +22,18 @@ namespace VRSF.Core.LaserPointer
                         if (stateComp.StateJustChangedToOn)
                         {
                             stateComp.StateJustChangedToOn = false;
+                            widthComp.CurrentWidth = widthComp.BaseWidth;
                             new OnLaserWidthChanged(raycastOrigin.RayOrigin, widthComp.BaseWidth);
                         }
                         break;
 
                     case EPointerState.DISAPPEARING:
-                        var newWidth = (Time.deltaTime * visibilityComp.DisappearanceSpeed) / 1000;
+                        widthComp.CurrentWidth -= (Time.deltaTime * visibilityComp.DisappearanceSpeed) / 2000;
 
-                        if (newWidth < 0.0f)
+                        if (widthComp.CurrentWidth < 0.0f)
                             stateComp.State = EPointerState.OFF;
 
-                        new OnLaserWidthChanged(raycastOrigin.RayOrigin, newWidth);
+                        new OnLaserWidthChanged(raycastOrigin.RayOrigin, widthComp.CurrentWidth);
                         break;
                 }
             });

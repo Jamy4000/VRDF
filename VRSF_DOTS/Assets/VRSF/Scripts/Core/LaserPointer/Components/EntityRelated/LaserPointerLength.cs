@@ -7,6 +7,8 @@ namespace VRSF.Core.LaserPointer
     [RequireComponentTag(typeof(VRRaycastOrigin))]
     public struct LaserPointerLength : IComponentData
     {
+        [HideInInspector] public bool ShouldPointTo3DObjectsCenter;
+        [HideInInspector] public bool ShouldPointToUICenter;
         [HideInInspector] public float BaseLength;
     }
 }
