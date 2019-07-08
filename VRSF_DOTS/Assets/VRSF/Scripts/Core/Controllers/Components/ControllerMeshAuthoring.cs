@@ -11,6 +11,10 @@ namespace VRSF.Core.Controllers
         [Tooltip("To which hand should this controller's mesh be assigned to ?")]
         [SerializeField] private EHand _controllersHand;
 
+        [Header("Destroy GameObject on Setup ended")]
+        [Tooltip("Should this gameobject be destroyed when the setup ended, or should only this script be destroyed ?")]
+        [SerializeField] private bool _destroyOnSetup = true;
+
         [Header("The Controller for this hand")]
         [Tooltip("This component group all controller's mesh for each loadable device. The created Controller will be set as child of the parent from the corresponding hand.")]
         [SerializeField] private VRControllers[] _vrControllers;
@@ -39,7 +43,11 @@ namespace VRSF.Core.Controllers
 
                 var parent = _controllersHand == EHand.LEFT ? VRSF_Components.LeftController.transform : VRSF_Components.RightController.transform;
                 GameObject.Instantiate(_controllersPerDevice[VRSF_Components.DeviceLoaded], parent);
-                Destroy(gameObject);
+
+                if (_destroyOnSetup)
+                    Destroy(gameObject);
+                else
+                    Destroy(this);
             }
             catch
             {

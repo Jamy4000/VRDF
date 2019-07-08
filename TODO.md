@@ -11,7 +11,8 @@
 
 ### OPTIONAL
 - [ ] Redo LaserPointer using mesh generation, like DrawMesh, and a simple plane (Welcome to my life).
-
+- [ ] Redo Controllers Setup using RenderMesh SharedComponent.
+- [ ] Rewrite Input Systems with burstCompiler. For that, we need to get the jobs' outputs.
 
 
 ## MOVE AROUND Package

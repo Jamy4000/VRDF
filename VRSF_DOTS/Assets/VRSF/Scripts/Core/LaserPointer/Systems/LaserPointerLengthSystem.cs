@@ -17,6 +17,7 @@ namespace VRSF.Core.LaserPointer
             _uiLayer = UnityEngine.LayerMask.NameToLayer("UI");
         }
         #region ComponentSystem_Methods
+
         [Unity.Burst.BurstCompile]
         protected override void OnUpdate()
         {
