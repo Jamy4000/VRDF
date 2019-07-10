@@ -14,15 +14,9 @@ namespace VRSF.Core.Inputs
         /// </summary>
         public bool IsUserRightHanded;
 
-        /// <summary>
-        /// Is the User clicking on the Back button ?
-        /// </summary>
-        public bool BackButtonClick;
-
         public GoAndGearVRInputCapture(bool isUserRightHanded = true)
         {
             IsUserRightHanded = isUserRightHanded;
-            BackButtonClick = false;
         }
     }
 }

@@ -32,23 +32,23 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct ThumbrestButtonInputCaptureJob : IJobForEach<ThumbrestInputCapture>
+        struct ThumbrestButtonInputCaptureJob : IJobForEach<ThumbrestInputCapture, BaseInputCapture>
         {
             public bool ThumbrestTouchButtonDown;
             public bool ThumbrestTouchButtonUp;
 
-            public void Execute(ref ThumbrestInputCapture thumbrestCapture)
+            public void Execute(ref ThumbrestInputCapture thumbrestCapture, ref BaseInputCapture baseInput)
             {
                 if (thumbrestCapture.Hand == EHand.LEFT)
                 {
                     if (ThumbrestTouchButtonDown)
                     {
-                        thumbrestCapture.ThumbrestTouch = true;
+                        baseInput.IsTouching = true;
                         new ButtonTouchEvent(EHand.LEFT, EControllersButton.THUMBREST);
                     }
                     else if (ThumbrestTouchButtonUp)
                     {
-                        thumbrestCapture.ThumbrestTouch = false;
+                        baseInput.IsTouching = false;
                         new ButtonUntouchEvent(EHand.LEFT, EControllersButton.THUMBREST);
                     }
                 }

@@ -18,17 +18,12 @@ namespace VRSF.Core.Utils.ButtonActionChoser
             public BACCalculationsComponent BACCalculationsComp;
         }
 
-        #region PRIVATE_VARIBALES
-        private InputVariableContainer _inputsContainer;
-        #endregion PRIVATE_VARIABLES
-
 
         #region ComponentSystem_Methods
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         protected override void OnCreateManager()
         {
             SDKChoserIsSetup.Listeners += StartBACsSetup;
-            _inputsContainer = InputVariableContainer.Instance;
 
             base.OnCreateManager();
         }
@@ -102,7 +97,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
                     return false;
                 }
 
-                entity.BACCalculationsComp.ThumbPos = _inputsContainer.LeftThumbPosition;
+                //entity.BACCalculationsComp.ThumbPos = _inputsContainer.LeftThumbPosition;
             }
             else if (entity.BACGeneralComp.ActionButton == EControllersButton.TOUCHPAD &&
                 entity.BACGeneralComp.ButtonHand == EHand.RIGHT)
@@ -114,7 +109,7 @@ namespace VRSF.Core.Utils.ButtonActionChoser
                     return false;
                 }
 
-                entity.BACCalculationsComp.ThumbPos = _inputsContainer.RightThumbPosition;
+                //entity.BACCalculationsComp.ThumbPos = _inputsContainer.RightThumbPosition;
             }
 
             return true;
@@ -149,23 +144,23 @@ namespace VRSF.Core.Utils.ButtonActionChoser
 
         private void StartBACsSetup(SDKChoserIsSetup info)
         {
-            foreach (var entity in GetEntities<Filter>())
-            {
-                // We check on which hand is set the Action Button selected
-                CheckButtonHand(entity);
+            //foreach (var entity in GetEntities<Filter>())
+            //{
+            //    // We check on which hand is set the Action Button selected
+            //    CheckButtonHand(entity);
 
-                // We check that all the parameters are set correctly
-                if (entity.BACCalculationsComp.ParametersAreInvalid || !CheckParameters(entity))
-                {
-                    Debug.LogError("The Button Action Choser parameters for the ButtonActionChoserComponents on the " + entity.BACGeneralComp.transform.name + " object are invalid.\n" +
-                        "Please specify valid values as displayed in the Help Boxes under your script. Setting CanBeUsed of ButtonActionChoserComponents to false.");
-                    entity.BACCalculationsComp.CanBeUsed = false;
-                }
-                else
-                {
-                    entity.BACCalculationsComp.ActionButtonIsReady = true;
-                }
-            }
+            //    // We check that all the parameters are set correctly
+            //    if (entity.BACCalculationsComp.ParametersAreInvalid || !CheckParameters(entity))
+            //    {
+            //        Debug.LogError("The Button Action Choser parameters for the ButtonActionChoserComponents on the " + entity.BACGeneralComp.transform.name + " object are invalid.\n" +
+            //            "Please specify valid values as displayed in the Help Boxes under your script. Setting CanBeUsed of ButtonActionChoserComponents to false.");
+            //        entity.BACCalculationsComp.CanBeUsed = false;
+            //    }
+            //    else
+            //    {
+            //        entity.BACCalculationsComp.ActionButtonIsReady = true;
+            //    }
+            //}
             new OnActionButtonIsReady();
         }
         #endregion PRIVATES_METHODS

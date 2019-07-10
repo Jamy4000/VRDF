@@ -31,36 +31,36 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct GripInputCaptureJob : IJobForEach<GripInputCapture>
+        struct GripInputCaptureJob : IJobForEach<GripInputCapture, BaseInputCapture>
         {
             public float GripSqueezeValue;
 
-            public void Execute(ref GripInputCapture gripInput)
+            public void Execute(ref GripInputCapture gripInput, ref BaseInputCapture baseInput)
             {
                 // This system only works for the right controller, as the right input are given as parameters of this system
                 if (gripInput.Hand == EHand.RIGHT)
                 {
                     // Check Click Events
-                    if (!gripInput.GripClick && GripSqueezeValue > gripInput.SqueezeClickThreshold)
+                    if (!baseInput.IsClicking && GripSqueezeValue > gripInput.SqueezeClickThreshold)
                     {
-                        gripInput.GripClick = true;
-                        gripInput.GripTouch = false;
+                        baseInput.IsClicking = true;
+                        baseInput.IsTouching = false;
                         new ButtonClickEvent(EHand.RIGHT, EControllersButton.GRIP);
                     }
-                    else if (gripInput.GripClick && GripSqueezeValue < gripInput.SqueezeClickThreshold)
+                    else if (baseInput.IsClicking && GripSqueezeValue < gripInput.SqueezeClickThreshold)
                     {
-                        gripInput.GripClick = false;
+                        baseInput.IsClicking = false;
                         new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.GRIP);
                     }
                     // Check Touch Events if user is not clicking
-                    else if (!gripInput.GripTouch && GripSqueezeValue > 0.0f)
+                    else if (!baseInput.IsTouching && GripSqueezeValue > 0.0f)
                     {
-                        gripInput.GripTouch = true;
+                        baseInput.IsTouching = true;
                         new ButtonTouchEvent(EHand.RIGHT, EControllersButton.GRIP);
                     }
-                    else if (gripInput.GripTouch && GripSqueezeValue == 0.0f)
+                    else if (baseInput.IsTouching && GripSqueezeValue == 0.0f)
                     {
-                        gripInput.GripTouch = false;
+                        baseInput.IsTouching = false;
                         new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.GRIP);
                     }
                 }

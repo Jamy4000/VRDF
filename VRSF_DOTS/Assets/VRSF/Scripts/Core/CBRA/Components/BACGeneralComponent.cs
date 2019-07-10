@@ -10,9 +10,9 @@ namespace VRSF.Core.Utils.ButtonActionChoser
     {
         [Header("The type of Interaction you want to use")]
         [HideInInspector] public EControllerInteractionType InteractionType = EControllerInteractionType.NONE;
-        
+
         [Header("The hand on which the button to use is situated")]
-        [HideInInspector] public EHand ButtonHand = EHand.NONE;
+        [HideInInspector] public EHand ButtonHand;
 
         [Header("The button you wanna use for the Action")]
         [HideInInspector] public EControllersButton ActionButton = EControllersButton.NONE;
@@ -36,8 +36,5 @@ namespace VRSF.Core.Utils.ButtonActionChoser
         [HideInInspector] public UnityEvent OnButtonStartClicking = new UnityEvent();
         [HideInInspector] public UnityEvent OnButtonStopClicking = new UnityEvent();
         [HideInInspector] public UnityEvent OnButtonIsClicking = new UnityEvent();
-
-        // Set within the BACTimerUpdateSystem on Start.
-        [HideInInspector] public BACTimerComponent BACTimer;
     }
 }

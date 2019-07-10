@@ -13,15 +13,9 @@ namespace VRSF.Core.Inputs
         /// </summary>
         public EHand Hand;
 
-        /// <summary>
-        /// Is the User touching on the thumbrest
-        /// </summary>
-        public bool ThumbrestTouch;
-
         public ThumbrestInputCapture(EHand hand)
         {
             Hand = hand;
-            ThumbrestTouch = false;
         }
     }
 }

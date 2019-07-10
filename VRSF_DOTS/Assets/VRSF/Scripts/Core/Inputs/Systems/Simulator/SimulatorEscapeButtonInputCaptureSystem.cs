@@ -37,21 +37,21 @@ namespace VRSF.Core.Inputs
         }
         #endregion
 
-        struct SimulatorInputCaptureJob : IJobForEach<MenuInputCapture>
+        struct SimulatorInputCaptureJob : IJobForEach<MenuInputCapture, BaseInputCapture>
         {
             public bool EscapeButtonWasClick;
 
-            public void Execute(ref MenuInputCapture menuInput)
+            public void Execute(ref MenuInputCapture menuInput, ref BaseInputCapture baseInput)
             {
                 // Check Click Events
-                if (!menuInput.MenuClick && EscapeButtonWasClick)
+                if (!baseInput.IsClicking && EscapeButtonWasClick)
                 {
-                    menuInput.MenuClick = true;
+                    baseInput.IsClicking = true;
                     new ButtonClickEvent(EHand.LEFT, EControllersButton.MENU);
                 }
-                else if (menuInput.MenuClick && !EscapeButtonWasClick)
+                else if (baseInput.IsClicking && !EscapeButtonWasClick)
                 {
-                    menuInput.MenuClick = false;
+                    baseInput.IsClicking = false;
                     new ButtonUnclickEvent(EHand.LEFT, EControllersButton.MENU);
                 }
             }

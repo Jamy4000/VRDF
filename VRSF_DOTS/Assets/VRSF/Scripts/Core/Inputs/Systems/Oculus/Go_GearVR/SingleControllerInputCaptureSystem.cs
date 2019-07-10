@@ -32,22 +32,22 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct BackButtonInputCaptureJob : IJobForEach<GoAndGearVRInputCapture>
+        struct BackButtonInputCaptureJob : IJobForEach<GoAndGearVRInputCapture, BaseInputCapture>
         {
             public bool MenuButtonDown;
             public bool MenuButtonUp;
 
-            public void Execute(ref GoAndGearVRInputCapture goAndGearInput)
+            public void Execute(ref GoAndGearVRInputCapture goAndGearInput, ref BaseInputCapture baseInput)
             {
                 // Check Click Events
                 if (MenuButtonDown)
                 {
-                    goAndGearInput.BackButtonClick = true;
+                    baseInput.IsClicking = true;
                     new ButtonClickEvent(goAndGearInput.IsUserRightHanded ? EHand.RIGHT : EHand.LEFT, EControllersButton.BACK_BUTTON);
                 }
                 else if (MenuButtonUp)
                 {
-                    goAndGearInput.BackButtonClick = false;
+                    baseInput.IsClicking = false;
                     new ButtonUnclickEvent(goAndGearInput.IsUserRightHanded ? EHand.RIGHT : EHand.LEFT, EControllersButton.BACK_BUTTON);
                 }
             }

@@ -32,12 +32,12 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct MenuInputCaptureJob : IJobForEach<MenuInputCapture>
+        struct MenuInputCaptureJob : IJobForEach<MenuInputCapture, BaseInputCapture>
         {
             public bool MenuButtonDown;
             public bool MenuButtonUp;
 
-            public void Execute(ref MenuInputCapture menuInput)
+            public void Execute(ref MenuInputCapture menuInput, ref BaseInputCapture baseInput)
             {
                 // This system only works for the left controller, as the left input are given as parameters of this system
                 if (menuInput.Hand == EHand.LEFT)
@@ -45,12 +45,12 @@ namespace VRSF.Core.Inputs
                     // Check Click Events
                     if (MenuButtonDown)
                     {
-                        menuInput.MenuClick = true;
+                        baseInput.IsClicking = true;
                         new ButtonClickEvent(EHand.LEFT, EControllersButton.MENU);
                     }
                     else if (MenuButtonUp)
                     {
-                        menuInput.MenuClick = false;
+                        baseInput.IsClicking = false;
                         new ButtonUnclickEvent(EHand.LEFT, EControllersButton.MENU);
                     }
                 }

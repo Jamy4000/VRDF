@@ -19,16 +19,6 @@ namespace VRSF.Core.Inputs
         public float SqueezeClickThreshold;
 
         /// <summary>
-        /// Is the User clicking on the Grip button ?
-        /// </summary>
-        public bool GripClick;
-
-        /// <summary>
-        /// Is the User touching the Grip button ?
-        /// </summary>
-        public bool GripTouch;
-
-        /// <summary>
         /// At which point the user is squeezing the grip, between 0.0f and 1.0f
         /// </summary>
         public float GripSqueezeValue;
@@ -37,8 +27,6 @@ namespace VRSF.Core.Inputs
         {
             Hand = hand;
             SqueezeClickThreshold = squeezeClickThreshold;
-            GripClick = false;
-            GripTouch = false;
             GripSqueezeValue = 0.0f;
         }
     }

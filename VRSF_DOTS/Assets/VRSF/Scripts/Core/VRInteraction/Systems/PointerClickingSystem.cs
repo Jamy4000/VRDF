@@ -22,9 +22,9 @@ namespace VRSF.Core.Interactions
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref PointerClick pointerClick, ref TriggerInputCapture triggerInputCapture, ref VRRaycastOutputs raycastOutputs) =>
+            Entities.ForEach((ref PointerClick pointerClick, ref TriggerInputCapture triggerInputCapture, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs) =>
             {
-                if (!pointerClick.ClickEventWasFired && pointerClick.CanClick && triggerInputCapture.TriggerClick)
+                if (!pointerClick.ClickEventWasFired && pointerClick.CanClick && baseInput.IsClicking)
                 {
                     switch (triggerInputCapture.Hand)
                     {
@@ -38,7 +38,7 @@ namespace VRSF.Core.Interactions
 
                     pointerClick.ClickEventWasFired = true;
                 }
-                else if (pointerClick.ClickEventWasFired && !triggerInputCapture.TriggerClick)
+                else if (pointerClick.ClickEventWasFired && !baseInput.IsClicking)
                 {
                     pointerClick.ClickEventWasFired = false;
                 }

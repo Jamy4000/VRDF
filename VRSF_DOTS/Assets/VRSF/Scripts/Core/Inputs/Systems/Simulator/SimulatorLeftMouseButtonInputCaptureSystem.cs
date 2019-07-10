@@ -37,27 +37,27 @@ namespace VRSF.Core.Inputs
         #endregion
 
 
-        struct SimulatorInputCaptureJob : IJobForEach<TriggerInputCapture>
+        struct SimulatorInputCaptureJob : IJobForEach<TriggerInputCapture, BaseInputCapture>
         {
             public bool LeftMouseButtonIsClicking;
 
-            public void Execute(ref TriggerInputCapture triggerInput)
+            public void Execute(ref TriggerInputCapture triggerInput, ref BaseInputCapture baseInput)
             {
                 if (triggerInput.Hand == EHand.LEFT)
                 {
                     triggerInput.TriggerSqueezeValue = LeftMouseButtonIsClicking ? 1 : 0;
 
                     // Check Click Events
-                    if (!triggerInput.TriggerClick && LeftMouseButtonIsClicking)
+                    if (!baseInput.IsClicking && LeftMouseButtonIsClicking)
                     {
-                        triggerInput.TriggerClick = true;
-                        triggerInput.TriggerTouch = true;
+                        baseInput.IsClicking = true;
+                        baseInput.IsTouching = true;
                         new ButtonClickEvent(EHand.LEFT, EControllersButton.TRIGGER);
                     }
-                    else if (triggerInput.TriggerClick && !LeftMouseButtonIsClicking)
+                    else if (baseInput.IsClicking && !LeftMouseButtonIsClicking)
                     {
-                        triggerInput.TriggerClick = false;
-                        triggerInput.TriggerTouch = false;
+                        baseInput.IsClicking = false;
+                        baseInput.IsTouching = false;
                         new ButtonUnclickEvent(EHand.LEFT, EControllersButton.TRIGGER);
                     }
                 }

@@ -36,7 +36,7 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct TouchpadInputCaptureJob : IJobForEach<TouchpadInputCapture>
+        struct TouchpadInputCaptureJob : IJobForEach<TouchpadInputCapture, BaseInputCapture>
         {
             public float2 ThumbPosition;
 
@@ -46,7 +46,7 @@ namespace VRSF.Core.Inputs
             public bool LeftThumbTouchDown;
             public bool LeftThumbTouchUp;
 
-            public void Execute(ref TouchpadInputCapture touchpadInput)
+            public void Execute(ref TouchpadInputCapture touchpadInput, ref BaseInputCapture baseInput)
             {
                 // This system only works for the left controller, as the left input are given as parameters of this system
                 if (touchpadInput.Hand == EHand.LEFT)
@@ -56,23 +56,24 @@ namespace VRSF.Core.Inputs
                     // Check Click Events
                     if (LeftThumbClickDown)
                     {
-                        touchpadInput.TouchpadClick = true;
+                        baseInput.IsClicking = true;
+                        baseInput.IsTouching = false;
                         new ButtonClickEvent(EHand.LEFT, EControllersButton.TOUCHPAD);
                     }
                     else if (LeftThumbClickUp)
                     {
-                        touchpadInput.TouchpadClick = false;
+                        baseInput.IsClicking = false;
                         new ButtonUnclickEvent(EHand.LEFT, EControllersButton.TOUCHPAD);
                     }
                     // Check Touch Events if user is not clicking
-                    else if (!touchpadInput.TouchpadClick && LeftThumbTouchDown)
+                    else if (!baseInput.IsClicking && LeftThumbTouchDown)
                     {
-                        touchpadInput.TouchpadTouch = true;
+                        baseInput.IsTouching = true;
                         new ButtonTouchEvent(EHand.LEFT, EControllersButton.TOUCHPAD);
                     }
                     else if (LeftThumbTouchUp)
                     {
-                        touchpadInput.TouchpadTouch = false;
+                        baseInput.IsTouching = false;
                         new ButtonUntouchEvent(EHand.LEFT, EControllersButton.TOUCHPAD);
                     }
                 }

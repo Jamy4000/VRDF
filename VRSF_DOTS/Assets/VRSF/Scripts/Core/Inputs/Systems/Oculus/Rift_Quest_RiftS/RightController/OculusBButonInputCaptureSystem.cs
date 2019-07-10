@@ -34,7 +34,8 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct BButtonInputCaptureJob : IJobForEach<BButtonInputCapture>
+        [RequireComponentTag(typeof(BButtonInputCapture))]
+        struct BButtonInputCaptureJob : IJobForEach<BaseInputCapture>
         {
             public bool BClickButtonDown;
             public bool BClickButtonUp;
@@ -42,28 +43,28 @@ namespace VRSF.Core.Inputs
             public bool BTouchButtonDown;
             public bool BTouchButtonUp;
 
-            public void Execute(ref BButtonInputCapture bButtonCapture)
+            public void Execute(ref BaseInputCapture baseInput)
             {
                 // Check Click Events
                 if (BClickButtonDown)
                 {
-                    bButtonCapture.B_Click = true;
+                    baseInput.IsClicking = true;
                     new ButtonClickEvent(EHand.RIGHT, EControllersButton.B_BUTTON);
                 }
                 else if (BClickButtonUp)
                 {
-                    bButtonCapture.B_Click = false;
+                    baseInput.IsClicking = false;
                     new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.B_BUTTON);
                 }
                 // Check Touch Events if user is not clicking
-                else if (!bButtonCapture.B_Click && BTouchButtonDown)
+                else if (!baseInput.IsClicking && BTouchButtonDown)
                 {
-                    bButtonCapture.B_Touch = true;
+                    baseInput.IsTouching = true;
                     new ButtonTouchEvent(EHand.RIGHT, EControllersButton.B_BUTTON);
                 }
                 else if (BTouchButtonUp)
                 {
-                    bButtonCapture.B_Touch = false;
+                    baseInput.IsTouching = false;
                     new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.B_BUTTON);
                 }
             }

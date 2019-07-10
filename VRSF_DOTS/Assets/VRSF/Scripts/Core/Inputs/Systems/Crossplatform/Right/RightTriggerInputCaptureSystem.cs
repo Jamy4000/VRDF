@@ -31,36 +31,36 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct TriggerInputCaptureJob : IJobForEach<TriggerInputCapture>
+        struct TriggerInputCaptureJob : IJobForEach<TriggerInputCapture, BaseInputCapture>
         {
             public float TriggerSqueezeValue;
 
-            public void Execute(ref TriggerInputCapture triggerInput)
+            public void Execute(ref TriggerInputCapture triggerInput, ref BaseInputCapture baseInput)
             {
                 // This system only works for the right controller, as the right input are given as parameters of this system
                 if (triggerInput.Hand == EHand.RIGHT)
                 {
                     // Check Click Events
-                    if (!triggerInput.TriggerClick && TriggerSqueezeValue > triggerInput.SqueezeClickThreshold)
+                    if (!baseInput.IsClicking && TriggerSqueezeValue > triggerInput.SqueezeClickThreshold)
                     {
-                        triggerInput.TriggerClick = true;
-                        triggerInput.TriggerTouch = false;
+                        baseInput.IsClicking = true;
+                        baseInput.IsTouching= false;
                         new ButtonClickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
                     }
-                    else if (triggerInput.TriggerClick && TriggerSqueezeValue < triggerInput.SqueezeClickThreshold)
+                    else if (baseInput.IsClicking && TriggerSqueezeValue < triggerInput.SqueezeClickThreshold)
                     {
-                        triggerInput.TriggerClick = false;
+                        baseInput.IsClicking = false;
                         new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
                     }
                     // Check Touch Events if user is not clicking
-                    else if (!triggerInput.TriggerTouch && TriggerSqueezeValue > 0.0f)
+                    else if (!baseInput.IsTouching && TriggerSqueezeValue > 0.0f)
                     {
-                        triggerInput.TriggerTouch = true;
+                        baseInput.IsTouching = true;
                         new ButtonTouchEvent(EHand.RIGHT, EControllersButton.TRIGGER);
                     }
-                    else if (triggerInput.TriggerTouch && TriggerSqueezeValue == 0.0f)
+                    else if (baseInput.IsTouching && TriggerSqueezeValue == 0.0f)
                     {
-                        triggerInput.TriggerTouch = false;
+                        baseInput.IsTouching = false;
                         new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.TRIGGER);
                     }
                 }

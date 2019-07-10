@@ -19,16 +19,6 @@ namespace VRSF.Core.Inputs
         public float SqueezeClickThreshold;
 
         /// <summary>
-        /// Is the User clicking on the Trigger button ?
-        /// </summary>
-        public bool TriggerClick;
-
-        /// <summary>
-        /// Is the User touching the Trigger button ?
-        /// </summary>
-        public bool TriggerTouch;
-
-        /// <summary>
         /// At which point the user is squeezing the trigger, between 0.0f and 1.0f
         /// </summary>
         public float TriggerSqueezeValue;
@@ -37,8 +27,6 @@ namespace VRSF.Core.Inputs
         {
             Hand = hand;
             SqueezeClickThreshold = squeezeClickThreshold;
-            TriggerClick = false;
-            TriggerTouch = false;
             TriggerSqueezeValue = 0.0f;
         }
     }

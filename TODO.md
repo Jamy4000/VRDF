@@ -14,6 +14,7 @@
 - [ ] Redo Controllers Setup using RenderMesh SharedComponent.
 - [ ] Rewrite Input Systems with burstCompiler. For that, we need to get the jobs' outputs.
 - [ ] Rewrite Input Systems without Right/Left differentiation, as we get the Input in all cases.
+- [ ] Rewrite Input Systems with Touch and Click differentiation (instead of only BaseInputCapture component), and create seperate Systems. NOT MANDATORY, need to check if it make sense
 
 
 ## MOVE AROUND Package

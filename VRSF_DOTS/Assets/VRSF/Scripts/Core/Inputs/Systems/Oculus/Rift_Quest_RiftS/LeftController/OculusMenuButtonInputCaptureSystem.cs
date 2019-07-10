@@ -32,24 +32,24 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct MenuButtonInputCaptureJob : IJobForEach<MenuInputCapture>
+        struct MenuButtonInputCaptureJob : IJobForEach<MenuInputCapture, BaseInputCapture>
         {
             public bool MenuClickButtonDown;
             public bool MenuClickButtonUp;
 
-            public void Execute(ref MenuInputCapture menuInput)
+            public void Execute(ref MenuInputCapture menuInput, ref BaseInputCapture baseInput)
             {
                 if (menuInput.Hand == EHand.LEFT)
                 {
                     // Check Click Events
                     if (MenuClickButtonDown)
                     {
-                        menuInput.MenuClick = true;
+                        baseInput.IsClicking = true;
                         new ButtonClickEvent(EHand.LEFT, EControllersButton.MENU);
                     }
                     else if (MenuClickButtonUp)
                     {
-                        menuInput.MenuClick = false;
+                        baseInput.IsClicking = false;
                         new ButtonUnclickEvent(EHand.LEFT, EControllersButton.MENU);
                     }
                 }

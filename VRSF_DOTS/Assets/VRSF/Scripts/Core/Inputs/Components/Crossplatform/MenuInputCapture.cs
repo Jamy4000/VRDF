@@ -13,15 +13,9 @@ namespace VRSF.Core.Inputs
         /// </summary>
         public EHand Hand;
 
-        /// <summary>
-        /// Is the User clicking on the Menu Button ?
-        /// </summary>
-        public bool MenuClick;
-
         public MenuInputCapture(EHand hand)
         {
             Hand = hand;
-            MenuClick = false;
         }
     }
 }
