@@ -1,11 +1,11 @@
-﻿using System;
+﻿using System.Collections;
 using UnityEngine;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Utils
 {
     /// <summary>
-    /// Destroy the gameobject attached to this object when SertupVR is ready
+    /// Destroy the gameobject attached to this object one frame after SetupVR is ready
     /// </summary>
     public class SetupVRDestroyer : MonoBehaviour
     {
@@ -13,6 +13,7 @@ namespace VRSF.Core.Utils
         {
             OnSetupVRReady.Listeners += DestroyThisObject;
         }
+
         private void OnDestroy()
         {
             OnSetupVRReady.Listeners -= DestroyThisObject;
@@ -20,8 +21,13 @@ namespace VRSF.Core.Utils
 
         private void DestroyThisObject(OnSetupVRReady info)
         {
-            Destroy(gameObject);
-        }
+            StartCoroutine(Destroying());
 
+            IEnumerator Destroying()
+            {
+                yield return new WaitForEndOfFrame();
+                Destroy(gameObject);
+            }
+        }
     }
 }

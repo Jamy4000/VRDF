@@ -19,7 +19,7 @@ namespace VRSF.Core.SetupVR
             {
                 Device = HeadsetChecker.CheckDeviceConnected();
             }
-            else if (Device == EDevice.NULL)
+            else if (Device == EDevice.NONE)
             {
                 Debug.LogError("<b>[VRSF] :</b> Device to Load is null, Checking runtime device.");
                 Device = HeadsetChecker.CheckDeviceConnected();

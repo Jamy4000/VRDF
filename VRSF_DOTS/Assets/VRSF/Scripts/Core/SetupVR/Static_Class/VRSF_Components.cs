@@ -9,7 +9,7 @@ namespace VRSF.Core.SetupVR
     {
         #region PUBLIC_VARIABLES
         [Header("The name of the SDK that has been loaded. Not necessary if you're using a Starting Screen.")]
-        public static EDevice DeviceLoaded = EDevice.NULL;
+        public static EDevice DeviceLoaded = EDevice.NONE;
 
         /// <summary>
         /// Whether the setup by VRSF for VR is ready

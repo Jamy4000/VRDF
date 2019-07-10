@@ -1,5 +1,5 @@
-﻿using Unity.Entities;
-using UnityEngine.Events;
+﻿using System;
+using Unity.Entities;
 
 namespace VRSF.Core.CBRA
 {
@@ -8,8 +8,15 @@ namespace VRSF.Core.CBRA
     /// </summary>
     public struct CBRAClickEvents : IComponentData
     {
-        public UnityEvent OnButtonStartClicking;
-        public UnityEvent OnButtonStopClicking;
-        public UnityEvent OnButtonIsClicking;
+        public Action OnButtonStartClicking;
+        public Action OnButtonIsClicking;
+        public Action OnButtonStopClicking;
+
+        public CBRAClickEvents(Action onStartClicking, Action onIsClicking, Action onStopClicking)
+        {
+            OnButtonStartClicking = onStartClicking;
+            OnButtonIsClicking = onIsClicking;
+            OnButtonStopClicking = onStopClicking;
+        }
     }
 }
