@@ -10,10 +10,10 @@ namespace VRSF.Core.CBRA
     {
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref TouchpadInputCapture touchpadInput, ref CBRAThumbPosition cbraThumbPos, ref CBRAInteractionType cbraInteraction, ref BaseInputCapture baseInput) =>
+            Entities.ForEach((Entity entity, ref TouchpadInputCapture touchpadInput, ref CBRAThumbPosition cbraThumbPos, ref CBRAInteractionType cbraInteraction, ref BaseInputCapture baseInput) =>
             {
-                if ((cbraInteraction.InteractionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK && baseInput.IsClicking && ThumbPositionChecker.CheckThumbPosition(cbraThumbPos.TouchThumbPosition, cbraThumbPos.IsTouchingThreshold, touchpadInput.ThumbPosition))
-                    CBRADelegatesHolder.ClickEvents[cbraInteraction][ActionType.IsInteracting].Invoke();
+                if (CBRADelegatesHolder.ClickEvents.ContainsKey(entity) && baseInput.IsClicking && ThumbPositionChecker.CheckThumbPosition(cbraThumbPos.TouchThumbPosition, cbraThumbPos.IsTouchingThreshold, touchpadInput.ThumbPosition))
+                    CBRADelegatesHolder.ClickEvents[entity][ActionType.IsInteracting].Invoke();
             });
         }
     }

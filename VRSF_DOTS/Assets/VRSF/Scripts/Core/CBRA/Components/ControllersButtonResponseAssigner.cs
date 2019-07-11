@@ -14,7 +14,6 @@ namespace VRSF.Core.CBRA
     /// Let you assign a response to one of the button on the Controllers of your choice.
     /// </summary>
     [RequireComponent(typeof(SetupVRDestroyer))]
-    [UnityEditor.CanEditMultipleObjects]
     public class ControllersButtonResponseAssigner : MonoBehaviour
     {
         [Header("The button you wanna use for the Action")]
@@ -40,10 +39,8 @@ namespace VRSF.Core.CBRA
         [HideInInspector] public EThumbPosition ClickThumbPosition = EThumbPosition.NONE;
 
         [Tooltip("At which threshold is the IsTouching event raised ? Absolute Value between 0 and 1")]
-        [Range(0, 1)]
         [HideInInspector] public float IsTouchingThreshold = 0.1f;
         [Tooltip("At which threshold is the IsClicking event raised ? Absolute Value between 0 and 1")]
-        [Range(0, 1)]
         [HideInInspector] public float IsClickingThreshold = 0.1f;
 
 
@@ -114,7 +111,7 @@ namespace VRSF.Core.CBRA
                 {
                     cbraHasEvents = true;
                     // Add the CBRA Click Events component to the ClickEvents dictionary
-                    CBRADelegatesHolder.ClickEvents.Add(cbraInteraction, new Dictionary<ActionType, Action>
+                    CBRADelegatesHolder.ClickEvents.Add(entity, new Dictionary<ActionType, Action>
                     {
                         { ActionType.StartInteracting, new Action(delegate { OnButtonStartClicking.Invoke(); }) },
                         { ActionType.IsInteracting, new Action(delegate { OnButtonIsClicking.Invoke(); }) },
@@ -130,7 +127,7 @@ namespace VRSF.Core.CBRA
                     cbraHasEvents = true;
 
                     // Add the CBRA Click Events component to the TouchEvents dictionary
-                    CBRADelegatesHolder.TouchEvents.Add(cbraInteraction, new Dictionary<ActionType, Action>
+                    CBRADelegatesHolder.TouchEvents.Add(entity, new Dictionary<ActionType, Action>
                     {
                         { ActionType.StartInteracting, new Action(delegate { OnButtonStartTouching.Invoke(); }) },
                         { ActionType.IsInteracting, new Action(delegate { OnButtonIsTouching.Invoke(); }) },

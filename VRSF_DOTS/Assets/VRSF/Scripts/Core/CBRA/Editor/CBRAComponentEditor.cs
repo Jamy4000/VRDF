@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using System;
 using UnityEditor;
 using UnityEngine;
 using VRSF.Core.Controllers;
@@ -482,6 +481,10 @@ namespace VRSF.Core.CBRA
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="menuCommand"></param>
         [MenuItem("GameObject/VRSF/Utils/Add CBRA Object", priority = 0)]
         [MenuItem("VRSF/Utils/Add CBRA Object", priority = 0)]
         public static void AddCBRAObject(MenuCommand menuCommand)

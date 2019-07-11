@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
 using VRSF.Core.Controllers;
@@ -9,20 +10,47 @@ namespace VRSF.Core.Inputs
     /// <summary>
     /// System common for the VR Headsets, capture the trigger inputs for the right controller
     /// </summary>
-    public class RightTriggerInputCaptureSystem : JobComponentSystem
+    public class RightTriggerInputCaptureSystem : ComponentSystem
     {
+        private JobHandle _inputDeps;
+
         protected override void OnCreate()
         {
             OnSetupVRReady.Listeners += CheckDevice;
             base.OnCreate();
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
-            return new TriggerInputCaptureJob
+            if (_inputDeps.IsCompleted)
             {
-                TriggerSqueezeValue = Input.GetAxis("RightTriggerSqueeze")
-            }.Schedule(this, inputDeps);
+                TriggerInputCaptureJob job = new TriggerInputCaptureJob
+                {
+                    TriggerSqueezeValue = Input.GetAxis("RightTriggerSqueeze"),
+                    ShouldRaiseClickEvent = new NativeArray<bool>(1, Allocator.TempJob),
+                    ShouldRaiseUnclickEvent = new NativeArray<bool>(1, Allocator.TempJob),
+                    ShouldRaiseTouchEvent = new NativeArray<bool>(1, Allocator.TempJob),
+                    ShouldRaiseUntouchEvent = new NativeArray<bool>(1, Allocator.TempJob),
+                };
+
+                _inputDeps = job.Schedule(this);
+                _inputDeps.Complete();
+
+                if (job.ShouldRaiseClickEvent[0])
+                    new ButtonClickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
+                else if (job.ShouldRaiseTouchEvent[0])
+                    new ButtonTouchEvent(EHand.RIGHT, EControllersButton.TRIGGER);
+                else if (job.ShouldRaiseUnclickEvent[0])
+                    new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
+                else if (job.ShouldRaiseUntouchEvent[0])
+                    new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.TRIGGER);
+
+                job.ShouldRaiseClickEvent.Dispose();
+                job.ShouldRaiseTouchEvent.Dispose();
+                job.ShouldRaiseUnclickEvent.Dispose();
+                job.ShouldRaiseUntouchEvent.Dispose();
+
+            }
         }
 
         protected override void OnDestroy()
@@ -31,9 +59,16 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
+        [Unity.Burst.BurstCompile]
         struct TriggerInputCaptureJob : IJobForEach<TriggerInputCapture, BaseInputCapture>
         {
             public float TriggerSqueezeValue;
+
+            // Outputs
+            public NativeArray<bool> ShouldRaiseClickEvent;
+            public NativeArray<bool> ShouldRaiseUnclickEvent;
+            public NativeArray<bool> ShouldRaiseTouchEvent;
+            public NativeArray<bool> ShouldRaiseUntouchEvent;
 
             public void Execute(ref TriggerInputCapture triggerInput, ref BaseInputCapture baseInput)
             {
@@ -45,23 +80,23 @@ namespace VRSF.Core.Inputs
                     {
                         baseInput.IsClicking = true;
                         baseInput.IsTouching= false;
-                        new ButtonClickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
+                        ShouldRaiseClickEvent[0] = true;
                     }
                     else if (baseInput.IsClicking && TriggerSqueezeValue < triggerInput.SqueezeClickThreshold)
                     {
                         baseInput.IsClicking = false;
-                        new ButtonUnclickEvent(EHand.RIGHT, EControllersButton.TRIGGER);
+                        ShouldRaiseUnclickEvent[0] = true;
                     }
                     // Check Touch Events if user is not clicking
                     else if (!baseInput.IsTouching && TriggerSqueezeValue > 0.0f)
                     {
                         baseInput.IsTouching = true;
-                        new ButtonTouchEvent(EHand.RIGHT, EControllersButton.TRIGGER);
+                        ShouldRaiseTouchEvent[0] = true;
                     }
                     else if (baseInput.IsTouching && TriggerSqueezeValue == 0.0f)
                     {
                         baseInput.IsTouching = false;
-                        new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.TRIGGER);
+                        ShouldRaiseUntouchEvent[0] = true;
                     }
                 }
             }
