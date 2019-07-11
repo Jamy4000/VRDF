@@ -6,6 +6,7 @@ using Unity.Entities;
 using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
 using System;
+using System.Collections.Generic;
 
 namespace VRSF.Core.CBRA
 {
@@ -13,6 +14,7 @@ namespace VRSF.Core.CBRA
     /// Let you assign a response to one of the button on the Controllers of your choice.
     /// </summary>
     [RequireComponent(typeof(SetupVRDestroyer))]
+    [UnityEditor.CanEditMultipleObjects]
     public class ControllersButtonResponseAssigner : MonoBehaviour
     {
         [Header("The button you wanna use for the Action")]
@@ -69,7 +71,7 @@ namespace VRSF.Core.CBRA
         private void CreateEntity(OnSetupVRReady info)
         {
             // If the device loaded is included in the device using this CBRA
-            if ((VRSF_Components.DeviceLoaded & DeviceUsingCBRA) == DeviceUsingCBRA)
+            if ((DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.Active.EntityManager;
 
@@ -97,7 +99,7 @@ namespace VRSF.Core.CBRA
                 }
 
                 // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-                if (!CBRASetupHelper.AddInteractionType(ref entityManager, ref entity, InteractionType))
+                if (!CBRASetupHelper.AddInteractionType(ref entityManager, ref entity, InteractionType, out CBRAInteractionType cbraInteraction))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
@@ -111,13 +113,13 @@ namespace VRSF.Core.CBRA
                     OnButtonStopClicking.GetPersistentEventCount() > 0 || OnButtonStopClicking.GetNonPersistentListenersCount() > 0)
                 {
                     cbraHasEvents = true;
-                    // Add the CBRA Click Events component to the entity
-                    entityManager.AddComponentData(entity, new CBRAClickEvents
-                    (
-                        new Action(delegate { OnButtonStartClicking.Invoke(); }),
-                        new Action(delegate { OnButtonIsClicking.Invoke(); }),
-                        new Action(delegate { OnButtonStopClicking.Invoke(); })
-                    ));
+                    // Add the CBRA Click Events component to the ClickEvents dictionary
+                    CBRADelegatesHolder.ClickEvents.Add(cbraInteraction, new Dictionary<ActionType, Action>
+                    {
+                        { ActionType.StartInteracting, new Action(delegate { OnButtonStartClicking.Invoke(); }) },
+                        { ActionType.IsInteracting, new Action(delegate { OnButtonIsClicking.Invoke(); }) },
+                        { ActionType.StopInteracting, new Action(delegate { OnButtonStopClicking.Invoke(); }) },
+                    });
                 }
 
                 // If at least one of the unity event for the touch has a persistent listener set in the editor
@@ -126,13 +128,14 @@ namespace VRSF.Core.CBRA
                     OnButtonStopTouching.GetPersistentEventCount() > 0 || OnButtonIsTouching.GetNonPersistentListenersCount() > 0)
                 {
                     cbraHasEvents = true;
-                    // Add the CBRA Click Events component to the entity
-                    entityManager.AddComponentData(entity, new CBRATouchEvents
-                    (
-                        new Action(delegate { OnButtonStartTouching.Invoke(); }),
-                        new Action(delegate { OnButtonIsTouching.Invoke(); }),
-                        new Action(delegate { OnButtonStopTouching.Invoke(); })
-                    ));
+
+                    // Add the CBRA Click Events component to the TouchEvents dictionary
+                    CBRADelegatesHolder.TouchEvents.Add(cbraInteraction, new Dictionary<ActionType, Action>
+                    {
+                        { ActionType.StartInteracting, new Action(delegate { OnButtonStartTouching.Invoke(); }) },
+                        { ActionType.IsInteracting, new Action(delegate { OnButtonIsTouching.Invoke(); }) },
+                        { ActionType.StopInteracting, new Action(delegate { OnButtonStopTouching.Invoke(); }) },
+                    });
                 }
 
                 // Check if at least one event response was setup

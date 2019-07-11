@@ -19,20 +19,26 @@ namespace VRSF.Core.CBRA
                 Any = Array.Empty<ComponentType>(),
                 // We need to check the position of the thumb for the touchpad, so we use a seperate system for that
                 None = new[] { ComponentType.ReadWrite<TouchpadInputCapture>() },
-                All = new[] { ComponentType.ReadWrite<CBRAClickEvents>(), ComponentType.ReadWrite<BaseInputCapture>(), },
+                All = new[] { ComponentType.ReadWrite<CBRAInteractionType>(), ComponentType.ReadWrite<BaseInputCapture>(), },
             });
         }
 
         protected override void OnUpdate()
         {
-            var clickEvents = _cbraQuery.ToComponentDataArray<CBRAClickEvents>(Unity.Collections.Allocator.Temp);
-            var baseInput = _cbraQuery.ToComponentDataArray<BaseInputCapture>(Unity.Collections.Allocator.Temp);
+            var cbraInteractions = _cbraQuery.ToComponentDataArray<CBRAInteractionType>(Unity.Collections.Allocator.TempJob);
+            var baseInput = _cbraQuery.ToComponentDataArray<BaseInputCapture>(Unity.Collections.Allocator.TempJob);
 
-            for (int i = 0; i < clickEvents.Length; i++)
+            for (int i = 0; i < cbraInteractions.Length; i++)
             {
-                if (baseInput[i].IsClicking)
-                    clickEvents[i].OnButtonIsClicking.Invoke();
+                if ((cbraInteractions[i].InteractionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK && baseInput[i].IsClicking)
+                {
+                    CBRADelegatesHolder.ClickEvents[cbraInteractions[i]][ActionType.IsInteracting].Invoke();
+                    UnityEngine.Debug.Log("cbra touching");
+                }
             }
+
+            cbraInteractions.Dispose();
+            baseInput.Dispose();
         }
     }
 }

@@ -89,21 +89,24 @@ namespace VRSF.Core.CBRA
         /// <summary>
         /// Add the corresponding InteractionType component for the selected button. 
         /// </summary>
-        public static bool AddInteractionType(ref EntityManager entityManager, ref Entity entity, EControllerInteractionType interactionType)
+        public static bool AddInteractionType(ref EntityManager entityManager, ref Entity entity, EControllerInteractionType interactionType, out CBRAInteractionType cbraInteraction)
         {
             // If the button hand wasn't set in editor, we destroy this entity and return.
             if (interactionType == EControllerInteractionType.NONE)
             {
                 Debug.LogErrorFormat("[b]VRSF :[\b] Please Specify valid Interaction Types to use for your ControllersButtonResponseAssigners.");
                 entityManager.DestroyEntity(entity);
+                cbraInteraction = new CBRAInteractionType();
                 return false;
             }
 
-            // Add the CBRA Interaction Type component to the entity
-            entityManager.SetComponentData(entity, new CBRAInteractionType
+            cbraInteraction = new CBRAInteractionType
             {
                 InteractionType = interactionType
-            });
+            };
+
+            // Add the CBRA Interaction Type component to the entity
+            entityManager.SetComponentData(entity, cbraInteraction);
 
             return true;
         }

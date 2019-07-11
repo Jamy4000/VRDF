@@ -1,8 +1,10 @@
 ﻿#if UNITY_EDITOR
 using System;
 using UnityEditor;
+using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.CBRA
 {
@@ -19,6 +21,21 @@ namespace VRSF.Core.CBRA
 
         private bool _showUnityEvents = false;
 
+        #region MAIN_VARIABLES
+        // The References for the UnityEvents
+        private SerializedProperty _deviceToUse;
+        private SerializedProperty _interactionType;
+        private SerializedProperty _buttonHand;
+        private SerializedProperty _buttonToUse;
+
+        private SerializedProperty _touchThumbPosition;
+        private SerializedProperty _clickThumbPosition;
+
+        private SerializedProperty _isTouchingThreshold;
+        private SerializedProperty _isClickingThreshold;
+        #endregion MAIN_VARIABLES
+
+        #region UNITY_EVENTS
         // The References for the UnityEvents
         private SerializedProperty _onButtonStartTouchingProperty;
         private SerializedProperty _onButtonStopTouchingProperty;
@@ -27,6 +44,8 @@ namespace VRSF.Core.CBRA
         private SerializedProperty _onButtonStartClickingProperty;
         private SerializedProperty _onButtonStopClickingProperty;
         private SerializedProperty _onButtonIsClickingProperty;
+        #endregion UNITY_EVENTS
+
         #endregion
 
 
@@ -35,6 +54,17 @@ namespace VRSF.Core.CBRA
         {
             // We set the buttonActionChoser reference
             _cbraTarget = (ControllersButtonResponseAssigner)target;
+
+            _deviceToUse = serializedObject.FindProperty("DeviceUsingCBRA");
+            _interactionType = serializedObject.FindProperty("InteractionType");
+            _buttonHand = serializedObject.FindProperty("ButtonHand");
+            _buttonToUse = serializedObject.FindProperty("ButtonToUse");
+
+            _touchThumbPosition = serializedObject.FindProperty("TouchThumbPosition");
+            _clickThumbPosition = serializedObject.FindProperty("ClickThumbPosition");
+
+            _isTouchingThreshold = serializedObject.FindProperty("IsTouchingThreshold");
+            _isClickingThreshold = serializedObject.FindProperty("IsClickingThreshold");
 
             _onButtonStartTouchingProperty = serializedObject.FindProperty("OnButtonStartTouching");
             _onButtonStopTouchingProperty = serializedObject.FindProperty("OnButtonStopTouching");
@@ -54,13 +84,15 @@ namespace VRSF.Core.CBRA
             EditorGUILayout.Space();
 
             DisplayPersonalizedEditor();
-
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-            serializedObject.ApplyModifiedProperties();
         }
 
         private void DisplayPersonalizedEditor()
         {
+            // We give a list of device that can use this feature to the user.
+            if (!DisplayDeviceToUse()) return;
+
+            EditorGUILayout.Space();
+
             // We check that the user has set a good value for the Interaction Type. if not, we don't display the rest of the parameters.
             if (!DisplayInteractionTypeParameters()) return;
 
@@ -70,15 +102,25 @@ namespace VRSF.Core.CBRA
             if (!DisplayHandParameters()) return;
 
             EditorGUILayout.Space();
-            EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("The button you wanna use for this feature", EditorStyles.miniBoldLabel);
-            Undo.RecordObject(_cbraTarget, "Changing button to use");
-            _cbraTarget.ButtonToUse = (EControllersButton)EditorGUILayout.EnumPopup("Button to use", _cbraTarget.ButtonToUse);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
+            // We check that the user has set a good value for the Interaction Type. if not, we don't display the rest of the parameters.
+            if (!DisplayButtonToUseParameter()) return;
 
             EditorGUILayout.Space();
 
+            DisplayInteractionTypesMessages();
+
+            EditorGUILayout.Space();
+
+            CheckThumbPos();
+
+            EditorGUILayout.Space();
+
+            DisplayInteractionEvents();
+        }
+
+        private void DisplayInteractionTypesMessages()
+        {
             switch (_cbraTarget.InteractionType)
             {
                 case EControllerInteractionType.TOUCH:
@@ -103,15 +145,237 @@ namespace VRSF.Core.CBRA
                     break;
 
                 default:
-                    _cbraTarget.ButtonToUse = EControllersButton.NONE;
+                    _buttonToUse.enumValueIndex = (int)EControllerInteractionType.NONE;
                     EditorGUILayout.HelpBox("Please chose a valid Interaction Type.", MessageType.Error);
                     return;
             }
-
-            CheckThumbPos();
-
-            DisplayInteractionEvents();
         }
+
+        private bool DisplayButtonToUseParameter()
+        {
+            EditorGUILayout.LabelField("The button you wanna use for this feature", EditorStyles.miniBoldLabel);
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_cbraTarget, "Changing button to use");
+            EditorGUILayout.PropertyField(_buttonToUse);
+            CheckEndChanges();
+
+            if (_buttonToUse.intValue == (int)EControllersButton.NONE)
+            {
+                EditorGUILayout.HelpBox("The Button to use cannot be NONE.", MessageType.Error);
+                return false;
+            }
+            return true;
+        }
+
+        private void DisplayThumbPosition(EControllerInteractionType interactionType)
+        {
+            switch (interactionType)
+            {
+                case EControllerInteractionType.CLICK:
+                    EditorGUILayout.LabelField("Thumb Position to use for click", EditorStyles.miniBoldLabel);
+
+                    Rect ourRect = EditorGUILayout.BeginHorizontal();
+                    EditorGUI.BeginProperty(ourRect, GUIContent.none, _clickThumbPosition);
+                    EditorGUI.BeginChangeCheck();
+
+                    Undo.RecordObject(_cbraTarget, "Changing click thumb pos");
+                    _clickThumbPosition.intValue = (int)(EThumbPosition)EditorGUILayout.EnumFlagsField("Thumb Click Position", _cbraTarget.ClickThumbPosition);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
+
+                    EditorGUI.EndProperty();
+                    EditorGUILayout.EndHorizontal();
+                    CheckEndChanges();
+
+                    ourRect = EditorGUILayout.BeginHorizontal();
+                    EditorGUI.BeginProperty(ourRect, GUIContent.none, _isClickingThreshold);
+                    EditorGUI.BeginChangeCheck();
+
+                    Undo.RecordObject(_cbraTarget, "Changing click threshold");
+                    _isClickingThreshold.floatValue = EditorGUILayout.Slider("Click Detection Threshold", _cbraTarget.IsClickingThreshold, 0.0f, 1.0f);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
+
+                    EditorGUI.EndProperty();
+                    EditorGUILayout.EndHorizontal();
+                    CheckEndChanges();
+
+                    break;
+
+                case EControllerInteractionType.TOUCH:
+                    EditorGUILayout.LabelField("Thumb Position to use for touch", EditorStyles.miniBoldLabel);
+
+                    ourRect = EditorGUILayout.BeginHorizontal();
+                    EditorGUI.BeginProperty(ourRect, GUIContent.none, _touchThumbPosition);
+                    EditorGUI.BeginChangeCheck();
+
+                    Undo.RecordObject(_cbraTarget, "Changing touch thumb pos");
+                    _touchThumbPosition.intValue = (int)(EThumbPosition)EditorGUILayout.EnumFlagsField("Thumb Touch Position", _cbraTarget.TouchThumbPosition);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
+
+                    EditorGUI.EndProperty();
+                    EditorGUILayout.EndHorizontal();
+                    CheckEndChanges();
+
+                    ourRect = EditorGUILayout.BeginHorizontal();
+                    EditorGUI.BeginProperty(ourRect, GUIContent.none, _isTouchingThreshold);
+                    EditorGUI.BeginChangeCheck();
+
+                    Undo.RecordObject(_cbraTarget, "Changing touch thumb pos");
+                    _isTouchingThreshold.floatValue = EditorGUILayout.Slider("Touch Detection Threshold", _cbraTarget.IsTouchingThreshold, 0.0f, 1.0f);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
+
+                    EditorGUI.EndProperty();
+                    EditorGUILayout.EndHorizontal();
+                    CheckEndChanges();
+
+                    break;
+            }
+        }
+
+        // Last thing to handle : MultipleObjectEditing using if (proipertyChange) then assign value
+
+        private bool DisplayDeviceToUse()
+        {
+            Undo.RecordObject(_cbraTarget, "Changing DeviceToUse");
+
+            EditorGUILayout.LabelField("Device using this CBRA", EditorStyles.miniBoldLabel);
+
+            Rect ourRect = EditorGUILayout.BeginHorizontal();
+            EditorGUI.BeginProperty(ourRect, GUIContent.none, _deviceToUse);
+            EditorGUI.BeginChangeCheck();
+
+            _deviceToUse.intValue = (int)(EDevice)EditorGUILayout.EnumFlagsField("Device List", _cbraTarget.DeviceUsingCBRA);
+
+            EditorGUI.EndProperty();
+            EditorGUILayout.EndHorizontal();
+            CheckEndChanges();
+
+            if (_deviceToUse.intValue == (int)EDevice.NONE)
+            {
+                EditorGUILayout.HelpBox("The Device type cannot be NONE.", MessageType.Error);
+                return false;
+            }
+            return true;
+        }
+
+        private bool DisplayInteractionTypeParameters()
+        {
+            EditorGUILayout.LabelField("Type of Interaction with the Controller", EditorStyles.miniBoldLabel);
+
+            Rect ourRect = EditorGUILayout.BeginHorizontal();
+            EditorGUI.BeginProperty(ourRect, GUIContent.none, _interactionType);
+            EditorGUI.BeginChangeCheck();
+
+            Undo.RecordObject(_cbraTarget, "Changing InteractionType");
+            _interactionType.intValue = (int)(EControllerInteractionType)EditorGUILayout.EnumFlagsField("Interaction Type", _cbraTarget.InteractionType);
+
+            EditorGUI.EndProperty();
+            EditorGUILayout.EndHorizontal();
+            CheckEndChanges();
+
+
+            if (_interactionType.intValue == (int)EControllerInteractionType.NONE)
+            {
+                EditorGUILayout.HelpBox("The Interaction type cannot be NONE.", MessageType.Error);
+                return false;
+            }
+            return true;
+        }
+
+
+        private bool DisplayHandParameters()
+        {
+            EditorGUILayout.LabelField("Hand using this feature", EditorStyles.miniBoldLabel);
+
+            Undo.RecordObject(_cbraTarget, "Changing Hand");
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(_buttonHand);
+            CheckEndChanges();
+
+            if (_buttonHand.intValue != (int)EHand.LEFT && _buttonHand.intValue != (int)EHand.RIGHT)
+            {
+                EditorGUILayout.HelpBox("The Hand cannot be NONE.", MessageType.Error);
+                return false;
+            }
+            return true;
+        }
+
+
+        private void CheckThumbPos()
+        {
+            if (_buttonToUse.enumValueIndex != (int)EControllersButton.TOUCHPAD)
+                return;
+
+            if ((_cbraTarget.InteractionType == EControllerInteractionType.CLICK && _cbraTarget.ClickThumbPosition == EThumbPosition.NONE) ||
+                (_cbraTarget.InteractionType == EControllerInteractionType.TOUCH && _cbraTarget.TouchThumbPosition == EThumbPosition.NONE) ||
+                (_cbraTarget.InteractionType == EControllerInteractionType.ALL &&
+                    (_cbraTarget.TouchThumbPosition == EThumbPosition.NONE || _cbraTarget.ClickThumbPosition == EThumbPosition.NONE)))
+            {
+                EditorGUILayout.HelpBox("Please chose a valid Thumb Position.", MessageType.Error);
+            }
+        }
+
+
+        private void DisplayInteractionEvents()
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            _showUnityEvents = EditorGUILayout.ToggleLeft("Display UnityEvents for Click/Touch Events", _showUnityEvents);
+
+            if (_showUnityEvents)
+            {
+                if ((_cbraTarget.InteractionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH)
+                {
+                    EditorGUILayout.Space();
+                    DisplayTouchEvents();
+                }
+                if ((_cbraTarget.InteractionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK)
+                {
+                    EditorGUILayout.Space();
+                    DisplayClickEvents();
+                }
+            }
+        }
+
+
+        private void DisplayTouchEvents()
+        {
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_cbraTarget, "Changing start touch events");
+            EditorGUILayout.PropertyField(_onButtonStartTouchingProperty);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_cbraTarget, "Changing stop touch events");
+            EditorGUILayout.PropertyField(_onButtonStopTouchingProperty);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_cbraTarget, "Changing is touching events");
+            EditorGUILayout.PropertyField(_onButtonIsTouchingProperty);
+            CheckEndChanges();
+        }
+
+
+        private void DisplayClickEvents()
+        {
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_cbraTarget, "Changing start clicking events");
+            EditorGUILayout.PropertyField(_onButtonStartClickingProperty);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_cbraTarget, "Changing stop clicking events");
+            EditorGUILayout.PropertyField(_onButtonStopClickingProperty);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_cbraTarget, "Changing is clicking events");
+            EditorGUILayout.PropertyField(_onButtonIsClickingProperty);
+            CheckEndChanges();
+        }
+
 
         private bool HandleTouchDisplay()
         {
@@ -209,141 +473,23 @@ namespace VRSF.Core.CBRA
                 "on the current devices.", MessageType.Error);
         }
 
-
-        private void DisplayThumbPosition(EControllerInteractionType interactionType)
+        void CheckEndChanges()
         {
-            switch (interactionType)
+            if (EditorGUI.EndChangeCheck())
             {
-                case EControllerInteractionType.CLICK:
-                    EditorGUILayout.LabelField("Thumb Position to use for click", EditorStyles.miniBoldLabel);
-
-                    Undo.RecordObject(_cbraTarget, "Changing click thumb pos");
-                    _cbraTarget.ClickThumbPosition = (EThumbPosition)EditorGUILayout.EnumFlagsField("Thumb Click Position", _cbraTarget.ClickThumbPosition);
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-
-                    Undo.RecordObject(_cbraTarget, "Changing click threshold");
-                    _cbraTarget.IsClickingThreshold = EditorGUILayout.Slider("Click Detection Threshold", _cbraTarget.IsClickingThreshold, 0.0f, 1.0f);
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-                    break;
-
-                case EControllerInteractionType.TOUCH:
-                    EditorGUILayout.LabelField("Thumb Position to use for touch", EditorStyles.miniBoldLabel);
-
-                    Undo.RecordObject(_cbraTarget, "Changing touch thumb pos");
-                    _cbraTarget.TouchThumbPosition = (EThumbPosition)EditorGUILayout.EnumFlagsField("Thumb Touch Position", _cbraTarget.TouchThumbPosition);
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-
-                    Undo.RecordObject(_cbraTarget, "Changing touch thumb pos");
-                    _cbraTarget.IsTouchingThreshold = EditorGUILayout.Slider("Touch Detection Threshold", _cbraTarget.IsTouchingThreshold, 0.0f, 1.0f);
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-                    break;
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
             }
         }
 
-
-        private bool DisplayInteractionTypeParameters()
+        [MenuItem("GameObject/VRSF/Utils/Add CBRA Object", priority = 0)]
+        [MenuItem("VRSF/Utils/Add CBRA Object", priority = 0)]
+        public static void AddCBRAObject(MenuCommand menuCommand)
         {
-            Undo.RecordObject(_cbraTarget, "Changing InteractionType");
-
-            EditorGUILayout.LabelField("Type of Interaction with the Controller", EditorStyles.miniBoldLabel);
-            _cbraTarget.InteractionType = (EControllerInteractionType)EditorGUILayout.EnumFlagsField("Interaction Type", _cbraTarget.InteractionType);
-
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-
-            if (_cbraTarget.InteractionType == EControllerInteractionType.NONE)
-            {
-                EditorGUILayout.HelpBox("The Interaction type cannot be NONE.", MessageType.Error);
-                return false;
-            }
-            return true;
-        }
-
-
-        private bool DisplayHandParameters()
-        {
-            Undo.RecordObject(_cbraTarget, "Changing Hand");
-
-            EditorGUILayout.LabelField("Hand using this feature", EditorStyles.miniBoldLabel);
-            _cbraTarget.ButtonHand = (EHand)EditorGUILayout.EnumPopup("Hand", _cbraTarget.ButtonHand);
-
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-
-            if (_cbraTarget.ButtonHand != EHand.LEFT && _cbraTarget.ButtonHand != EHand.RIGHT)
-            {
-                EditorGUILayout.HelpBox("The Hand cannot be NONE.", MessageType.Error);
-                return false;
-            }
-            return true;
-        }
-
-
-        private void CheckThumbPos()
-        {
-            if (_cbraTarget.ButtonToUse != EControllersButton.TOUCHPAD)
-                return;
-
-            if ((_cbraTarget.InteractionType == EControllerInteractionType.CLICK && _cbraTarget.ClickThumbPosition == EThumbPosition.NONE) ||
-                (_cbraTarget.InteractionType == EControllerInteractionType.TOUCH && _cbraTarget.TouchThumbPosition == EThumbPosition.NONE) ||
-                (_cbraTarget.InteractionType == EControllerInteractionType.ALL &&
-                    (_cbraTarget.TouchThumbPosition == EThumbPosition.NONE || _cbraTarget.ClickThumbPosition == EThumbPosition.NONE)))
-            {
-                EditorGUILayout.HelpBox("Please chose a valid Thumb Position.", MessageType.Error);
-            }
-        }
-
-
-        private void DisplayInteractionEvents()
-        {
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
-
-            _showUnityEvents = EditorGUILayout.ToggleLeft("Display UnityEvents for Click/Touch Events", _showUnityEvents);
-
-            if (_showUnityEvents)
-            {
-                if ((_cbraTarget.InteractionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH)
-                {
-                    EditorGUILayout.Space();
-                    DisplayTouchEvents();
-                }
-                if ((_cbraTarget.InteractionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK)
-                {
-                    EditorGUILayout.Space();
-                    DisplayClickEvents();
-                }
-            }
-        }
-
-
-        private void DisplayTouchEvents()
-        {
-            Undo.RecordObject(_cbraTarget, "Changing start touch events");
-            EditorGUILayout.PropertyField(_onButtonStartTouchingProperty);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-
-            Undo.RecordObject(_cbraTarget, "Changing stop touch events");
-            EditorGUILayout.PropertyField(_onButtonStopTouchingProperty);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-
-            Undo.RecordObject(_cbraTarget, "Changing is touching events");
-            EditorGUILayout.PropertyField(_onButtonIsTouchingProperty);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-        }
-
-
-        private void DisplayClickEvents()
-        {
-            Undo.RecordObject(_cbraTarget, "Changing start clicking events");
-            EditorGUILayout.PropertyField(_onButtonStartClickingProperty);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-
-            Undo.RecordObject(_cbraTarget, "Changing stop clicking events");
-            EditorGUILayout.PropertyField(_onButtonStopClickingProperty);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
-
-            Undo.RecordObject(_cbraTarget, "Changing is clicking events");
-            EditorGUILayout.PropertyField(_onButtonIsClickingProperty);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(_cbraTarget);
+            var cbraObject = new GameObject("CBRA");
+            cbraObject.transform.SetParent(Selection.activeTransform);
+            cbraObject.AddComponent<ControllersButtonResponseAssigner>();
+            Selection.SetActiveObjectWithContext(cbraObject, menuCommand.context);
         }
         #endregion
     }

@@ -7,7 +7,7 @@
 - [x] Fading Effect
 - [x] LaserPointer Systems
 - [x] Controllers Models Setup Systems
-- [ ] ButtonActionChoser Systems
+- [ ] ButtonActionChoser Systems : Start and Stop interacting remaining
 
 ### OPTIONAL
 - [ ] Redo LaserPointer using mesh generation, like DrawMesh, and a simple plane (Welcome to my life).
