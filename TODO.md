@@ -1,20 +1,20 @@
 ## CORE Package
 - [x] SetupVR Systems
-- [x] Input Systems
+- [ ] Input Systems : Refactor with output from jobs
 - [x] Raycasting Systems
 - [x] VRInteractions Systems
 - [x] Haptic Effect
 - [x] Fading Effect
 - [x] LaserPointer Systems
 - [x] Controllers Models Setup Systems
-- [ ] ButtonActionChoser Systems : Start and Stop interacting remaining
+- [x] ButtonActionChoser Systems
 
 ### OPTIONAL
 - [ ] Redo LaserPointer using mesh generation, like DrawMesh, and a simple plane (Welcome to my life).
 - [ ] Redo Controllers Setup using RenderMesh SharedComponent.
-- [ ] Rewrite Input Systems with burstCompiler. For that, we need to get the jobs' outputs.
 - [ ] Rewrite Input Systems without Right/Left differentiation, as we get the Input in all cases.
 - [ ] Rewrite Input Systems with Touch and Click differentiation (instead of only BaseInputCapture component), and create seperate Systems. NOT MANDATORY, need to check if it make sense
+- [ ] When CameraFade is done, destroy entity. Recreate it when event is raised.
 
 
 ## MOVE AROUND Package
