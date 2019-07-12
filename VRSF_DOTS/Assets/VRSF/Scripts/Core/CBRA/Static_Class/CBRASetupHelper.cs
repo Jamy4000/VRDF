@@ -78,10 +78,10 @@ namespace VRSF.Core.CBRA
             }
 
             // Add the CBRA Hand component to the entity
-            entityManager.SetComponentData(entity, new CBRAHand
-            {
-                ButtonHand = hand
-            });
+            if (hand == EHand.LEFT)
+                entityManager.SetComponentData(entity, new LeftHand());
+            else
+                entityManager.SetComponentData(entity, new RightHand());
 
             return true;
         }

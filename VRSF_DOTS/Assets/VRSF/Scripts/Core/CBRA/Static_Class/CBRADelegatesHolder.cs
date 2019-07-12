@@ -6,15 +6,12 @@ namespace VRSF.Core.CBRA
 {
     public static class CBRADelegatesHolder
     {
-        public static Dictionary<Entity, Dictionary<ActionType, Action>> TouchEvents = new Dictionary<Entity, Dictionary<ActionType, Action>>();
+        public static Dictionary<Entity, Action> StartTouchingEvents = new Dictionary<Entity, Action>();
+        public static Dictionary<Entity, Action> IsTouchingEvents = new Dictionary<Entity, Action>();
+        public static Dictionary<Entity, Action> StopTouchingEvents = new Dictionary<Entity, Action>();
 
-        public static Dictionary<Entity, Dictionary<ActionType, Action>> ClickEvents = new Dictionary<Entity, Dictionary<ActionType, Action>>();
-    }
-
-    public enum ActionType
-    {
-        StartInteracting,
-        IsInteracting,
-        StopInteracting
+        public static Dictionary<Entity, Action> StartClickingEvents = new Dictionary<Entity, Action>();
+        public static Dictionary<Entity, Action> IsClickingEvents = new Dictionary<Entity, Action>();
+        public static Dictionary<Entity, Action> StopClickingEvents = new Dictionary<Entity, Action>();
     }
 }

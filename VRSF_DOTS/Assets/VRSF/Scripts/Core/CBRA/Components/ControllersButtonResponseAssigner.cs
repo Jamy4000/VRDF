@@ -75,7 +75,6 @@ namespace VRSF.Core.CBRA
                 var archetype = entityManager.CreateArchetype
                 (
                     typeof(BaseInputCapture),
-                    typeof(CBRAHand),
                     typeof(CBRAInteractionType)
                 );
 
@@ -105,34 +104,39 @@ namespace VRSF.Core.CBRA
                 bool cbraHasEvents = false;
 
                 // If at least one of the unity event for the click has a persistent listener set in the editor
-                if (OnButtonStartClicking.GetPersistentEventCount() > 0 || OnButtonStartClicking.GetNonPersistentListenersCount() > 0 ||
-                    OnButtonIsClicking.GetPersistentEventCount() > 0 || OnButtonIsClicking.GetNonPersistentListenersCount() > 0 ||
-                    OnButtonStopClicking.GetPersistentEventCount() > 0 || OnButtonStopClicking.GetNonPersistentListenersCount() > 0)
+                // Add the CBRA Click Events component to the ClickEvents dictionary
+                if (OnButtonStartClicking.GetPersistentEventCount() > 0 || OnButtonStartClicking.GetNonPersistentListenersCount() > 0)
                 {
                     cbraHasEvents = true;
-                    // Add the CBRA Click Events component to the ClickEvents dictionary
-                    CBRADelegatesHolder.ClickEvents.Add(entity, new Dictionary<ActionType, Action>
-                    {
-                        { ActionType.StartInteracting, new Action(delegate { OnButtonStartClicking.Invoke(); }) },
-                        { ActionType.IsInteracting, new Action(delegate { OnButtonIsClicking.Invoke(); }) },
-                        { ActionType.StopInteracting, new Action(delegate { OnButtonStopClicking.Invoke(); }) },
-                    });
+                    CBRADelegatesHolder.StartClickingEvents.Add(entity, new Action(delegate { OnButtonStartClicking.Invoke(); }));
+                }
+                if (OnButtonIsClicking.GetPersistentEventCount() > 0 || OnButtonIsClicking.GetNonPersistentListenersCount() > 0)
+                {
+                    cbraHasEvents = true;
+                    CBRADelegatesHolder.IsClickingEvents.Add(entity, new Action(delegate { OnButtonIsClicking.Invoke(); }));
+                }
+                if (OnButtonStopClicking.GetPersistentEventCount() > 0 || OnButtonStopClicking.GetNonPersistentListenersCount() > 0)
+                {
+                    cbraHasEvents = true;
+                    CBRADelegatesHolder.StopClickingEvents.Add(entity, new Action(delegate { OnButtonStopClicking.Invoke(); }));
                 }
 
                 // If at least one of the unity event for the touch has a persistent listener set in the editor
-                if (OnButtonStartTouching.GetPersistentEventCount() > 0 || OnButtonStartTouching.GetNonPersistentListenersCount() > 0 ||
-                    OnButtonIsTouching.GetPersistentEventCount() > 0 || OnButtonStopTouching.GetNonPersistentListenersCount() > 0 ||
-                    OnButtonStopTouching.GetPersistentEventCount() > 0 || OnButtonIsTouching.GetNonPersistentListenersCount() > 0)
+                // Add the CBRA Click Events component to the ClickEvents dictionary
+                if (OnButtonStartTouching.GetPersistentEventCount() > 0 || OnButtonStartTouching.GetNonPersistentListenersCount() > 0)
                 {
                     cbraHasEvents = true;
-
-                    // Add the CBRA Click Events component to the TouchEvents dictionary
-                    CBRADelegatesHolder.TouchEvents.Add(entity, new Dictionary<ActionType, Action>
-                    {
-                        { ActionType.StartInteracting, new Action(delegate { OnButtonStartTouching.Invoke(); }) },
-                        { ActionType.IsInteracting, new Action(delegate { OnButtonIsTouching.Invoke(); }) },
-                        { ActionType.StopInteracting, new Action(delegate { OnButtonStopTouching.Invoke(); }) },
-                    });
+                    CBRADelegatesHolder.StartTouchingEvents.Add(entity, new Action(delegate { OnButtonStartTouching.Invoke(); }));
+                }
+                if (OnButtonIsTouching.GetPersistentEventCount() > 0 || OnButtonStopTouching.GetNonPersistentListenersCount() > 0)
+                {
+                    cbraHasEvents = true;
+                    CBRADelegatesHolder.IsTouchingEvents.Add(entity, new Action(delegate { OnButtonIsTouching.Invoke(); }));
+                }
+                if (OnButtonStopTouching.GetPersistentEventCount() > 0 || OnButtonIsTouching.GetNonPersistentListenersCount() > 0)
+                {
+                    cbraHasEvents = true;
+                    CBRADelegatesHolder.StopTouchingEvents.Add(entity, new Action(delegate { OnButtonStopTouching.Invoke(); }));
                 }
 
                 // Check if at least one event response was setup
