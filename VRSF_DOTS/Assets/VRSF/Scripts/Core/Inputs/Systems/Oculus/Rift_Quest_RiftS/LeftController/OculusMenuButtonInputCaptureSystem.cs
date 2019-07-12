@@ -1,7 +1,7 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs
@@ -11,8 +11,12 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class OculusMenuButtonInputCaptureSystem : JobComponentSystem
     {
+        private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
+
         protected override void OnCreate()
         {
+            // Cache the EndSimulationEntityCommandBufferSystem in a field, so we don't have to get it every frame
+            _endSimEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             OnSetupVRReady.Listeners += CheckDevice;
             base.OnCreate();
         }
@@ -23,6 +27,7 @@ namespace VRSF.Core.Inputs
             {
                 MenuClickButtonDown = Input.GetButtonDown("OculusMenuButtonClick"),
                 MenuClickButtonUp = Input.GetButtonUp("OculusMenuButtonClick"),
+                Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
         }
 
@@ -32,26 +37,25 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct MenuButtonInputCaptureJob : IJobForEach<MenuInputCapture, BaseInputCapture>
+        [RequireComponentTag(typeof(LeftHand))]
+        struct MenuButtonInputCaptureJob : IJobForEachWithEntity<MenuInputCapture, BaseInputCapture>
         {
-            public bool MenuClickButtonDown;
-            public bool MenuClickButtonUp;
+            [ReadOnly] public bool MenuClickButtonDown;
+            [ReadOnly] public bool MenuClickButtonUp;
 
-            public void Execute(ref MenuInputCapture menuInput, ref BaseInputCapture baseInput)
+            public EntityCommandBuffer.Concurrent Commands;
+
+            public void Execute(Entity entity, int index, ref MenuInputCapture menuInput, ref BaseInputCapture baseInput)
             {
-                if (menuInput.Hand == EHand.LEFT)
+                if (MenuClickButtonDown)
                 {
-                    // Check Click Events
-                    if (MenuClickButtonDown)
-                    {
-                        baseInput.IsClicking = true;
-                        new ButtonClickEvent(EHand.LEFT, EControllersButton.MENU);
-                    }
-                    else if (MenuClickButtonUp)
-                    {
-                        baseInput.IsClicking = false;
-                        new ButtonUnclickEvent(EHand.LEFT, EControllersButton.MENU);
-                    }
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.MENU });
+                    baseInput.IsClicking = true;
+                }
+                else if (MenuClickButtonUp)
+                {
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.MENU });
+                    baseInput.IsClicking = false;
                 }
             }
         }

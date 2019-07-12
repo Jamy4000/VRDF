@@ -30,7 +30,7 @@ namespace VRSF.Core.Inputs
         [RequireComponentTag(typeof(LeftHand))]
         struct TriggerInputCaptureJob : IJobForEachWithEntity<TriggerInputCapture, BaseInputCapture>
         {
-            public float LeftTriggerSqueezeValue;
+            [ReadOnly] public float LeftTriggerSqueezeValue;
 
             public EntityCommandBuffer.Concurrent Commands;
 

@@ -2,15 +2,14 @@
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs
 {
     /// <summary>
-    /// System to capture some keys from the simulator
+    /// Capture inputs for the menu buttons of the HTC Vive and Focus for the right controller
     /// </summary>
-    public class SimulatorLeftMouseButtonInputCaptureSystem : JobComponentSystem
+    public class HtcRightMenuInputCaptureSystem : JobComponentSystem
     {
         private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
 
@@ -24,12 +23,12 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new SimulatorInputCaptureJob()
+            return new MenuInputCaptureJob
             {
-                LeftMouseButtonDown = Input.GetMouseButtonDown(0),
-                LeftMouseButtonUp = Input.GetMouseButtonUp(0),
+                RightMenuButtonDown = Input.GetButtonDown("HtcRightMenuClick"),
+                RightMenuButtonUp = Input.GetButtonUp("HtcRightMenuClick"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(this, inputDeps);
+            }.Schedule(this);
         }
 
         protected override void OnDestroy()
@@ -38,25 +37,24 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        [RequireComponentTag(typeof(LeftHand))]
-        struct SimulatorInputCaptureJob : IJobForEachWithEntity<TriggerInputCapture, BaseInputCapture>
+        [RequireComponentTag(typeof(RightHand))]
+        struct MenuInputCaptureJob : IJobForEachWithEntity<MenuInputCapture, BaseInputCapture>
         {
-            [ReadOnly] public bool LeftMouseButtonDown;
-            [ReadOnly] public bool LeftMouseButtonUp;
+            [ReadOnly] public bool RightMenuButtonDown;
+            [ReadOnly] public bool RightMenuButtonUp;
 
             public EntityCommandBuffer.Concurrent Commands;
 
-            public void Execute(Entity entity, int index, ref TriggerInputCapture triggerInput, ref BaseInputCapture baseInput)
+            public void Execute(Entity entity, int index, ref MenuInputCapture menuInput, ref BaseInputCapture baseInput)
             {
-                // Check Click Events
-                if (LeftMouseButtonDown)
+                if (RightMenuButtonDown)
                 {
-                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.MENU });
                     baseInput.IsClicking = true;
                 }
-                else if (LeftMouseButtonUp)
+                else if (RightMenuButtonUp)
                 {
-                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.MENU });
                     baseInput.IsClicking = false;
                 }
             }
@@ -69,8 +67,8 @@ namespace VRSF.Core.Inputs
         /// <param name="info"></param>
         private void CheckDevice(OnSetupVRReady info)
         {
-            this.Enabled = VRSF_Components.DeviceLoaded == EDevice.SIMULATOR;
+            this.Enabled = VRSF_Components.DeviceLoaded == EDevice.HTC_FOCUS || VRSF_Components.DeviceLoaded == EDevice.HTC_VIVE;
         }
-        #endregion
+        #endregion PRIVATE_METHODS
     }
 }

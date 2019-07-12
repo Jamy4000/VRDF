@@ -1,7 +1,7 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs
@@ -11,8 +11,12 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class SignleControllerInputCaptureSystem : JobComponentSystem
     {
+        private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
+
         protected override void OnCreate()
         {
+            // Cache the EndSimulationEntityCommandBufferSystem in a field, so we don't have to get it every frame
+            _endSimEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             OnSetupVRReady.Listeners += CheckForDevice;
             base.OnCreate();
         }
@@ -22,7 +26,8 @@ namespace VRSF.Core.Inputs
             return new BackButtonInputCaptureJob()
             {
                 MenuButtonDown = Input.GetButtonDown("BackButtonClick"),
-                MenuButtonUp = Input.GetButtonUp("BackButtonClick")
+                MenuButtonUp = Input.GetButtonUp("BackButtonClick"),
+                Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
         }
 
@@ -32,23 +37,25 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct BackButtonInputCaptureJob : IJobForEach<GoAndGearVRInputCapture, BaseInputCapture>
+        struct BackButtonInputCaptureJob : IJobForEachWithEntity<GoAndGearVRInputCapture, BaseInputCapture>
         {
-            public bool MenuButtonDown;
-            public bool MenuButtonUp;
+            [ReadOnly] public bool MenuButtonDown;
+            [ReadOnly] public bool MenuButtonUp;
 
-            public void Execute(ref GoAndGearVRInputCapture goAndGearInput, ref BaseInputCapture baseInput)
+            public EntityCommandBuffer.Concurrent Commands;
+
+            public void Execute(Entity entity, int index, ref GoAndGearVRInputCapture goAndGearInput, ref BaseInputCapture baseInput)
             {
                 // Check Click Events
                 if (MenuButtonDown)
                 {
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.BACK_BUTTON });
                     baseInput.IsClicking = true;
-                    new ButtonClickEvent(goAndGearInput.IsUserRightHanded ? EHand.RIGHT : EHand.LEFT, EControllersButton.BACK_BUTTON);
                 }
                 else if (MenuButtonUp)
                 {
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.BACK_BUTTON });
                     baseInput.IsClicking = false;
-                    new ButtonUnclickEvent(goAndGearInput.IsUserRightHanded ? EHand.RIGHT : EHand.LEFT, EControllersButton.BACK_BUTTON);
                 }
             }
         }

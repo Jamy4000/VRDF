@@ -1,7 +1,7 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs
@@ -11,8 +11,12 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class OculusXButonInputCaptureSystem : JobComponentSystem
     {
+        private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
+
         protected override void OnCreate()
         {
+            // Cache the EndSimulationEntityCommandBufferSystem in a field, so we don't have to get it every frame
+            _endSimEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             OnSetupVRReady.Listeners += CheckDevice;
             base.OnCreate();
         }
@@ -24,7 +28,8 @@ namespace VRSF.Core.Inputs
                 XClickButtonDown = Input.GetButtonDown("OculusXButtonClick"),
                 XClickButtonUp = Input.GetButtonUp("OculusXButtonClick"),
                 XTouchButtonDown = Input.GetButtonDown("OculusXButtonTouch"),
-                XTouchButtonUp = Input.GetButtonUp("OculusXButtonTouch")
+                XTouchButtonUp = Input.GetButtonUp("OculusXButtonTouch"),
+                Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
         }
 
@@ -34,38 +39,40 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        [RequireComponentTag(typeof(XButtonInputCapture))]
-        struct XButtonInputCaptureJob : IJobForEach<BaseInputCapture>
+        [RequireComponentTag(typeof(LeftHand), typeof(XButtonInputCapture))]
+        struct XButtonInputCaptureJob : IJobForEachWithEntity<BaseInputCapture>
         {
-            public bool XClickButtonDown;
-            public bool XClickButtonUp;
+            [ReadOnly] public bool XClickButtonDown;
+            [ReadOnly] public bool XClickButtonUp;
 
-            public bool XTouchButtonDown;
-            public bool XTouchButtonUp;
+            [ReadOnly] public bool XTouchButtonDown;
+            [ReadOnly] public bool XTouchButtonUp;
 
-            public void Execute(ref BaseInputCapture baseInput)
+            public EntityCommandBuffer.Concurrent Commands;
+
+            public void Execute(Entity entity, int index, ref BaseInputCapture baseInput)
             {
                 // Check Click Events
                 if (XClickButtonDown)
                 {
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.X_BUTTON });
                     baseInput.IsClicking = true;
-                    new ButtonClickEvent(EHand.LEFT, EControllersButton.X_BUTTON);
                 }
                 else if (XClickButtonUp)
                 {
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.X_BUTTON });
                     baseInput.IsClicking = false;
-                    new ButtonUnclickEvent(EHand.LEFT, EControllersButton.X_BUTTON);
                 }
                 // Check Touch Events if user is not clicking
                 else if (!baseInput.IsClicking && XTouchButtonDown)
                 {
+                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.X_BUTTON });
                     baseInput.IsTouching = true;
-                    new ButtonTouchEvent(EHand.LEFT, EControllersButton.X_BUTTON);
                 }
                 else if (XTouchButtonUp)
                 {
+                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.X_BUTTON });
                     baseInput.IsTouching = false;
-                    new ButtonUntouchEvent(EHand.LEFT, EControllersButton.X_BUTTON);
                 }
             }
         }

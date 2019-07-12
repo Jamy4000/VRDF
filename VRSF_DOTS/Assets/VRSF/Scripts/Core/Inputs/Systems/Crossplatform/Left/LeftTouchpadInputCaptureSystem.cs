@@ -44,13 +44,13 @@ namespace VRSF.Core.Inputs
         [RequireComponentTag(typeof(LeftHand))]
         struct TouchpadInputCaptureJob : IJobForEachWithEntity<TouchpadInputCapture, BaseInputCapture>
         {
-            public float2 LeftThumbPosition;
+            [ReadOnly] public float2 LeftThumbPosition;
 
-            public bool LeftThumbClickDown;
-            public bool LeftThumbClickUp;
+            [ReadOnly] public bool LeftThumbClickDown;
+            [ReadOnly] public bool LeftThumbClickUp;
 
-            public bool LeftThumbTouchDown;
-            public bool LeftThumbTouchUp;
+            [ReadOnly] public bool LeftThumbTouchDown;
+            [ReadOnly] public bool LeftThumbTouchUp;
 
             public EntityCommandBuffer.Concurrent Commands;
 

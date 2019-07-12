@@ -26,7 +26,6 @@ namespace VRSF.Core.Inputs
             return new GripInputCaptureJob
             {
                 LeftGripSqueezeValue = Input.GetAxis("LeftGripSqueeze"),
-                //RightGripSqueezeValue = Input.GetAxis("RightGripSqueeze"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this);
         }
@@ -40,8 +39,7 @@ namespace VRSF.Core.Inputs
         [RequireComponentTag(typeof(LeftHand))]
         struct GripInputCaptureJob : IJobForEachWithEntity<GripInputCapture, BaseInputCapture>
         {
-            public float LeftGripSqueezeValue;
-            //public float RightGripSqueezeValue;
+            [ReadOnly] public float LeftGripSqueezeValue;
 
             public EntityCommandBuffer.Concurrent Commands;
 

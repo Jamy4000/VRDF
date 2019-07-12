@@ -1,6 +1,6 @@
 ## CORE Package
 - [x] SetupVR Systems
-- [ ] Input Systems : Refactor with output from jobs
+- [ ] Input Systems : Done, need to remove rest of the ref for old input events
 - [x] Raycasting Systems
 - [x] VRInteractions Systems
 - [x] Haptic Effect

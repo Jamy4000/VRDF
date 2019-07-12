@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
+﻿using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs
@@ -12,12 +11,12 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class SimulatorEscapeButtonInputCaptureSystem : JobComponentSystem
     {
-        #region JobComponentSystem_Methods
-        /// <summary>
-        /// Called after the scene was loaded, setup the entities variables
-        /// </summary>
+        private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
+
         protected override void OnCreate()
         {
+            // Cache the EndSimulationEntityCommandBufferSystem in a field, so we don't have to get it every frame
+            _endSimEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             OnSetupVRReady.Listeners += CheckDevice;
             base.OnCreate();
         }
@@ -26,7 +25,9 @@ namespace VRSF.Core.Inputs
         {
             return new SimulatorInputCaptureJob()
             {
-                EscapeButtonWasClick = Input.GetKeyDown(KeyCode.Escape)
+                EscapeButtonDown = Input.GetKeyDown(KeyCode.Escape),
+                EscapeButtonUp = Input.GetKeyUp(KeyCode.Escape),
+                Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
         }
 
@@ -35,24 +36,26 @@ namespace VRSF.Core.Inputs
             OnSetupVRReady.Listeners -= CheckDevice;
             base.OnDestroy();
         }
-        #endregion
 
-        struct SimulatorInputCaptureJob : IJobForEach<MenuInputCapture, BaseInputCapture>
+        struct SimulatorInputCaptureJob : IJobForEachWithEntity<MenuInputCapture, BaseInputCapture>
         {
-            public bool EscapeButtonWasClick;
+            [ReadOnly] public bool EscapeButtonDown;
+            [ReadOnly] public bool EscapeButtonUp;
 
-            public void Execute(ref MenuInputCapture menuInput, ref BaseInputCapture baseInput)
+            public EntityCommandBuffer.Concurrent Commands;
+
+            public void Execute(Entity entity, int index, ref MenuInputCapture menuInput, ref BaseInputCapture baseInput)
             {
                 // Check Click Events
-                if (!baseInput.IsClicking && EscapeButtonWasClick)
+                if (EscapeButtonDown)
                 {
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.MENU });
                     baseInput.IsClicking = true;
-                    new ButtonClickEvent(EHand.LEFT, EControllersButton.MENU);
                 }
-                else if (baseInput.IsClicking && !EscapeButtonWasClick)
+                else if (EscapeButtonUp)
                 {
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.MENU });
                     baseInput.IsClicking = false;
-                    new ButtonUnclickEvent(EHand.LEFT, EControllersButton.MENU);
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
 using VRSF.Core.Controllers;
@@ -11,8 +12,12 @@ namespace VRSF.Core.Inputs
     /// </summary>
     public class OculusRightThumbrestInputCaptureSystem : JobComponentSystem
     {
+        private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
+
         protected override void OnCreate()
         {
+            // Cache the EndSimulationEntityCommandBufferSystem in a field, so we don't have to get it every frame
+            _endSimEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             OnSetupVRReady.Listeners += CheckDevice;
             base.OnCreate();
         }
@@ -22,7 +27,8 @@ namespace VRSF.Core.Inputs
             return new ThumbrestButtonInputCaptureJob()
             {
                 ThumbrestTouchButtonDown = Input.GetButtonDown("OculusRightThumbrestTouch"),
-                ThumbrestTouchButtonUp = Input.GetButtonUp("OculusRightThumbrestTouch")
+                ThumbrestTouchButtonUp = Input.GetButtonUp("OculusRightThumbrestTouch"),
+                Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
         }
 
@@ -32,25 +38,25 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct ThumbrestButtonInputCaptureJob : IJobForEach<ThumbrestInputCapture, BaseInputCapture>
+        [RequireComponentTag(typeof(RightHand))]
+        struct ThumbrestButtonInputCaptureJob : IJobForEachWithEntity<ThumbrestInputCapture, BaseInputCapture>
         {
-            public bool ThumbrestTouchButtonDown;
-            public bool ThumbrestTouchButtonUp;
+            [ReadOnly] public bool ThumbrestTouchButtonDown;
+            [ReadOnly] public bool ThumbrestTouchButtonUp;
 
-            public void Execute(ref ThumbrestInputCapture thumbrestCapture, ref BaseInputCapture baseInput)
+            public EntityCommandBuffer.Concurrent Commands;
+
+            public void Execute(Entity entity, int index, ref ThumbrestInputCapture thumbrestCapture, ref BaseInputCapture baseInput)
             {
-                if (thumbrestCapture.Hand == EHand.RIGHT)
+                if (ThumbrestTouchButtonDown)
                 {
-                    if (ThumbrestTouchButtonDown)
-                    {
-                        baseInput.IsTouching = true;
-                        new ButtonTouchEvent(EHand.RIGHT, EControllersButton.THUMBREST);
-                    }
-                    else if (ThumbrestTouchButtonUp)
-                    {
-                        baseInput.IsTouching = false;
-                        new ButtonUntouchEvent(EHand.RIGHT, EControllersButton.THUMBREST);
-                    }
+                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.THUMBREST });
+                    baseInput.IsTouching = true;
+                }
+                else if (ThumbrestTouchButtonUp)
+                {
+                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.THUMBREST });
+                    baseInput.IsTouching = false;
                 }
             }
         }
