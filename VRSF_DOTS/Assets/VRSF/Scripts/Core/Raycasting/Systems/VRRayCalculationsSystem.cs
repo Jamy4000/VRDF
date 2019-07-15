@@ -47,7 +47,7 @@ namespace VRSF.Core.Raycast
                         originTransform = VRSF_Components.VRCamera.transform;
                         break;
                     default:
-                        Debug.LogError("[b]VRSF :[\b] An error has occured in the RayCalculationsSystems. " +
+                        Debug.LogError("<b>[VRSF] :</b> An error has occured in the RayCalculationsSystems. " +
                             "Please check that the RayOrigin for your VRRaycatAuthoring Components are set correctly. Using Camera as Origin.");
                         break;
                 }

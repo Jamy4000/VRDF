@@ -15,7 +15,7 @@ namespace VRSF.Core.CBRA
         public static bool CheckThumbPosition(EThumbPosition posToCheck, float threshold, float2 thumbPos)
         {
             // If the position to check is ANY, and at least one of the four position is more than the threshold in the both axis
-            if (posToCheck == EThumbPosition.ANY && (thumbPos.x <= -threshold || thumbPos.x >= threshold || thumbPos.y >= threshold || thumbPos.y <= -threshold))
+            if (posToCheck == EThumbPosition.ANY)
                 return true;
 
             // If the position to check contains at least LEFT, we check if if the pos value is < to the threshold in the x axis

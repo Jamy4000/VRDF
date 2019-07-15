@@ -15,6 +15,7 @@
 - [ ] Rewrite Input Systems without Right/Left differentiation, as we get the Input in all cases.
 - [ ] Rewrite Input Systems with Touch and Click differentiation (instead of only BaseInputCapture component), and create seperate Systems. NOT MANDATORY, need to check if it make sense
 - [ ] When CameraFade is done, destroy entity. Recreate it when event is raised.
+- [ ] Create editor script for EnumFlagsField which handle the multiple object editing. I basically need to display a property field, and check afterward by hand the answer given by the user to then redisplay the right enum.
 
 
 ## MOVE AROUND Package

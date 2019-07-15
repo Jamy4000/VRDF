@@ -28,7 +28,7 @@ namespace VRSF.Core.Inputs
                 LeftMenuButtonDown = Input.GetButtonDown("HtcLeftMenuClick"),
                 LeftMenuButtonUp = Input.GetButtonUp("HtcLeftMenuClick"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(this);
+            }.Schedule(this, inputDeps);
         }
 
         protected override void OnDestroy()

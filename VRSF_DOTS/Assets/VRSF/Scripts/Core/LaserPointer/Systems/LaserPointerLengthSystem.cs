@@ -18,7 +18,6 @@ namespace VRSF.Core.LaserPointer
         }
         #region ComponentSystem_Methods
 
-        [Unity.Burst.BurstCompile]
         protected override void OnUpdate()
         {
             Entities.ForEach((ref LaserPointerLength laserLength, ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs) =>

@@ -20,41 +20,43 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new TriggerInputCaptureJob
+            return new LeftTriggerInputCaptureJob
             {
                 LeftTriggerSqueezeValue = Input.GetAxis("LeftTriggerSqueeze"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(this);
+            }.Schedule(this, inputDeps);
         }
 
         [RequireComponentTag(typeof(LeftHand))]
-        struct TriggerInputCaptureJob : IJobForEachWithEntity<TriggerInputCapture, BaseInputCapture>
+        struct LeftTriggerInputCaptureJob : IJobForEachWithEntity<TriggerInputCapture, BaseInputCapture>
         {
             [ReadOnly] public float LeftTriggerSqueezeValue;
 
             public EntityCommandBuffer.Concurrent Commands;
 
-            public void Execute(Entity entity, int index, ref TriggerInputCapture triggerInput, ref BaseInputCapture baseClickInput)
+            public void Execute(Entity entity, int index, ref TriggerInputCapture triggerInput, ref BaseInputCapture baseInput)
             {
-                if (!baseClickInput.IsClicking && LeftTriggerSqueezeValue > triggerInput.SqueezeClickThreshold)
+                if (!baseInput.IsClicking && LeftTriggerSqueezeValue > triggerInput.SqueezeClickThreshold)
                 {
                     Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
-                    baseClickInput.IsClicking = true;
+                    baseInput.IsTouching = false;
+                    baseInput.IsClicking = true;
                 }
-                else if (baseClickInput.IsClicking && LeftTriggerSqueezeValue < triggerInput.SqueezeClickThreshold)
+                else if (baseInput.IsClicking && LeftTriggerSqueezeValue < triggerInput.SqueezeClickThreshold)
                 {
                     Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
-                    baseClickInput.IsClicking = true;
+                    baseInput.IsClicking = false;
+                    baseInput.IsTouching = true;
                 }
-                else if (!baseClickInput.IsClicking && !baseClickInput.IsTouching && LeftTriggerSqueezeValue > 0.0f)
+                else if (!baseInput.IsClicking && !baseInput.IsTouching && LeftTriggerSqueezeValue > 0.0f)
                 {
                     Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
-                    baseClickInput.IsTouching = true;
+                    baseInput.IsTouching = true;
                 }
-                else if (baseClickInput.IsTouching && LeftTriggerSqueezeValue == 0.0f)
+                else if (baseInput.IsTouching && LeftTriggerSqueezeValue == 0.0f)
                 {
                     Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
-                    baseClickInput.IsTouching = true;
+                    baseInput.IsTouching = false;
                 }
             }
         }

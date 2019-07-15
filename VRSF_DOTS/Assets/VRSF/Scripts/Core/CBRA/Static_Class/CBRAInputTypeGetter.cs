@@ -34,7 +34,7 @@ namespace VRSF.Core.CBRA
                     return typeof(TouchpadInputCapture);
 
                 default:
-                    Debug.LogErrorFormat("[b]VRSF :[\b] Please Specify valid buttons to use for your ControllersButtonResponseAssigners.");
+                    Debug.LogErrorFormat("<b>[VRSF] :</b> Please Specify valid buttons to use for your ControllersButtonResponseAssigners.");
                     return null;
             }
         }

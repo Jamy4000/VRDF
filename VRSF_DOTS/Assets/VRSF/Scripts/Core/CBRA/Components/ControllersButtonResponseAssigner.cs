@@ -6,7 +6,6 @@ using Unity.Entities;
 using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
 using System;
-using System.Collections.Generic;
 
 namespace VRSF.Core.CBRA
 {
@@ -16,7 +15,7 @@ namespace VRSF.Core.CBRA
     [RequireComponent(typeof(SetupVRDestroyer))]
     public class ControllersButtonResponseAssigner : MonoBehaviour
     {
-        [Header("The button you wanna use for the Action")]
+        [Header("The Devices that are using this CBRA Script")]
         [HideInInspector] public EDevice DeviceUsingCBRA = EDevice.ALL;
 
 
@@ -95,7 +94,7 @@ namespace VRSF.Core.CBRA
                 }
 
                 // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-                if (!CBRASetupHelper.AddInteractionType(ref entityManager, ref entity, InteractionType, out CBRAInteractionType cbraInteraction))
+                if (!CBRASetupHelper.AddInteractionType(ref entityManager, ref entity, InteractionType, ButtonToUse, out CBRAInteractionType cbraInteraction))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
@@ -142,14 +141,14 @@ namespace VRSF.Core.CBRA
                 // Check if at least one event response was setup
                 if (!cbraHasEvents)
                 {
-                    Debug.LogErrorFormat("[b]VRSF :[\b] Please give at least one response to one of the Unity Events for the CBRA on Object {0}.", transform.name);
+                    Debug.LogErrorFormat("<b>[VRSF] :</b> Please give at least one response to one of the Unity Events for the CBRA on Object {0}.", transform.name);
                     entityManager.DestroyEntity(entity);
                     return;
                 }
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window
-                entityManager.SetName(entity, string.Format("CBRA Entity", entity.Index));
+                entityManager.SetName(entity, string.Format("CBRA Entity from GO " + transform.name, entity.Index));
 #endif
             }
         }

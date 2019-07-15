@@ -27,7 +27,7 @@ namespace VRSF.Core.Inputs
             {
                 RightGripSqueezeValue = Input.GetAxis("RightGripSqueeze"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(this);
+            }.Schedule(this, inputDeps);
         }
 
         protected override void OnDestroy()
@@ -48,12 +48,14 @@ namespace VRSF.Core.Inputs
                 if (!baseInput.IsClicking && RightGripSqueezeValue > gripInput.SqueezeClickThreshold)
                 {
                     Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.GRIP });
+                    baseInput.IsTouching = false;
                     baseInput.IsClicking = true;
                 }
                 else if (baseInput.IsClicking && RightGripSqueezeValue < gripInput.SqueezeClickThreshold)
                 {
                     Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.GRIP });
                     baseInput.IsClicking = false;
+                    baseInput.IsTouching = true;
                 }
                 else if (!baseInput.IsClicking && !baseInput.IsTouching && RightGripSqueezeValue > 0.0f)
                 {

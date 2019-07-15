@@ -8,7 +8,7 @@ using VRSF.Core.SetupVR;
 namespace VRSF.Core.Interactions
 {
     /// <summary>
-    /// Handle the Click and Unclick event in VR. Basically link the Raycast system and the Input System.
+    /// Handle the Click event in VR. Basically link the Raycast system and the Input System.
     /// CANNOT BE JOBIFIED as we need to send transform info in the ObjectWasClickedEvent
     /// </summary>
     public class PointerClickingSystem : ComponentSystem
@@ -48,10 +48,6 @@ namespace VRSF.Core.Interactions
         protected override void OnDestroy()
         {
             OnSetupVRReady.Listeners -= Setup;
-            // Just checking if the callbacks were indeed registered
-            if (ButtonUnclickEvent.IsMethodAlreadyRegistered(ResetVariable))
-                ButtonUnclickEvent.Listeners -= ResetVariable;
-
             base.OnDestroy();
         }
         #endregion
@@ -72,28 +68,9 @@ namespace VRSF.Core.Interactions
             }
         }
 
-        void ResetVariable(ButtonUnclickEvent info)
-        {
-            if (info.ButtonInteracting == EControllersButton.TRIGGER)
-            {
-                if (info.HandInteracting == EHand.RIGHT)
-                    InteractionVariableContainer.HasClickSomethingRight = false;
-                else
-                    InteractionVariableContainer.HasClickSomethingLeft = false;
-            }
-        }
-
         private void Setup(OnSetupVRReady info)
         {
-            // Just checking if there's entities in the scene
-            if (GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0 && !ButtonUnclickEvent.IsMethodAlreadyRegistered(ResetVariable))
-            {
-                ButtonUnclickEvent.Listeners += ResetVariable;
-            }
-            else
-            {
-                this.Enabled = false;
-            }
+            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0;
         }
         #endregion PRIVATE_METHODS
     }

@@ -32,7 +32,7 @@ namespace VRSF.Core.Inputs
                 LeftThumbTouchDown = Input.GetButtonDown("LeftThumbTouch"),
                 LeftThumbTouchUp = Input.GetButtonUp("LeftThumbTouch"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(this);
+            }.Schedule(this, inputDeps);
         }
 
         protected override void OnDestroy()
@@ -62,12 +62,14 @@ namespace VRSF.Core.Inputs
                 if (LeftThumbClickDown)
                 {
                     Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.TOUCHPAD });
+                    baseInput.IsTouching = false;
                     baseInput.IsClicking = true;
                 }
                 else if (LeftThumbClickUp)
                 {
                     Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.TOUCHPAD });
                     baseInput.IsClicking = false;
+                    baseInput.IsTouching = true;
                 }
                 // Check Touch Events if user is not clicking
                 else if (!baseInput.IsClicking && LeftThumbTouchDown)

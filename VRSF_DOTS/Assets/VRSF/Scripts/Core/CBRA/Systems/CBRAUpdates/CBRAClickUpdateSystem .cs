@@ -10,7 +10,7 @@ namespace VRSF.Core.CBRA
     {
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref CBRAInteractionType cbraInteractionType, ref BaseInputCapture baseInput) =>
+            Entities.WithNone<TouchpadInputCapture>().ForEach((Entity entity, ref CBRAInteractionType cbraInteractionType, ref BaseInputCapture baseInput) =>
             {
                 if (baseInput.IsClicking)
                     CBRADelegatesHolder.IsClickingEvents[entity]?.Invoke();

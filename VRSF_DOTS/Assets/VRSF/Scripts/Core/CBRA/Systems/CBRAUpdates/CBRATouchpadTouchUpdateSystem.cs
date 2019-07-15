@@ -12,7 +12,7 @@ namespace VRSF.Core.CBRA
         {
             Entities.ForEach((Entity entity, ref TouchpadInputCapture touchpadInput, ref CBRAThumbPosition cbraThumbPos, ref BaseInputCapture baseInput) => 
             {
-                if (baseInput.IsClicking && ThumbPositionChecker.CheckThumbPosition(cbraThumbPos.TouchThumbPosition, cbraThumbPos.IsTouchingThreshold, touchpadInput.ThumbPosition))
+                if (baseInput.IsTouching && ThumbPositionChecker.CheckThumbPosition(cbraThumbPos.TouchThumbPosition, cbraThumbPos.IsTouchingThreshold, touchpadInput.ThumbPosition))
                     CBRADelegatesHolder.IsTouchingEvents[entity]?.Invoke();
             });
         }

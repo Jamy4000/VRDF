@@ -21,7 +21,7 @@ namespace VRSF.Core.CBRA
             Entities.ForEach((Entity entity, ref CBRAInteractionType cbraInteractionType, ref StopTouchingEventComp stopTouchingEvent) =>
             {
                 if (_entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(stopTouchingEvent.ButtonInteracting)))
-                    CBRADelegatesHolder.StartTouchingEvents[entity]?.Invoke();
+                    CBRADelegatesHolder.StopTouchingEvents[entity]?.Invoke();
 
                 PostUpdateCommands.RemoveComponent(entity, typeof(StopTouchingEventComp));
             });

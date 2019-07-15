@@ -1,5 +1,4 @@
-﻿using System;
-using Unity.Entities;
+﻿using Unity.Entities;
 using VRSF.Core.Inputs;
 
 namespace VRSF.Core.CBRA
@@ -21,8 +20,8 @@ namespace VRSF.Core.CBRA
         {
             Entities.ForEach((Entity entity, ref CBRAInteractionType cbraInteractionType, ref StopClickingEventComp stopClickingEvent) =>
             {
-                if (CBRADelegatesHolder.StopClickingEvents.ContainsKey(entity) && _entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)))
-                    CBRADelegatesHolder.StopClickingEvents[entity].Invoke();
+                if (_entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)))
+                    CBRADelegatesHolder.StopClickingEvents[entity]?.Invoke();
 
                 PostUpdateCommands.RemoveComponent(entity, typeof(StopClickingEventComp));
             });

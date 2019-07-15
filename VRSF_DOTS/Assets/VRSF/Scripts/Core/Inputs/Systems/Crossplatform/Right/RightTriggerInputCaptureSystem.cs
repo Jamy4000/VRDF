@@ -24,7 +24,7 @@ namespace VRSF.Core.Inputs
             {
                 RightTriggerSqueezeValue = Input.GetAxis("RightTriggerSqueeze"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(this);
+            }.Schedule(this, inputDeps);
         }
 
         [RequireComponentTag(typeof(RightHand))]
@@ -39,12 +39,14 @@ namespace VRSF.Core.Inputs
                 if (!baseInput.IsClicking && RightTriggerSqueezeValue > triggerInput.SqueezeClickThreshold)
                 {
                     Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
+                    baseInput.IsTouching = false;
                     baseInput.IsClicking = true;
                 }
                 else if (baseInput.IsClicking && RightTriggerSqueezeValue < triggerInput.SqueezeClickThreshold)
                 {
                     Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
                     baseInput.IsClicking = false;
+                    baseInput.IsTouching = true;
                 }
                 else if (!baseInput.IsClicking && !baseInput.IsTouching && RightTriggerSqueezeValue > 0.0f)
                 {
