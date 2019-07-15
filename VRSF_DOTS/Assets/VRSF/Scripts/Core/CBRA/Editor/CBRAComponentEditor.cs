@@ -491,8 +491,8 @@ namespace VRSF.Core.CBRA
         /// 
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Utils/Add CBRA Object", priority = 0)]
-        [MenuItem("VRSF/Utils/Add CBRA Object", priority = 0)]
+        [MenuItem("GameObject/VRSF/Utils/Add CBRA Object", priority = 2)]
+        [MenuItem("VRSF/Utils/Add CBRA Object", priority = 2)]
         public static void AddCBRAObject(MenuCommand menuCommand)
         {
             var cbraObject = new GameObject("CBRA");

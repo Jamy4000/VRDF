@@ -20,11 +20,15 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new TriggerInputCaptureJob
+            var handle = new TriggerInputCaptureJob
             {
                 RightTriggerSqueezeValue = Input.GetAxis("RightTriggerSqueeze"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
+
+            handle.Complete();
+
+            return handle;
         }
 
         [RequireComponentTag(typeof(RightHand))]
