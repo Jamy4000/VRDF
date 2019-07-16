@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using VRSF.Core.FadingEffect;
 
 namespace VRSF.Core.SetupVR
 { 
@@ -19,7 +20,7 @@ namespace VRSF.Core.SetupVR
             {
                 Device = HeadsetChecker.CheckDeviceConnected();
             }
-            else if (Device == EDevice.NONE)
+            else if (Device == EDevice.NONE || Device == EDevice.ALL)
             {
                 Debug.LogError("<b>[VRSF] :</b> Device to Load is null, Checking runtime device.");
                 Device = HeadsetChecker.CheckDeviceConnected();
@@ -30,6 +31,7 @@ namespace VRSF.Core.SetupVR
 
             VRSF_Components.SetupVRIsReady = true;
             new OnSetupVRReady();
+            new StartFadingInEvent(0.5f);
         }
     }
 }

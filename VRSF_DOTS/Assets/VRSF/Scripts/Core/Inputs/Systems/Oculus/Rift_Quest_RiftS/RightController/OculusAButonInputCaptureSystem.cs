@@ -2,7 +2,6 @@
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs
@@ -24,7 +23,7 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new AButtonInputCaptureJob()
+            var handle = new AButtonInputCaptureJob()
             {
                 AClickButtonDown = Input.GetButtonDown("OculusAButtonClick"),
                 AClickButtonUp = Input.GetButtonUp("OculusAButtonClick"),
@@ -32,6 +31,9 @@ namespace VRSF.Core.Inputs
                 ATouchButtonUp = Input.GetButtonUp("OculusAButtonTouch"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
+
+            handle.Complete();
+            return handle;
         }
 
         protected override void OnDestroy()

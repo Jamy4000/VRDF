@@ -23,12 +23,15 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new ThumbrestButtonInputCaptureJob()
+            var handle = new ThumbrestButtonInputCaptureJob()
             {
                 ThumbrestTouchButtonDown = Input.GetButtonDown("OculusLeftThumbrestTouch"),
                 ThumbrestTouchButtonUp = Input.GetButtonUp("OculusLeftThumbrestTouch"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
+
+            handle.Complete();
+            return handle;
         }
 
         protected override void OnDestroy()

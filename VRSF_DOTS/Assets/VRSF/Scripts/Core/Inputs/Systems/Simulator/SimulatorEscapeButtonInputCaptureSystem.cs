@@ -23,12 +23,15 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new SimulatorInputCaptureJob()
+            var handle = new SimulatorInputCaptureJob()
             {
                 EscapeButtonDown = Input.GetKeyDown(KeyCode.Escape),
                 EscapeButtonUp = Input.GetKeyUp(KeyCode.Escape),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
+
+            handle.Complete();
+            return handle;
         }
 
         protected override void OnDestroy()

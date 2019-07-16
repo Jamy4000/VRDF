@@ -23,7 +23,7 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new XButtonInputCaptureJob()
+            var handle = new XButtonInputCaptureJob()
             {
                 XClickButtonDown = Input.GetButtonDown("OculusXButtonClick"),
                 XClickButtonUp = Input.GetButtonUp("OculusXButtonClick"),
@@ -31,6 +31,9 @@ namespace VRSF.Core.Inputs
                 XTouchButtonUp = Input.GetButtonUp("OculusXButtonTouch"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
+
+            handle.Complete();
+            return handle;
         }
 
         protected override void OnDestroy()

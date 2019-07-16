@@ -24,12 +24,15 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new SimulatorInputCaptureJob()
+            var handle = new SimulatorInputCaptureJob()
             {
                 LeftMouseButtonDown = Input.GetMouseButtonDown(0),
                 LeftMouseButtonUp = Input.GetMouseButtonUp(0),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
+
+            handle.Complete();
+            return handle;
         }
 
         protected override void OnDestroy()

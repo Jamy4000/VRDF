@@ -24,7 +24,7 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new TouchpadInputCaptureJob()
+            var handle = new TouchpadInputCaptureJob()
             {
                 RightThumbPosition = new float2(Input.GetAxis("HorizontalRight"), Input.GetAxis("VerticalRight")),
                 RightThumbClickDown = Input.GetButtonDown("RightThumbClick"),
@@ -33,6 +33,9 @@ namespace VRSF.Core.Inputs
                 RightThumbTouchUp = Input.GetButtonUp("RightThumbTouch"),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
+
+            handle.Complete();
+            return handle;
         }
 
         protected override void OnDestroy()

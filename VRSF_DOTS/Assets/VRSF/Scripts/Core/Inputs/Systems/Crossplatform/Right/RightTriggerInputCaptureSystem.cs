@@ -27,7 +27,6 @@ namespace VRSF.Core.Inputs
             }.Schedule(this, inputDeps);
 
             handle.Complete();
-
             return handle;
         }
 
