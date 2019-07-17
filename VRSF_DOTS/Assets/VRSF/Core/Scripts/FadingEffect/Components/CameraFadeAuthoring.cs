@@ -44,7 +44,7 @@ namespace VRSF.Core.FadingEffect
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window
-            dstManager.SetName(entity, string.Format("Camera Fade Entity", entity.Index));
+            dstManager.SetName(entity, "Camera Fade Entity");
 #endif
         }
     }

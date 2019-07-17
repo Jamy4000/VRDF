@@ -50,7 +50,7 @@ namespace VRSF.Core.LaserPointer
 
 #if UNITY_EDITOR
             // Set the name of the entity in Editor Mode for the Entity Debugger Window
-            dstManager.SetName(entity, string.Format("Laser Pointer " + raycastAuthoring.RayOrigin.ToString(), entity.Index));
+            dstManager.SetName(entity, string.Format("Laser Pointer {0}", raycastAuthoring.RayOrigin.ToString()));
 #endif
             
             Destroy(this);

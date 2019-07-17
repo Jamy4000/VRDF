@@ -148,7 +148,7 @@ namespace VRSF.Core.CBRA
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window
-                entityManager.SetName(entity, string.Format("CBRA Entity from GO " + transform.name, entity.Index));
+                entityManager.SetName(entity, string.Format("CBRA Entity from GO {0}", transform.name));
 #endif
             }
         }
