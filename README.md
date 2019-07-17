@@ -34,7 +34,7 @@ The stable versions are placed in the Releases section of this repository. Multi
 2. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
 3. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
 4. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
-5. Add this line "com.Jamy4000.VRSF_DOTS": "git://github.com/Jamy4000/VRSF_DOTS.git", to your manifest.json. It does not update automatically when I push fixes to this repo. You must remove the lock in your manifest.
+5. Add this line "com.jamy4000.vrsf_dots": "git://github.com/Jamy4000/VRSF_DOTS.git", to your manifest.json. It does not update automatically when I push fixes to this repo. You must remove the lock in your manifest.
 6. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
 7. Set the Start Position of your CameraRig using the CameraRig object
 8. You should be good to go !
