@@ -3,11 +3,11 @@
 ## Summary
 First version of the Core Package.
 
-Every Systems and Components have been simplified and optimizied compared to the last VRSF_Hybrid_Version. here are some of the new stuffs in this release :
+Every Systems and Components have been simplified and optimizied compared to the last VRSF_Hybrid_Version. Here are some of the new stuffs when compared to VRSF_Hybrid_ECS :
 
-BAC are now called CBRA (ControllersButtonResponseAssigner) and only have one Authoring Monobehaviour.
-SetupVR in now devided in two Authoring Monobehaviour, DeviceToLoadAuthoring and VRObjectsAuthoring.
-Pointers Objects have been divided in three prefabs : BasicPointer (only check for Raycast), LaserPointer (Display a LineRenderer for the Pointer), and LaserPointerWithClick (Display a LineRenderer and let you click on objects like the UI using the trigger button).
+- BAC are now called CBRA (ControllersButtonResponseAssigner) and only have one Authoring Monobehaviour.
+- SetupVR in now devided in two Authoring Monobehaviour, DeviceToLoadAuthoring and VRObjectsAuthoring.
+- Pointers Objects have been divided in three prefabs : BasicPointer (only check for Raycast), LaserPointer (Display a LineRenderer for the Pointer), and LaserPointerWithClick (Display a LineRenderer and let you click on objects like the UI using the trigger button).
 
 ## [v0.1](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.1) (2019-07-17)
 **Closed issues:**
