@@ -30,7 +30,7 @@ namespace VRSF.Core.SetupVR
                 return;
             }
 
-            _setupVRPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/Core/SetupVR.prefab");
+            _setupVRPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["SetupVR"];
 
             // Create a custom game object
             GameObject setupVR = PrefabUtility.InstantiatePrefab(_setupVRPrefab) as GameObject;

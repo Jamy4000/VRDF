@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 9d61850a171e2024c92cff72650a66f2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _cameraFadePrefab: {fileID: 9090530287602746573, guid: 655fa835d79771149af1a17bf43a9ddc,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

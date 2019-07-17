@@ -13,7 +13,7 @@ namespace VRSF.Core.FadingEffect
         [MenuItem("VRSF/Utils/Add Camera Fader", priority = 1)]
         private static void AddCameraFader(MenuCommand menuCommand)
         {
-            var faderPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/Core/CameraFade/CameraFade.prefab");
+            var faderPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["CameraFader"];
 
             // Create a custom game object
             GameObject pointer = PrefabUtility.InstantiatePrefab(faderPrefab) as GameObject;

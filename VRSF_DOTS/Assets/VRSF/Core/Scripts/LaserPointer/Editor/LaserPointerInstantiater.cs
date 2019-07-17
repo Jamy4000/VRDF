@@ -13,7 +13,7 @@ namespace VRSF.Core.LaserPointer
         [MenuItem("VRSF/Laser Pointer/Add Pointer (Without Laser)", priority = 2)]
         private static void AddBasicPointer(MenuCommand menuCommand)
         {
-            var pointerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/Core/Pointer/BasicRaycastPointer.prefab");
+            var pointerPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["BasicPointer"];
             CreateGameObject(pointerPrefab, menuCommand);
         }
 
@@ -25,7 +25,7 @@ namespace VRSF.Core.LaserPointer
         [MenuItem("VRSF/Laser Pointer/Add Laser Pointer", priority = 0)]
         private static void AddLaserPointer(MenuCommand menuCommand)
         {
-            GameObject pointerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/Core/Pointer/LaserPointer.prefab");
+            var pointerPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["LaserPointer"];
             CreateGameObject(pointerPrefab, menuCommand);
         }
 
@@ -37,7 +37,7 @@ namespace VRSF.Core.LaserPointer
         [MenuItem("VRSF/Laser Pointer/Add Laser Pointer With Click", priority = 0)]
         private static void AddLaserPointerWithClick(MenuCommand menuCommand)
         {
-            GameObject pointerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/Core/Pointer/LaserPointerWithClick.prefab");
+            var pointerPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["LaserPointerWithClick"];
             CreateGameObject(pointerPrefab, menuCommand);
         }
 
