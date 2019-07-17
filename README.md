@@ -27,36 +27,6 @@ The stable versions are placed in the Releases section of this repository. Multi
 
 
 
-# Basic Setup
-
-## Package Manager Setup
-1. Create a new Empty project using Unity 2019.x
-2. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
-3. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
-4. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
-5. Add this line "com.jamy4000.vrsf_dots": "git://github.com/Jamy4000/VRSF_DOTS.git", to your manifest.json. It does not update automatically when I push fixes to this repo. You must remove the lock in your manifest.
-6. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
-7. Set the Start Position of your CameraRig using the CameraRig object
-8. You should be good to go !
-
-## Manual Setup
-1. Create a new Empty project using Unity 2019.x
-2. Import the different packages and setup the settings listed above
-3. Relaunch the Editor to be sure that everything is correctly recompiled
-4. Import the VRSF_DOTS_Core package
-5. Import the other VRSF_DOTS extension packages you need (Samples, Move Around, UI or Gaze)
-6. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
-7. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
-8. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
-9. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
-10. Set the Start Position of your CameraRig using the CameraRig object
-11. You should be good to go !
-
-## Extension Packages
-If you want to add anything more in your scene (Movements, UI, Gaze, ...), just check the prefabs in the different Extension Packages, or check the different scenes in the VRSF.Samples folder of this repository :)
-
-
-
 # Requirements
 For Unity, you need to download the latest **2019.1 version or later**, as it's required to be able to use Unity DOTS.
 
@@ -85,6 +55,26 @@ If you need to build for a mobile platform, you need as well to download the And
 
 
 Once all of that is done, **Restart your project so everything can be recompiled !**
+
+
+
+# Basic Setup
+
+## Manual Setup
+1. Create a new Empty project using Unity 2019.x
+2. Import the different packages and setup the settings listed above
+3. Relaunch the Editor to be sure that everything is correctly recompiled
+4. Import the VRSF_DOTS_Core package
+5. Import the other VRSF_DOTS extension packages you need (Samples, Move Around, UI or Gaze)
+6. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
+7. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
+8. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
+9. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
+10. Set the Start Position of your CameraRig using the CameraRig object
+11. You should be good to go !
+
+## Extension Packages
+If you want to add anything more in your scene (Movements, UI, Gaze, ...), just check the prefabs in the different Extension Packages, or check the different scenes in the VRSF.Samples folder of this repository :)
 
 
 # Credits
