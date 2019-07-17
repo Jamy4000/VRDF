@@ -23,9 +23,9 @@ namespace VRSF.Core.FadingEffect
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
-            int cameraFadeEntities = GetEntityQuery(typeof(CameraFade)).CalculateLength();
+            int cameraFadeEntities = GetEntityQuery(typeof(CameraFadeParameters)).CalculateLength();
             _entities = new NativeArray<Entity>(cameraFadeEntities, Allocator.Persistent);
-            Entities.ForEach((Entity e, ref CameraFade cameraFade) =>
+            Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
                 _renderMesh = _entityManager.GetSharedComponentData<RenderMesh>(e);
                 return;
@@ -37,7 +37,7 @@ namespace VRSF.Core.FadingEffect
             int index = 0;
             bool materialWasSet = false;
 
-            Entities.ForEach((Entity e, ref CameraFade cameraFade) =>
+            Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
                 _entities[index] = e;
                 if (!materialWasSet && cameraFade.FadingInProgress)
@@ -68,7 +68,7 @@ namespace VRSF.Core.FadingEffect
         /// <summary>
         /// Change the alpha of the fading canvas and set the current teleporting state if the fade in/out is done
         /// </summary>
-        private Material HandlePlaneAlpha(ref CameraFade cameraFade, RenderMesh renderMesh)
+        private Material HandlePlaneAlpha(ref CameraFadeParameters cameraFade, RenderMesh renderMesh)
         {
             Material newMat = renderMesh.material;
             Color color = newMat.color;
@@ -102,7 +102,7 @@ namespace VRSF.Core.FadingEffect
             return newMat;
         }
 
-        public static void ResetParameters(ref CameraFade cameraFade)
+        public static void ResetParameters(ref CameraFadeParameters cameraFade)
         {
             cameraFade.FadingInProgress = false;
             cameraFade.FadingSpeed = cameraFade.OldFadingSpeedFactor;

@@ -24,7 +24,7 @@ namespace VRSF.Core.FadingEffect
 
         private void StartFadeOut(StartFadingOutEvent info)
         {
-            Entities.ForEach((ref CameraFade cameraFade) =>
+            Entities.ForEach((ref CameraFadeParameters cameraFade) =>
             {
                 cameraFade.FadingInProgress = true;
                 cameraFade.IsFadingIn = false;
@@ -38,7 +38,7 @@ namespace VRSF.Core.FadingEffect
         
         private void OnFadeOutEnded(OnFadingOutEndedEvent info)
         {
-            Entities.ForEach((ref CameraFade cameraFade) =>
+            Entities.ForEach((ref CameraFadeParameters cameraFade) =>
             {
                 var overrideSpeed = cameraFade.FadingSpeed;
 
