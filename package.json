@@ -1,20 +1,22 @@
 {
-    "name": "com.jamy4000.vrsf_dots",
+    "name": "com.Jamy4000.VRSF_DOTS",
     "author": "Arnaud Briche / Jamy4000 - Absolute Software GmbH",
     "displayName": "VRSF DOTS",
-    "version": "0.0.1",
+    "version": "0.1",
     "unity": "2019.1",
-    "description": "Easy-to-use Virtual Reality using DOTS approach, Event Callbacks System and a bit of magic.",
+    "description": "Virtual Reality framework using DOTS approach to improve the performances.",
     "dependencies": {
-        "com.e7.ecs.line-renderer": "https://github.com/5argon/ECSLineRenderer.git",
         "com.unity.entities": "0.0.12-preview.33",
-        "com.unity.rendering.hybrid": "0.0.1-preview.13"
+        "com.unity.rendering.hybrid": "0.0.1-preview.13",
+    	"com.unity.xr.legacyinputhelpers": "2.0.4",
+    	"com.unity.xr.oculus.android": "1.36.0",
+    	"com.unity.xr.oculus.standalone": "1.36.0",
+    	"com.unity.xr.openvr.standalone": "1.0.5",
+    	"com.unity.xr.windowsmr.metro": "1.0.12",
     },
     "keywords": [
         "entities",
         "hybrid",
-        "rendering",
-        "xr",
-        "vr"
+        "virtual reality"
     ]
 }

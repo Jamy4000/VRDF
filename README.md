@@ -1,5 +1,5 @@
 # VR Scriptable Framework using Unity DOTS
-This repository is a Virtual Reality Framework using the Unity Input Manager for Inputs and Interaction, an Event System as seen in [Quill18 video](https://www.youtube.com/watch?v=04wXkgfd9V8) and the DOTS from Unity3D. It aims to ease the use of Virtual Reality in a project, and to have a light tool for that, while integrating a cross-platform project, some basic VR features and being as fast as possible. 
+This repository is a Virtual Reality Framework using the Unity Input Manager for Inputs and Interaction, an Event System as seen in [Quill18 video](https://www.youtube.com/watch?v=04wXkgfd9V8) and the DOTS workflow from Unity3D. It aims to ease the use of Virtual Reality in a project, and to have a light tool for that, while integrating a cross-platform project, some basic VR features and being as fast as possible. 
 
 
 There's still a couple of systems using MonoBehaviour during the PlayMode (Example : the LaserLengthSetter and the LaserWidthSetter), and by that I mean that they're not used to setup any Entity. 
@@ -26,10 +26,43 @@ The supported devices for now are :
 The stable versions are placed in the Releases section of this repository. Multiple packages are available, with extensions depending on your use. The only one you absolutely need is the VRSF_Hybrid_Core package.
 
 
+
+# Basic Setup
+
+## Package Manager Setup
+1. Create a new Empty project using Unity 2019.x
+2. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
+3. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
+4. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
+5. Add this line "com.Jamy4000.VRSF_DOTS": "git://github.com/Jamy4000/VRSF_DOTS.git", to your manifest.json. It does not update automatically when I push fixes to this repo. You must remove the lock in your manifest.
+6. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
+7. Set the Start Position of your CameraRig using the CameraRig object
+8. You should be good to go !
+
+## Manual Setup
+1. Create a new Empty project using Unity 2019.x
+2. Import the different packages and setup the settings listed above
+3. Relaunch the Editor to be sure that everything is correctly recompiled
+4. Import the VRSF_DOTS_Core package
+5. Import the other VRSF_DOTS extension packages you need (Samples, Move Around, UI or Gaze)
+6. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
+7. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
+8. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
+9. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
+10. Set the Start Position of your CameraRig using the CameraRig object
+11. You should be good to go !
+
+## Extension Packages
+If you want to add anything more in your scene (Movements, UI, Gaze, ...), just check the prefabs in the different Extension Packages, or check the different scenes in the VRSF.Samples folder of this repository :)
+
+
+
 # Requirements
 For Unity, you need to download the latest **2019.1 version or later**, as it's required to be able to use Unity DOTS.
 
 ## Packages
+WARNING : Not needed if you import this repository using the Package Manager. For more info, check the Basic Setup section.
+
 To use this Framework, you gonna need the following stuffs :
 - **The XR Legacy Input Helpers** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on All Packages > XR Legacy Input Helpers > Install).
 - **The Entities Package 0.0.12 preview-33** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install). 
@@ -54,27 +87,11 @@ If you need to build for a mobile platform, you need as well to download the And
 Once all of that is done, **Restart your project so everything can be recompiled !**
 
 
-
-# Basic Setup
-
-1. Import the different packages and setup the settings listed above
-2. Relaunch the Editor to be sure that everything is correctly recompiled
-3. Import the VRSF_DOTS_Core package
-4. Import the other VRSF_DOTS extension packages you need (Samples, Move Around, UI or Gaze)
-5. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
-6. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
-7. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
-8. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
-9. Set the Start Position of your CameraRig using the CameraRig object
-10. You should be good to go !
-
-If you want to add anything more in your scene (Movements, UI, Gaze, ...), just check the prefabs in the different Extension Packages, or check the different scenes in the VRSF.Samples folder of this repository :)
-
-
 # Credits
 This repository is based on multiple repositories found online, and that's why I would like to thanks the following persons for their work that helped me through the development of this project :
 - The EventCallbacks Plugin from [Quill18](https://www.youtube.com/watch?v=04wXkgfd9V8) and the rewriting of it by [CrazyFrog55](https://github.com/crazyfox55) and [FuzzyHobo](https://github.com/FuzzyHobo). I made my own version available [here](https://github.com/Jamy4000/UnityCallbackAndEventTutorial).
 - The Vive-Teleporter offered by [FlaFla2](https://github.com/Flafla2/Vive-Teleporter) for the calculation and display of the Parabole in the Curve Teleporter.
+- [5argon](https://github.com/5argon) for all the public repository and tutorials he made, as well as for his answers on all the different ECS forums out there. You're the real MVP.
 
 
 # Documentation
