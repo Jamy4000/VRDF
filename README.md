@@ -31,8 +31,6 @@ The stable versions are placed in the Releases section of this repository. Multi
 For Unity, you need to download the latest **2019.1 version or later**, as it's required to be able to use Unity DOTS.
 
 ## Packages
-WARNING : Not needed if you import this repository using the Package Manager. For more info, check the Basic Setup section.
-
 To use this Framework, you gonna need the following stuffs :
 - **The XR Legacy Input Helpers** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on All Packages > XR Legacy Input Helpers > Install).
 - **The Entities Package 0.0.12 preview-33** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install). 
