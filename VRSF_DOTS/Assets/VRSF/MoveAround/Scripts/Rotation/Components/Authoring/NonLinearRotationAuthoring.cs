@@ -8,11 +8,8 @@ namespace VRSF.MoveAround.Rotation
     /// <summary>
     /// Component used by the rotation systems to rotate the user using the thumbstick/Touchpad
     /// </summary>
-    public class UserRotationAuthoring : MonoBehaviour
+    public class NonLinearRotationAuthoring : MonoBehaviour
     {
-        [Tooltip("Do you want to rotate using deltaTime or by a certain amount of degrees ?")]
-        [SerializeField] private bool _useLinearRotation = false;
-
         [Tooltip("How do you want to rotate ?")]
         [SerializeField] private EControllerInteractionType _interactionType = EControllerInteractionType.TOUCH;
 
@@ -21,9 +18,6 @@ namespace VRSF.MoveAround.Rotation
 
         [Tooltip("Amount of degrees to rotate when UseSmoothRotation is at false")]
         [SerializeField] private float _degreesToRotate = 30.0f;
-
-        [Tooltip("Speed of the rotation effect when UseSmoothRotation is at true")]
-        [SerializeField] private float _maxSpeed = 1.0f;
 
         public void Awake()
         {
@@ -48,27 +42,20 @@ namespace VRSF.MoveAround.Rotation
                     return;
             }
 
-            if (_useLinearRotation)
+            entityManager.AddComponentData(entity, new UserRotationInteractionType
             {
-                entityManager.AddComponentData(entity, new LinearUserRotation
-                {
-                    CurrentRotationSpeed = 0.0f,
-                    MaxRotationSpeed = _maxSpeed,
-                    UseTouchToRotate = (_interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,
-                    UseClickToRotate = (_interactionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK
-                });
-            }
-            else
-            {
-                entityManager.AddComponentData(entity, new NonLinearUserRotation { DegreesToRotate = this._degreesToRotate });
-            }
+                UseTouchToRotate = (_interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,
+                UseClickToRotate = (_interactionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK
+            });
+
+            entityManager.AddComponentData(entity, new NonLinearUserRotation { DegreesToRotate = this._degreesToRotate });
 
             entityManager.SetComponentData(entity, new BaseInputCapture());
             entityManager.SetComponentData(entity, new TouchpadInputCapture());
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window
-            entityManager.SetName(entity, "User Rotation Entity");
+            entityManager.SetName(entity, "User Non Linear Rotation Entity");
 #endif
 
             Destroy(gameObject);

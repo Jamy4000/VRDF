@@ -12,7 +12,7 @@ namespace VRSF.MoveAround.Rotation
     /// Rotate the user based on the Speed parameter using a sliding effect.
     /// WARNING Can give motion sickness !
     /// </summary>
-    public class UserRotationAccelerationSystem : JobComponentSystem
+    public class UserRotationDecelerationSystem : JobComponentSystem
     {
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
@@ -22,7 +22,7 @@ namespace VRSF.MoveAround.Rotation
             NativeArray<float3> rotationAxisOutput = new NativeArray<float3>(1, Allocator.TempJob);
             NativeArray<float> currentSpeedOutput = new NativeArray<float>(1, Allocator.TempJob);
 
-            var job = new RotationJob
+            var job = new DecelerationJob
             {
                 DeltaTime = Time.deltaTime,
                 RotationAxis = rotationAxisOutput,
@@ -55,7 +55,7 @@ namespace VRSF.MoveAround.Rotation
 
         //        // LastThumbPos : The last thumbPos of the user when rotating (touching/clicking the thumbstick) only 
         //        entity.RotationComp.LastThumbPos = entity.RotationComp.IsRotating ? entity.BACCalculations.ThumbPos.Value.x : entity.RotationComp.LastThumbPos;
-
+                
         //        // Setting the current speed of the user
         //        entity.RotationComp.CurrentSpeed += isAccelerating ? maxSpeedTimeDeltaTime : -maxSpeedTimeDeltaTime;
 
@@ -70,24 +70,23 @@ namespace VRSF.MoveAround.Rotation
         //}
 
         [Unity.Burst.BurstCompile]
-        private struct RotationJob : IJobForEach<LinearUserRotation, UserRotationInteractionType, BaseInputCapture, TouchpadInputCapture>
+        private struct DecelerationJob : IJobForEach<LinearUserRotation, UserRotationInteractionType, BaseInputCapture, LinearRotationDeceleration>
         {
             [ReadOnly] public float DeltaTime;
 
             public NativeArray<float3> RotationAxis;
             public NativeArray<float> CurrentSpeed;
 
-            public void Execute(ref LinearUserRotation lur, ref UserRotationInteractionType urit, ref BaseInputCapture bic, ref TouchpadInputCapture tic)
+            public void Execute(ref LinearUserRotation lur, ref UserRotationInteractionType urit, ref BaseInputCapture bic, ref LinearRotationDeceleration lrd)
             {
-                if ((urit.UseClickToRotate && bic.IsClicking) || (urit.UseTouchToRotate && bic.IsTouching))
+                if (lur.CurrentRotationSpeed > 0.0f && ((urit.UseClickToRotate && !bic.IsClicking) || (urit.UseTouchToRotate && !bic.IsTouching)))
                 {
                     // maxSpeedTimeDeltaTime : To calculate the current speed according to deltaTime, Max Speed and acceleration factor
-                    float maxSpeedTimeDeltaTime = DeltaTime * lur.AccelerationFactor * (lur.MaxRotationSpeed / 50);
+                    float maxSpeedTimeDeltaTime = DeltaTime * lrd.DecelerationFactor * (lur.MaxRotationSpeed / 50);
 
                     // Setting the current speed of the user
-                    lur.CurrentRotationSpeed += maxSpeedTimeDeltaTime;
+                    lur.CurrentRotationSpeed -= maxSpeedTimeDeltaTime;
 
-                    lur.LastThumbXPos = tic.ThumbPosition.x;
                     RotationAxis[0] = new float3(0, lur.LastThumbXPos, 0);
                     CurrentSpeed[0] = lur.CurrentRotationSpeed;
                 }

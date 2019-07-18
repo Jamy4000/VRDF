@@ -53,13 +53,13 @@ namespace VRSF.Core.Inputs
                 }
                 else if (!baseInput.IsClicking && !baseInput.IsTouching && LeftTriggerSqueezeValue > 0.0f)
                 {
-                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
                     baseInput.IsTouching = true;
+                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
                 }
                 else if (baseInput.IsTouching && LeftTriggerSqueezeValue == 0.0f)
                 {
-                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
                     baseInput.IsTouching = false;
+                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
                 }
             }
         }

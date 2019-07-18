@@ -6,8 +6,7 @@ namespace VRSF.MoveAround.Rotation
     {
         public float CurrentRotationSpeed;
         public float MaxRotationSpeed;
-
-        public bool UseClickToRotate;
-        public bool UseTouchToRotate;
+        public float AccelerationFactor;
+        public float LastThumbXPos;
     }
 }

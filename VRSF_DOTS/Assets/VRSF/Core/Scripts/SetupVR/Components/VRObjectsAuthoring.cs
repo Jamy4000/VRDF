@@ -33,6 +33,8 @@ namespace VRSF.Core.SetupVR
             VRSF_Components.LeftController = CheckProvidedGameObject(_leftController, "RESERVED_LeftController");
             VRSF_Components.RightController = CheckProvidedGameObject(_rightController, "RESERVED_RightController");
 
+            VRSF_Components.SetCameraRigPosition(_cameraRig.transform.position);
+
 
             GameObject CheckProvidedGameObject(GameObject toCheck, string tag)
             {

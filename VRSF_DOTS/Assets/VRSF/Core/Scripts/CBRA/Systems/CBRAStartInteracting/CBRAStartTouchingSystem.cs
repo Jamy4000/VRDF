@@ -22,7 +22,10 @@ namespace VRSF.Core.CBRA
             {
                 if (CBRADelegatesHolder.StartTouchingEvents.ContainsKey(entity) && _entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(startTouchingEvent.ButtonInteracting)))
                     CBRADelegatesHolder.StartTouchingEvents[entity].Invoke();
+            });
 
+            Entities.ForEach((Entity entity, ref StartTouchingEventComp startTouchingEvent) =>
+            {
                 PostUpdateCommands.RemoveComponent(entity, typeof(StartTouchingEventComp));
             });
         }

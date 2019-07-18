@@ -22,7 +22,10 @@ namespace VRSF.Core.CBRA
             {
                 if (_entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)))
                     CBRADelegatesHolder.StopClickingEvents[entity]?.Invoke();
+            });
 
+            Entities.ForEach((Entity entity, ref StopClickingEventComp stopClickingEvent) =>
+            {
                 PostUpdateCommands.RemoveComponent(entity, typeof(StopClickingEventComp));
             });
         }

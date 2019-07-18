@@ -69,12 +69,12 @@ namespace VRSF.Core.Inputs
                     baseInput.IsTouching = true;
                 }
                 // Check Touch Events if user is not clicking
-                else if (!baseInput.IsClicking && XTouchButtonDown)
+                else if (!baseInput.IsClicking && !baseInput.IsTouching && XTouchButtonDown)
                 {
                     Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.X_BUTTON });
                     baseInput.IsTouching = true;
                 }
-                else if (XTouchButtonUp)
+                else if (baseInput.IsTouching && XTouchButtonUp)
                 {
                     Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.X_BUTTON });
                     baseInput.IsTouching = false;
