@@ -9,11 +9,11 @@ namespace VRSF.Core.LaserPointer
         /// 
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Laser Pointer/Add Pointer (Without Laser)", priority = 2)]
-        [MenuItem("VRSF/Laser Pointer/Add Pointer (Without Laser)", priority = 2)]
+        [MenuItem("GameObject/VRSF/Laser Pointer/Add Pointer (Without Laser)", priority = 1)]
+        [MenuItem("VRSF/Laser Pointer/Add Pointer (Without Laser)", priority = 1)]
         private static void AddBasicPointer(MenuCommand menuCommand)
         {
-            var pointerPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["BasicPointer"];
+            var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("BasicRaycastPointer");
             CreateGameObject(pointerPrefab, menuCommand);
         }
 
@@ -21,11 +21,11 @@ namespace VRSF.Core.LaserPointer
         /// 
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Laser Pointer/Add Laser Pointer", priority = 0)]
-        [MenuItem("VRSF/Laser Pointer/Add Laser Pointer", priority = 0)]
+        [MenuItem("GameObject/VRSF/Laser Pointer/Add Laser Pointer", priority = 1)]
+        [MenuItem("VRSF/Laser Pointer/Add Laser Pointer", priority = 1)]
         private static void AddLaserPointer(MenuCommand menuCommand)
         {
-            var pointerPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["LaserPointer"];
+            var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("LaserPointer");
             CreateGameObject(pointerPrefab, menuCommand);
         }
 
@@ -33,11 +33,11 @@ namespace VRSF.Core.LaserPointer
         ///
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Laser Pointer/Add Laser Pointer With Click", priority = 0)]
-        [MenuItem("VRSF/Laser Pointer/Add Laser Pointer With Click", priority = 0)]
+        [MenuItem("GameObject/VRSF/Laser Pointer/Add Laser Pointer With Click", priority = 1)]
+        [MenuItem("VRSF/Laser Pointer/Add Laser Pointer With Click", priority = 1)]
         private static void AddLaserPointerWithClick(MenuCommand menuCommand)
         {
-            var pointerPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["LaserPointerWithClick"];
+            var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("LaserPointerWithClick");
             CreateGameObject(pointerPrefab, menuCommand);
         }
 

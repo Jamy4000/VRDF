@@ -9,22 +9,31 @@ namespace VRSF.Core.FadingEffect
         /// 
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Utils/Add Camera Fader", priority = 1)]
-        [MenuItem("VRSF/Utils/Add Camera Fader", priority = 1)]
+        [MenuItem("GameObject/VRSF/Utils/Add Camera Fader", priority = 2)]
+        [MenuItem("VRSF/Utils/Add Camera Fader", priority = 2)]
         private static void AddCameraFader(MenuCommand menuCommand)
         {
-            var faderPrefab = Utils.VRSFPrefabReferencer.instance.PrefabsDictionary["CameraFader"];
+            GameObject cameraFader = GameObject.FindObjectOfType<CameraFadeAuthoring>().gameObject;
 
-            // Create a custom game object
-            GameObject pointer = PrefabUtility.InstantiatePrefab(faderPrefab) as GameObject;
+            if (cameraFader != null)
+            {
+                Debug.LogError("<b>[VRSF] :</b> a Camera Fader is already present in the scene.\n No need to add multiple instance of it.");
+                Selection.activeObject = cameraFader;
+                return;
+            }
+
+            var faderPrefab = Utils.VRSFPrefabReferencer.GetPrefab("CameraFade");
+
+            // Instantiate a custom game object
+            cameraFader = PrefabUtility.InstantiatePrefab(faderPrefab) as GameObject;
 
             // Register the creation in the undo system
-            Undo.RegisterCreatedObjectUndo(pointer, "Create " + pointer.name);
+            Undo.RegisterCreatedObjectUndo(cameraFader, "Create " + cameraFader.name);
 
             // Ensure it gets reparented if this was a context click (otherwise does nothing)
-            GameObjectUtility.SetParentAndAlign(pointer, FindObjectOfType<Camera>().gameObject);
+            GameObjectUtility.SetParentAndAlign(cameraFader, FindObjectOfType<Camera>().gameObject);
 
-            Selection.activeObject = pointer;
+            Selection.activeObject = cameraFader;
         }
     }
 }

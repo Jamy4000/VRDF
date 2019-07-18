@@ -38,8 +38,8 @@ namespace VRSF.MoveAround.Rotation
         /// Add a linear rotation gameObject in the scene
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Move Around/Add Linear Rotation", priority = 3)]
-        [MenuItem("VRSF/Move Around/Add Linear Rotation", priority = 3)]
+        [MenuItem("GameObject/VRSF/Move Around/Rotation/Add Linear Rotation", priority = 3)]
+        [MenuItem("VRSF/Move Around/Rotation/Add Linear Rotation", priority = 3)]
         public static void AddCBRAObject(MenuCommand menuCommand)
         {
             var cbraObject = new GameObject("Linear Rotation");

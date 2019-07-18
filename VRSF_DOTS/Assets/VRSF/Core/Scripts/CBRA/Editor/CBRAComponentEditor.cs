@@ -14,6 +14,7 @@ namespace VRSF.Core.CBRA
     [CanEditMultipleObjects]
     public class CBRAComponentEditor : Editor
     {
+        [SerializeField] private Utils.VRSFPrefabReferencer _prefabReferencer;
         #region PRIVATE_VARIABLES
         // The reference to the target
         private ControllersButtonResponseAssigner _cbraTarget;
