@@ -1,10 +1,10 @@
-﻿using UnityEngine;
-using VRSF.Core.SetupVR;
+﻿using VRSF.Core.SetupVR;
 using VRSF.Core.Inputs;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Collections;
 using Unity.Mathematics;
+using VRSF.Core.Interactions;
 
 namespace VRSF.MoveAround.Rotation
 {
@@ -36,11 +36,11 @@ namespace VRSF.MoveAround.Rotation
 
         [Unity.Burst.BurstCompile]
         [ExcludeComponent(typeof(LinearRotationDeceleration))]
-        private struct StopperJob : IJobForEach<LinearUserRotation, UserRotationInteractionType, BaseInputCapture>
+        private struct StopperJob : IJobForEach<LinearUserRotation, ControllersInteractionType, BaseInputCapture>
         {
-            public void Execute(ref LinearUserRotation lur, ref UserRotationInteractionType urit, ref BaseInputCapture bic)
+            public void Execute(ref LinearUserRotation lur, [ReadOnly] ref ControllersInteractionType cit, [ReadOnly] ref BaseInputCapture bic)
             {
-                if (lur.CurrentRotationSpeed > 0.0f && ((urit.UseClickToRotate && !bic.IsClicking) || (urit.UseTouchToRotate && !bic.IsTouching)))
+                if (lur.CurrentRotationSpeed > 0.0f && ((cit.HasClickInteraction && !bic.IsClicking) || (cit.HasTouchInteraction && !bic.IsTouching)))
                 {
                     // Setting the current speed of the user to 0
                     lur.CurrentRotationSpeed = 0.0f;

@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Collections;
 using Unity.Mathematics;
+using VRSF.Core.Interactions;
 
 namespace VRSF.MoveAround.Rotation
 {
@@ -40,16 +41,16 @@ namespace VRSF.MoveAround.Rotation
         }
 
         [Unity.Burst.BurstCompile]
-        private struct DecelerationJob : IJobForEach<LinearUserRotation, UserRotationInteractionType, BaseInputCapture, LinearRotationDeceleration>
+        private struct DecelerationJob : IJobForEach<LinearUserRotation, ControllersInteractionType, BaseInputCapture, LinearRotationDeceleration>
         {
             [ReadOnly] public float DeltaTime;
 
             public NativeArray<float3> RotationAxis;
             public NativeArray<float> CurrentSpeed;
 
-            public void Execute(ref LinearUserRotation lur, ref UserRotationInteractionType urit, ref BaseInputCapture bic, ref LinearRotationDeceleration lrd)
+            public void Execute(ref LinearUserRotation lur, [ReadOnly] ref ControllersInteractionType urit, [ReadOnly] ref BaseInputCapture bic, [ReadOnly] ref LinearRotationDeceleration lrd)
             {
-                if (lur.CurrentRotationSpeed > 0.0f && ((urit.UseClickToRotate && !bic.IsClicking) || (urit.UseTouchToRotate && !bic.IsTouching)))
+                if (lur.CurrentRotationSpeed > 0.0f && ((urit.HasClickInteraction && !bic.IsClicking) || (urit.HasTouchInteraction && !bic.IsTouching)))
                 {
                     // maxSpeedTimeDeltaTime : To calculate the current speed according to deltaTime, Max Speed and acceleration factor
                     float maxSpeedTimeDeltaTime = DeltaTime * lrd.DecelerationFactor * (lur.MaxRotationSpeed / 50);

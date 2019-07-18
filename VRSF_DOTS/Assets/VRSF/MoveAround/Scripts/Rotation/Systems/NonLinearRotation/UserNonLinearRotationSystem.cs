@@ -2,6 +2,7 @@
 using VRSF.Core.Inputs;
 using Unity.Entities;
 using Unity.Mathematics;
+using VRSF.Core.Interactions;
 
 namespace VRSF.MoveAround.Rotation
 {
@@ -15,9 +16,9 @@ namespace VRSF.MoveAround.Rotation
             if (!VRSF_Components.SetupVRIsReady)
                 return;
 
-            Entities.ForEach((ref NonLinearUserRotation nlur, ref UserRotationInteractionType urit, ref BaseInputCapture bic, ref TouchpadInputCapture tic) =>
+            Entities.ForEach((ref NonLinearUserRotation nlur, ref ControllersInteractionType cit, ref BaseInputCapture bic, ref TouchpadInputCapture tic) =>
             {
-                if (!nlur.HasAlreadyRotated && math.abs(tic.ThumbPosition.x) > 0.5f)
+                if (!nlur.HasAlreadyRotated && WantsToRotate(cit, bic) && math.abs(tic.ThumbPosition.x) > 0.5f)
                 {
                     VRSF_Components.RotateVRCameraAround(new float3(0.0f, tic.ThumbPosition.x, 0.0f), nlur.DegreesToRotate);
                     nlur.HasAlreadyRotated = true;
@@ -27,6 +28,11 @@ namespace VRSF.MoveAround.Rotation
                     nlur.HasAlreadyRotated = false;
                 }
             });
+        }
+
+        private bool WantsToRotate(ControllersInteractionType cit, BaseInputCapture bic)
+        {
+            return (bic.IsClicking && cit.HasClickInteraction) || (bic.IsTouching && cit.HasTouchInteraction);
         }
     }
 }

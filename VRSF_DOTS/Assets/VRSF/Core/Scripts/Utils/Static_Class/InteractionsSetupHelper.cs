@@ -2,37 +2,38 @@
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
+using VRSF.Core.Interactions;
 using VRSF.Core.SetupVR;
 
-namespace VRSF.Core.CBRA
+namespace VRSF.Core.Utils
 {
-    public static class CBRASetupHelper
+    public static class InteractionSetupHelper
     {
         /// <summary>
         /// Add the corresponding Input component for the selected button. 
         /// </summary>
-        public static bool AddButtonInputComponent(ref EntityManager entityManager, ref Entity entity, EControllersButton buttonToUse, EHand hand, EThumbPosition touchThumbPos, EThumbPosition clickThumbPosition, float isTouchingThreshold, float isClickingThreshold)
+        public static bool AddButtonInputComponent(ref EntityManager entityManager, ref Entity entity, VRInteraction.VRInteractionSet interactionSet)
         {
             // Add the BaseInputCapture component to the entity
             entityManager.SetComponentData(entity, new BaseInputCapture());
 
             // Add the specific inputCapture component for our button
-            switch (buttonToUse)
+            switch (interactionSet.ButtonToUse)
             {
                 case EControllersButton.A_BUTTON:
                     entityManager.AddComponentData(entity, new AButtonInputCapture());
-                    return IsTwoHandOculusDevice() && hand == EHand.RIGHT;
+                    return IsTwoHandOculusDevice() && interactionSet.ButtonHand == EHand.RIGHT;
                 case EControllersButton.B_BUTTON:
                     entityManager.AddComponentData(entity, new BButtonInputCapture());
-                    return IsTwoHandOculusDevice() && hand == EHand.RIGHT;
+                    return IsTwoHandOculusDevice() && interactionSet.ButtonHand == EHand.RIGHT;
                 case EControllersButton.X_BUTTON:
                     entityManager.AddComponentData(entity, new XButtonInputCapture());
-                    return IsTwoHandOculusDevice() && hand == EHand.LEFT;
+                    return IsTwoHandOculusDevice() && interactionSet.ButtonHand == EHand.LEFT;
                 case EControllersButton.Y_BUTTON:
                     entityManager.AddComponentData(entity, new YButtonInputCapture());
-                    return IsTwoHandOculusDevice() && hand == EHand.LEFT;
+                    return IsTwoHandOculusDevice() && interactionSet.ButtonHand == EHand.LEFT;
                 case EControllersButton.THUMBREST:
-                    entityManager.AddComponentData(entity, new ThumbrestInputCapture(hand));
+                    entityManager.AddComponentData(entity, new ThumbrestInputCapture(interactionSet.ButtonHand));
                     return IsTwoHandOculusDevice();
 
                 case EControllersButton.BACK_BUTTON:
@@ -40,27 +41,27 @@ namespace VRSF.Core.CBRA
                     return IsOneHandPortableDevice();
 
                 case EControllersButton.TRIGGER:
-                    entityManager.AddComponentData(entity, new TriggerInputCapture(hand));
+                    entityManager.AddComponentData(entity, new TriggerInputCapture(interactionSet.ButtonHand));
                     return true;
                 case EControllersButton.GRIP:
-                    entityManager.AddComponentData(entity, new GripInputCapture(hand));
+                    entityManager.AddComponentData(entity, new GripInputCapture(interactionSet.ButtonHand));
                     return true;
                 case EControllersButton.MENU:
-                    if (IsTwoHandOculusDevice() && hand == EHand.RIGHT)
+                    if (IsTwoHandOculusDevice() && interactionSet.ButtonHand == EHand.RIGHT)
                     {
                         Debug.LogError("<b>[VRSF] :</b> Menu button aren't supported on the Right Hand for Two Handed Oculus Devices.");
                         return false;
                     }
 
-                    entityManager.AddComponentData(entity, new MenuInputCapture(hand));
+                    entityManager.AddComponentData(entity, new MenuInputCapture(interactionSet.ButtonHand));
                     return true;
 
                 case EControllersButton.TOUCHPAD:
                     // We check that the thumbposition give in the inspector is not set as none
-                    if (touchThumbPos != EThumbPosition.NONE)
+                    if (interactionSet.TouchThumbPosition != EThumbPosition.NONE)
                     {
-                        entityManager.AddComponentData(entity, new TouchpadInputCapture(hand));
-                        entityManager.AddComponentData(entity, new CBRAThumbPosition { TouchThumbPosition = touchThumbPos, IsTouchingThreshold = isTouchingThreshold, ClickThumbPosition = clickThumbPosition, IsClickingThreshold = isClickingThreshold });
+                        entityManager.AddComponentData(entity, new TouchpadInputCapture(interactionSet.ButtonHand));
+                        entityManager.AddComponentData(entity, new InteractionThumbPosition { TouchThumbPosition = interactionSet.TouchThumbPosition, IsTouchingThreshold = interactionSet.IsTouchingThreshold, ClickThumbPosition = interactionSet.ClickThumbPosition, IsClickingThreshold = interactionSet.IsClickingThreshold });
                         return true;
                     }
 
@@ -99,24 +100,23 @@ namespace VRSF.Core.CBRA
         /// <summary>
         /// Add the corresponding InteractionType component for the selected button. 
         /// </summary>
-        public static bool AddInteractionType(ref EntityManager entityManager, ref Entity entity, EControllerInteractionType interactionType, EControllersButton button, out CBRAInteractionType cbraInteraction)
+        public static bool AddInteractionType(ref EntityManager entityManager, ref Entity entity, EControllerInteractionType interactionType, EControllersButton button)
         {
             // If the button hand wasn't set in editor, we destroy this entity and return.
             if (interactionType == EControllerInteractionType.NONE || !InteractionIsCompatibleWithButton(interactionType, button))
             {
                 Debug.LogError("<b>[VRSF] :</b> Please Specify valid Interaction Types in your ControllersButtonResponseAssigners.");
-                cbraInteraction = new CBRAInteractionType();
                 return false;
             }
             else
             {
-                cbraInteraction = new CBRAInteractionType
-                {
-                    InteractionType = interactionType
-                };
-
                 // set the CBRA Interaction Type component to the entity
-                entityManager.SetComponentData(entity, cbraInteraction);
+                entityManager.SetComponentData(entity, new ControllersInteractionType
+                {
+                    InteractionType = interactionType,
+                    HasTouchInteraction = (interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,
+                    HasClickInteraction = (interactionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK
+                });
 
                 return true;
             }

@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using VRSF.Core.Inputs;
-using VRSF.Core.Controllers;
 using Unity.Entities;
 using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
 using System;
+using VRSF.Core.Interactions;
+using VRSF.Core.VRInteraction;
 
 namespace VRSF.Core.CBRA
 {
@@ -15,33 +16,7 @@ namespace VRSF.Core.CBRA
     [RequireComponent(typeof(SetupVRDestroyer))]
     public class ControllersButtonResponseAssigner : MonoBehaviour
     {
-        [Header("The Devices that are using this CBRA Script")]
-        [HideInInspector] public EDevice DeviceUsingCBRA = EDevice.ALL;
-
-
-        [Header("The type of Interaction you want to use")]
-        [HideInInspector] public EControllerInteractionType InteractionType = EControllerInteractionType.NONE;
-
-
-        [Header("The hand on which the button to use is situated")]
-        [HideInInspector] public EHand ButtonHand;
-
-
-        [Header("The button you wanna use for the Action")]
-        [HideInInspector] public EControllersButton ButtonToUse = EControllersButton.NONE;
-
-
-        [Header("Thumbs Parameters")]
-        [Tooltip("The position of the thumb you wanna use for the Touch Action")]
-        [HideInInspector] public EThumbPosition TouchThumbPosition = EThumbPosition.NONE;
-        [Tooltip("The position of the thumb you wanna use for the Click Action")]
-        [HideInInspector] public EThumbPosition ClickThumbPosition = EThumbPosition.NONE;
-
-        [Tooltip("At which threshold is the IsTouching event raised ? Absolute Value between 0 and 1")]
-        [HideInInspector] public float IsTouchingThreshold = 0.1f;
-        [Tooltip("At which threshold is the IsClicking event raised ? Absolute Value between 0 and 1")]
-        [HideInInspector] public float IsClickingThreshold = 0.1f;
-
+        [SerializeField] public VRInteractionSet InteractionParameters;
 
         [Header("The UnityEvents called when the user is Touching")]
         [HideInInspector] public UnityEvent OnButtonStartTouching;
@@ -67,34 +42,36 @@ namespace VRSF.Core.CBRA
         private void CreateEntity(OnSetupVRReady info)
         {
             // If the device loaded is included in the device using this CBRA
-            if ((DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
+            if ((InteractionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.Active.EntityManager;
 
                 var archetype = entityManager.CreateArchetype
                 (
                     typeof(BaseInputCapture),
-                    typeof(CBRAInteractionType)
+                    typeof(ControllersInteractionType),
+                    typeof(CBRATag)
                 );
 
                 var entity = entityManager.CreateEntity(archetype);
+                entityManager.SetComponentData(entity, new CBRATag());
 
                 // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
-                if (!CBRASetupHelper.AddButtonInputComponent(ref entityManager, ref entity, ButtonToUse, ButtonHand, TouchThumbPosition, ClickThumbPosition, IsTouchingThreshold, IsClickingThreshold))
+                if (!InteractionSetupHelper.AddButtonInputComponent(ref entityManager, ref entity, InteractionParameters))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
                 }
 
                 // If the Hand wasn't chose correctly, we destroy this entity and return.
-                if (!CBRASetupHelper.AddButtonHand(ref entityManager, ref entity, ButtonHand))
+                if (!InteractionSetupHelper.AddButtonHand(ref entityManager, ref entity, InteractionParameters.ButtonHand))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
                 }
 
                 // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-                if (!CBRASetupHelper.AddInteractionType(ref entityManager, ref entity, InteractionType, ButtonToUse, out CBRAInteractionType cbraInteraction))
+                if (!InteractionSetupHelper.AddInteractionType(ref entityManager, ref entity, InteractionParameters.InteractionType, InteractionParameters.ButtonToUse))
                 {
                     entityManager.DestroyEntity(entity);
                     return;

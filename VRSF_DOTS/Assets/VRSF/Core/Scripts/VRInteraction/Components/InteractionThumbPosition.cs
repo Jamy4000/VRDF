@@ -1,9 +1,9 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Inputs;
 
-namespace VRSF.Core.CBRA
+namespace VRSF.Core.Interactions
 {
-    public struct CBRAThumbPosition : IComponentData
+    public struct InteractionThumbPosition : IComponentData
     {
         public EThumbPosition TouchThumbPosition;
         public float IsTouchingThreshold;

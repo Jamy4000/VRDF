@@ -2,6 +2,7 @@
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
+using VRSF.Core.Interactions;
 
 namespace VRSF.MoveAround.Rotation
 {
@@ -23,7 +24,7 @@ namespace VRSF.MoveAround.Rotation
         {
             var entityManager = World.Active.EntityManager;
 
-            var archetype = entityManager.CreateArchetype(typeof(BaseInputCapture), typeof(TouchpadInputCapture));
+            var archetype = entityManager.CreateArchetype(typeof(BaseInputCapture), typeof(TouchpadInputCapture), typeof(ControllersInteractionType));
 
             var entity = entityManager.CreateEntity(archetype);
 
@@ -42,10 +43,11 @@ namespace VRSF.MoveAround.Rotation
                     return;
             }
 
-            entityManager.AddComponentData(entity, new UserRotationInteractionType
+            entityManager.AddComponentData(entity, new ControllersInteractionType
             {
-                UseTouchToRotate = (_interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,
-                UseClickToRotate = (_interactionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK
+                InteractionType = _interactionType,
+                HasTouchInteraction = (_interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,
+                HasClickInteraction = (_interactionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK
             });
 
             entityManager.AddComponentData(entity, new NonLinearUserRotation { DegreesToRotate = this._degreesToRotate });

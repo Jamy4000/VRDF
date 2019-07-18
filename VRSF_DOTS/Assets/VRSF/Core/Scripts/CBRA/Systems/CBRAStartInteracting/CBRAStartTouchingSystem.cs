@@ -18,7 +18,7 @@ namespace VRSF.Core.CBRA
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref CBRAInteractionType cbraInteractionType, ref StartTouchingEventComp startTouchingEvent) =>
+            Entities.ForEach((Entity entity, ref CBRATag cbraTag, ref StartTouchingEventComp startTouchingEvent) =>
             {
                 if (CBRADelegatesHolder.StartTouchingEvents.ContainsKey(entity) && _entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(startTouchingEvent.ButtonInteracting)))
                     CBRADelegatesHolder.StartTouchingEvents[entity].Invoke();
