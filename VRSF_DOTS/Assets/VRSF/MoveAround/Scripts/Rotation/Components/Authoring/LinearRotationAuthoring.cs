@@ -28,7 +28,7 @@ namespace VRSF.MoveAround.Rotation
 
         [Tooltip("How fast is the deceleration for the rotation effect going ?")]
         [SerializeField]
-        [HideInInspector] public float DecelerationFactor = 2.0f;
+        [HideInInspector] public float DecelerationFactor = 3.0f;
 
         public void Awake()
         {

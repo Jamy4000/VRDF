@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace VRSF.MoveAround.Rotation
@@ -25,7 +23,7 @@ namespace VRSF.MoveAround.Rotation
 
                 EditorGUI.BeginChangeCheck();
 
-                var newValue = EditorGUILayout.Slider("Deceleration Factor", decelerationSpeedProp.floatValue, 0.1f, 5.0f);
+                var newValue = EditorGUILayout.Slider("Deceleration Factor", decelerationSpeedProp.floatValue, 0.1f, 10.0f);
 
                 if (EditorGUI.EndChangeCheck())
                 {

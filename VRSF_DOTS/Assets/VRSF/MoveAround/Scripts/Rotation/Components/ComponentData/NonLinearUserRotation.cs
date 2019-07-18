@@ -8,5 +8,10 @@ namespace VRSF.MoveAround.Rotation
         /// Amount of degrees to rotate 
         /// </summary>
         public float DegreesToRotate;
+
+        /// <summary>
+        /// If the user already rotated this frame
+        /// </summary>
+        public bool HasAlreadyRotated;
     }
 }

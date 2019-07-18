@@ -47,6 +47,30 @@ namespace VRSF.Core.SetupVR
                 newPos.y = y;
             }
         }
+
+        /// <summary>
+        /// Method to set the CameraRig position by taking account of the SDK loaded
+        /// We suggest you to give a position situated on a plane, as we're adding the height of the user in Y axis
+        /// when setYPos is true and we're not using OpenVR.
+        /// </summary>
+        /// <param name="newRotAxis"></param>
+        /// <param name="angle"></param>
+        /// <param name="useVRCameraOffset">Whether we should use the VRCamera local pos to calculate the new pos of the cameraRig</param>
+        public static void RotateVRCameraAround(Vector3 newRotAxis, float angle, bool useVRCameraOffset = true)
+        {
+            // TODO if (useVRCameraOffset) GetNewPosWithCameraOffset();
+            CameraRig.transform.RotateAround(VRCamera.transform.position, newRotAxis, angle);
+
+
+            void GetNewPosWithCameraOffset()
+            {
+                // TODO : Do the same method but with a quaternion in the signature
+                var y = newRotAxis.y;
+                var cameraDirectionVector = new Vector3(newRotAxis.x - VRCamera.transform.position.x, 0.0f, newRotAxis.z - VRCamera.transform.position.z);
+                newRotAxis = CameraRig.transform.position + cameraDirectionVector;
+                newRotAxis.y = y;
+            }
+        }
         #endregion
     }
 }

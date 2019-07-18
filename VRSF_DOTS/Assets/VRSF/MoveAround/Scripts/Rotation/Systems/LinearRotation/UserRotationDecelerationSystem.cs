@@ -31,43 +31,13 @@ namespace VRSF.MoveAround.Rotation
 
             job.Complete();
 
-            VRSF_Components.CameraRig.transform.RotateAround(VRSF_Components.VRCamera.transform.position, rotationAxisOutput[0], currentSpeedOutput[0]);
+            VRSF_Components.RotateVRCameraAround(rotationAxisOutput[0], currentSpeedOutput[0]);
 
             rotationAxisOutput.Dispose();
             currentSpeedOutput.Dispose();
 
             return inputDeps;
         }
-
-        //private void HandleRotationWithAcceleration(Filter entity)
-        //{
-        //    // If the user is not aiming to the UI
-        //    if (!entity.RotationComp.RaycastHitVar.RaycastHitIsOnUI())
-        //    {
-        //        // isAccelerating : The user is Rotating (touching/clicking the thumbstick) and the currentSpeed is < (maxSpeed / 5)
-        //        bool isAccelerating = entity.RotationComp.IsRotating && entity.RotationComp.CurrentSpeed < (entity.RotationComp.MaxSpeed / 20);
-
-        //        // isDecelerating : The user is not Rotating (not touching/clicking the thumbstick) and the currentSpeed is > 0
-        //        bool isDecelerating = !entity.RotationComp.IsRotating && entity.RotationComp.CurrentSpeed > 0.0f;
-
-        //        // maxSpeedTimeDeltaTime : To calculate the current speed according to deltaTime and Max Speed
-        //        float maxSpeedTimeDeltaTime = Time.deltaTime * (entity.RotationComp.MaxSpeed / 50);
-
-        //        // LastThumbPos : The last thumbPos of the user when rotating (touching/clicking the thumbstick) only 
-        //        entity.RotationComp.LastThumbPos = entity.RotationComp.IsRotating ? entity.BACCalculations.ThumbPos.Value.x : entity.RotationComp.LastThumbPos;
-                
-        //        // Setting the current speed of the user
-        //        entity.RotationComp.CurrentSpeed += isAccelerating ? maxSpeedTimeDeltaTime : -maxSpeedTimeDeltaTime;
-
-        //        if (entity.RotationComp.CurrentSpeed > 0.0f)
-        //        {
-        //            Vector3 eyesPosition = VRSF_Components.VRCamera.transform.position;
-        //            Vector3 rotationAxis = new Vector3(0, entity.RotationComp.LastThumbPos, 0);
-
-        //            VRSF_Components.CameraRig.transform.RotateAround(eyesPosition, rotationAxis, entity.RotationComp.CurrentSpeed);
-        //        }
-        //    }
-        //}
 
         [Unity.Burst.BurstCompile]
         private struct DecelerationJob : IJobForEach<LinearUserRotation, UserRotationInteractionType, BaseInputCapture, LinearRotationDeceleration>
