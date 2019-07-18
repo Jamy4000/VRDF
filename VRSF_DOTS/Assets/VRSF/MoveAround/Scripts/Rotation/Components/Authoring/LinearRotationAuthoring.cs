@@ -75,7 +75,7 @@ namespace VRSF.MoveAround.Rotation
             }
 
             entityManager.SetComponentData(entity, new BaseInputCapture());
-            entityManager.SetComponentData(entity, new TouchpadInputCapture());
+            entityManager.SetComponentData(entity, new TouchpadInputCapture()); 
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window

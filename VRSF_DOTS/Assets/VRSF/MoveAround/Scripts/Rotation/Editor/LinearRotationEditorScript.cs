@@ -14,6 +14,7 @@ namespace VRSF.MoveAround.Rotation
         {
             _lra = (LinearRotationAuthoring)target;
         }
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -33,6 +34,20 @@ namespace VRSF.MoveAround.Rotation
                     PrefabUtility.RecordPrefabInstancePropertyModifications(_lra);
                 }
             }
+        }
+
+        /// <summary>
+        /// Add a linear rotation gameObject in the scene
+        /// </summary>
+        /// <param name="menuCommand"></param>
+        [MenuItem("GameObject/VRSF/Move Around/Add Linear Rotation", priority = 3)]
+        [MenuItem("VRSF/Move Around/Add Linear Rotation", priority = 3)]
+        public static void AddCBRAObject(MenuCommand menuCommand)
+        {
+            var cbraObject = new GameObject("Linear Rotation");
+            cbraObject.transform.SetParent(Selection.activeTransform);
+            cbraObject.AddComponent<LinearRotationAuthoring>();
+            Selection.SetActiveObjectWithContext(cbraObject, menuCommand.context);
         }
     }
 }
