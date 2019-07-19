@@ -18,10 +18,10 @@ namespace VRSF.Core.CBRA
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref CBRATag cbraTag, ref StartClickingEventComp startClickingEvent) =>
+            Entities.WithAll<CBRATag>().ForEach((Entity entity, ref StartClickingEventComp startClickingEvent) =>
             {
-                if (CBRADelegatesHolder.StartClickingEvents.ContainsKey(entity) && _entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(startClickingEvent.ButtonInteracting)))
-                    CBRADelegatesHolder.StartClickingEvents[entity].Invoke();
+                if (_entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(startClickingEvent.ButtonInteracting)))
+                    CBRADelegatesHolder.StartClickingEvents[entity]?.Invoke();
             });
 
             Entities.ForEach((Entity entity, ref StartClickingEventComp startClickingEvent) =>

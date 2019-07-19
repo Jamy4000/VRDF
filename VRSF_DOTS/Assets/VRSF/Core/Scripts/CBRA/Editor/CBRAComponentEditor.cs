@@ -72,6 +72,8 @@ namespace VRSF.Core.CBRA
 
                 if (_showUnityEvents)
                 {
+                    EditorGUILayout.HelpBox("The target script for thess events can't be on the same GameObject as this CBRA. If you do so, THE EVENTS WON'T BE CALLED.", MessageType.Warning);
+
                     if ((_interactionSet.InteractionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH)
                     {
                         EditorGUILayout.Space();

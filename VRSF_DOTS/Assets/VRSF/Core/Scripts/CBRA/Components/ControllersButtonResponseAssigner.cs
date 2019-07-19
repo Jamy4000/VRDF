@@ -13,7 +13,7 @@ namespace VRSF.Core.CBRA
     /// <summary>
     /// Let you assign a response to one of the button on the Controllers of your choice.
     /// </summary>
-    [RequireComponent(typeof(SetupVRDestroyer), typeof(VRInteractionAuthoring))]
+    [RequireComponent(typeof(VRInteractionAuthoring))]
     public class ControllersButtonResponseAssigner : MonoBehaviour
     {
         [Header("The UnityEvents called when the user is Touching")]
@@ -54,7 +54,7 @@ namespace VRSF.Core.CBRA
                 );
 
                 var entity = entityManager.CreateEntity(archetype);
-                entityManager.SetComponentData(entity, new CBRATag());
+                entityManager.AddComponentData(entity, new CBRATag());
 
                 // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
                 if (!InteractionSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
