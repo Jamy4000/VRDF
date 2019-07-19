@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using Unity.Mathematics;
+using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Rendering;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -25,24 +25,24 @@ namespace VRSF.MoveAround.Teleport
         /// <param name="normal">If hit, the normal of the hit surface.  Otherwise (0, 1, 0)</param>
         /// 
         /// <returns>If the raycast hit something.</returns>
-        public static bool Linecast(Vector3 p1, Vector3 p2, out bool pointOnNavmesh, int excludedLayer, out Vector3 hitPoint, out Vector3 normal, TeleportNavMesh teleportNavMesh)
+        public static bool Linecast(float3 p1, float3 p2, out bool pointOnNavmesh, int excludedLayer, out float3 hitPoint, out float3 normal, TeleportNavMesh tnm)
         {
             Vector3 dir = p2 - p1;
             float dist = dir.magnitude;
             dir /= dist;
 
-            if (Physics.Raycast(p1, dir, out RaycastHit hit, dist, ~excludedLayer, (QueryTriggerInteraction)teleportNavMesh.QueryTriggerInteraction))
+            if (Physics.Raycast(p1, dir, out RaycastHit hit, dist, ~excludedLayer, (QueryTriggerInteraction)tnm.QueryTriggerInteraction))
             {
                 normal = hit.normal;
                 hitPoint = hit.point;
 
-                if (teleportNavMesh.IgnoreSlopedSurfaces && Vector3.Dot(Vector3.up, hit.normal) < 0.99f)
+                if (tnm.IgnoreSlopedSurfaces && math.dot(Vector3.up, hit.normal) < 0.99f)
                 {
                     pointOnNavmesh = false;
                     return true;
                 }
                 
-                pointOnNavmesh = NavMesh.SamplePosition(hitPoint, out NavMeshHit navHit, teleportNavMesh.SampleRadius, teleportNavMesh.NavAreaMask);
+                pointOnNavmesh = NavMesh.SamplePosition(hitPoint, out NavMeshHit navHit, tnm.SampleRadius, tnm.NavAreaMask);
                 // Get the closest position on the navMesh
                 if (Vector3IsCorrect(navHit.position))
                     hitPoint = navHit.position;
@@ -51,7 +51,7 @@ namespace VRSF.MoveAround.Teleport
             else
             {
                 pointOnNavmesh = false;
-                hitPoint = Vector3.zero;
+                hitPoint = float3.zero;
                 normal = Vector3.up;
                 return false;
             }

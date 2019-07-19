@@ -16,7 +16,6 @@ namespace VRSF.Core.LaserPointer
             base.OnCreate();
             _uiLayer = UnityEngine.LayerMask.NameToLayer("UI");
         }
-        #region ComponentSystem_Methods
 
         protected override void OnUpdate()
         {
@@ -31,7 +30,6 @@ namespace VRSF.Core.LaserPointer
                 new OnLaserLengthChanged(raycastOrigin.RayOrigin, newEndPoint);
             });
         }
-        #endregion ComponentSystem_Methods
 
         private float3 CheckEndPoint(LaserPointerLength laserLength, VRRaycastOutputs raycastOutputs)
         {

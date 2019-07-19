@@ -1,5 +1,4 @@
 ﻿using Unity.Entities;
-using Unity.Jobs;
 using UnityEngine;
 using VRSF.Core.Raycast;
 
@@ -18,6 +17,13 @@ namespace VRSF.Core.LaserPointer
             {
                 switch (stateComp.State)
                 {
+                    case EPointerState.FORCE_OFF:
+                        if (widthComp.CurrentWidth != 0.0f)
+                        {
+                            widthComp.CurrentWidth = 0.0f;
+                            new OnLaserWidthChanged(raycastOrigin.RayOrigin, widthComp.CurrentWidth);
+                        }
+                        break;
                     case EPointerState.ON:
                         if (stateComp.StateJustChangedToOn)
                         {

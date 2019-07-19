@@ -24,7 +24,7 @@ namespace VRSF.MoveAround.Teleport
                 switch (gtp.CurrentTeleportState)
                 {
                     case ETeleportState.Teleporting:
-                        canTeleport = UserIsOnNavMesh(sbs, tnm, raycastOutputs, raycastParam.ExcludedLayer, out Vector3 newUsersPos);
+                        canTeleport = UserIsOnNavMesh(sbs, tnm, raycastOutputs, raycastParam.ExcludedLayer, out float3 newUsersPos);
                         newPos = newUsersPos;
 
                         // We teleport the user as soon as we go out of the job
@@ -39,7 +39,7 @@ namespace VRSF.MoveAround.Teleport
             if (canTeleport) VRSF_Components.SetCameraRigPosition(newPos, false);
         }
 
-        private bool UserIsOnNavMesh(StepByStepComponent sbs, TeleportNavMesh tnm, VRRaycastOutputs raycastOutputs, LayerMask excludedLayers, out Vector3 newCameraRigPos)
+        private bool UserIsOnNavMesh(StepByStepComponent sbs, TeleportNavMesh tnm, VRRaycastOutputs raycastOutputs, LayerMask excludedLayers, out float3 newCameraRigPos)
         {
             Transform vrCamTransform = VRSF_Components.VRCamera.transform;
             Transform cameraRigTransform = VRSF_Components.CameraRig.transform;
@@ -58,11 +58,11 @@ namespace VRSF.MoveAround.Teleport
             // We check the theoritic position for the cameraRig
             newCameraRigPos = GetNewTheoriticPos(directionVector, true);
             // We check the theoritic new user pos
-            var newCameraPos = GetNewTheoriticPos(directionVector, false);
+            float3 newCameraPos = GetNewTheoriticPos(directionVector, false);
 
             // We calculate a vector down based on the new Camera Pos. 
             var downVectorDistance = Mathf.Abs(vrCamTransform.localPosition.y + VRSF_Components.FloorOffset.transform.localPosition.y) + sbs.StepHeight;
-            var downVector = newCameraPos + (Vector3.down * downVectorDistance);
+            var downVector = newCameraPos + (new float3(0.0f, -1.0f, 0.0f) * downVectorDistance);
 
             // We calculate the linecast between the newUserPos and the downVector and check if it hits the NavMesh
             TeleportNavMeshHelper.Linecast
@@ -88,10 +88,10 @@ namespace VRSF.MoveAround.Teleport
             /// <param name="scaledDirection">The direction multiplied by the distance to go to</param>
             /// <param name="isCheckingCameraRig">Whether the check is for the CameraRig or the VRCamera</param>
             /// <returns>The new Theoritic position</returns>
-            Vector3 GetNewTheoriticPos(Vector3 scaledDirection, bool isCheckingCameraRig)
+            float3 GetNewTheoriticPos(Vector3 scaledDirection, bool isCheckingCameraRig)
             {
-                var origin = isCheckingCameraRig ? cameraRigTransform.position : vrCamTransform.position;
-                return origin + new Vector3(scaledDirection.x, 0.0f, scaledDirection.z);
+                float3 origin = isCheckingCameraRig ? cameraRigTransform.position : vrCamTransform.position;
+                return origin + new float3(scaledDirection.x, 0.0f, scaledDirection.z);
             }
         }
     }

@@ -5,7 +5,6 @@ using VRSF.Core.Inputs;
 using VRSF.Core.Interactions;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
-using VRSF.Core.Utils;
 using VRSF.Core.VRInteraction;
 
 namespace VRSF.MoveAround.Teleport
@@ -14,7 +13,7 @@ namespace VRSF.MoveAround.Teleport
     /// Contains all variable necessary for the StepByStepSystems to work.
     /// It implements the ITeleportComponent to be able to display the boundaries limits with TeleportBoundaries.
     /// </summary>
-    [RequireComponent(typeof(SetupVRDestroyer), typeof(GeneralTeleportAuthoring), typeof(VRInteractionAuthoring))]
+    [RequireComponent(typeof(GeneralTeleportAuthoring), typeof(VRInteractionAuthoring))]
     public class StepByStepAuthoring : MonoBehaviour
     {
         [Header("Teleport Step by Step Parameters")]
@@ -27,6 +26,7 @@ namespace VRSF.MoveAround.Teleport
         private void Awake()
         {
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
+
             // If the device loaded is included in the device using this CBRA
             if ((interactionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
@@ -46,87 +46,30 @@ namespace VRSF.MoveAround.Teleport
 
                 var entity = entityManager.CreateEntity(archetype);
 
-                /*
-                 * Setting up Interactions
-                 */
-
-                // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
+                // Setting up Interactions
+                if (!TeleporterSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))
                 {
                     entityManager.DestroyEntity(entity);
+                    Destroy(gameObject);
                     return;
                 }
 
-                // If the Hand wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
+                // Setting up Raycasting
+                if(!TeleporterSetupHelper.SetupRaycast(ref entityManager, ref entity, interactionParameters, _distanceStepByStep))
                 {
                     entityManager.DestroyEntity(entity);
+                    Destroy(gameObject);
                     return;
                 }
 
-                // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddInteractionType(ref entityManager, ref entity, interactionParameters.InteractionType, interactionParameters.ButtonToUse))
-                {
-                    entityManager.DestroyEntity(entity);
-                    return;
-                }
+                // Setting up General Teleporter Stuffs
+                TeleporterSetupHelper.SetupTeleportStuffs(ref entityManager, ref entity, GetComponent<GeneralTeleportAuthoring>());
 
-                /*
-                 * Setting up Raycasting
-                 */
-
-                switch (interactionParameters.ButtonHand)
-                {
-                    case EHand.LEFT:
-                        entityManager.SetComponentData(entity, new VRRaycastOrigin { RayOrigin = ERayOrigin.LEFT_HAND });
-                        break;
-                    case EHand.RIGHT:
-                        entityManager.SetComponentData(entity, new VRRaycastOrigin { RayOrigin = ERayOrigin.RIGHT_HAND });
-                        break;
-                    default:
-                        Debug.LogError("<b>[VRSF] :</b> Please specify a valid hand on your UserRotationAuthoring Components.");
-                        entityManager.DestroyEntity(entity);
-                        Destroy(gameObject);
-                        return;
-                }
-
-                var generalTeleportParam = GetComponent<GeneralTeleportAuthoring>();
-
-                entityManager.SetComponentData(entity, new VRRaycastParameters
-                {
-                    MaxRaycastDistance = _distanceStepByStep,
-                    ExcludedLayer = generalTeleportParam.ExcludedLayers
-                });
-
-                entityManager.SetComponentData(entity, new VRRaycastOutputs
-                {
-                    RaycastHitVar = new RaycastHitVariable(),
-                    RayVar = new Ray()
-                });
-
-                /*
-                 * Setting up TeleportStuffs
-                 */
-
+                // Setup Specific sbs teleporter
                 entityManager.SetComponentData(entity, new StepByStepComponent
                 {
                     DistanceStepByStep = _distanceStepByStep,
                     StepHeight = _stepHeight
-                });
-
-                entityManager.SetComponentData(entity, new GeneralTeleportParameters
-                {
-                    IsUsingFadingEffect = generalTeleportParam.IsUsingFadingEffect
-                });
-
-                var tnm = GetComponent<TeleportNavMeshAuthoring>();
-
-                entityManager.SetComponentData(entity, new TeleportNavMesh
-                {
-                    IgnoreSlopedSurfaces = tnm.IgnoreSlopedSurfaces,
-                    NavAreaMask = tnm.NavAreaMask,
-                    QueryTriggerInteraction = tnm.QueryTriggerInteraction,
-                    SampleRadius = tnm.SampleRadius
                 });
 
 #if UNITY_EDITOR

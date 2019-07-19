@@ -7,6 +7,7 @@
     {
         ON = 0,
         OFF = 1,
-        DISAPPEARING = 2
+        DISAPPEARING = 2,
+        FORCE_OFF = 3
     }
 }
