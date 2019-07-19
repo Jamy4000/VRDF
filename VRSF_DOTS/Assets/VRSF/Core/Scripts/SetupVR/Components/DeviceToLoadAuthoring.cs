@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.SpatialTracking;
 using VRSF.Core.FadingEffect;
 
 namespace VRSF.Core.SetupVR
@@ -29,9 +31,20 @@ namespace VRSF.Core.SetupVR
             VRSF_Components.DeviceLoaded = Device;
             VRSF_Components.CameraRig.transform.name = "[VRSF] " + Device.ToString();
 
+            if (Device == EDevice.SIMULATOR)
+                RemoveVRStuffs();
+
             VRSF_Components.SetupVRIsReady = true;
             new OnSetupVRReady();
             new StartFadingInEvent(0.5f);
+        }
+
+        private void RemoveVRStuffs()
+        {
+            Destroy(VRSF_Components.LeftController.GetComponent<TrackedPoseDriver>());
+            Destroy(VRSF_Components.RightController.GetComponent<TrackedPoseDriver>());
+            Destroy(VRSF_Components.VRCamera.GetComponent<TrackedPoseDriver>());
+            UnityEngine.XR.XRSettings.enabled = false;
         }
     }
 }

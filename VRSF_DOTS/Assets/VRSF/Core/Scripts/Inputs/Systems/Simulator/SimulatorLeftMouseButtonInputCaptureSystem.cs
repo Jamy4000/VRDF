@@ -2,7 +2,6 @@
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs

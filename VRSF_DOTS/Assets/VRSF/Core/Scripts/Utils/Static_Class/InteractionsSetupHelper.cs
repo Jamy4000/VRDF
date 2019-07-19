@@ -12,7 +12,7 @@ namespace VRSF.Core.Utils
         /// <summary>
         /// Add the corresponding Input component for the selected button. 
         /// </summary>
-        public static bool AddButtonInputComponent(ref EntityManager entityManager, ref Entity entity, VRInteraction.VRInteractionSet interactionSet)
+        public static bool AddInputCaptureComponent(ref EntityManager entityManager, ref Entity entity, VRInteraction.VRInteractionAuthoring interactionSet)
         {
             // Add the BaseInputCapture component to the entity
             entityManager.SetComponentData(entity, new BaseInputCapture());

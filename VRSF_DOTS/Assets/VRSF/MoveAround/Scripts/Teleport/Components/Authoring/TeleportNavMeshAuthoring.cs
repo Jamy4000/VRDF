@@ -12,20 +12,16 @@ namespace VRSF.MoveAround.Teleport
     /// </summary>
     public class TeleportNavMeshAuthoring : MonoBehaviour
     {
-        [SerializeField] public int _QueryTriggerInteraction = 0;
+        [SerializeField] public int QueryTriggerInteraction = 0;
 
-        [SerializeField]
-        [HideInInspector] public int NavAreaMask = ~0; // Initialize to all
+        [SerializeField] public int NavAreaMask = ~0; // Initialize to all
 
-        [SerializeField] public bool _IgnoreSlopedSurfaces = true;
+        [SerializeField] public bool IgnoreSlopedSurfaces = true;
 
-        [SerializeField] public float _SampleRadius = 0.25f;
+        [SerializeField] public float SampleRadius = 0.25f;
 
-        #region GETTERS_SETTERS
-        public float SampleRadius
-        {
-            get { return _SampleRadius; }
-        }
-        #endregion GETTERS_SETTERS
+        [SerializeField] public ENavmeshDewarpingMethod DewarpingMethod = ENavmeshDewarpingMethod.RoundToVoxelSize;
+
+        [HideInInspector] public Mesh SelectableMesh;
     }
 }

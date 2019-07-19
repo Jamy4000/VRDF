@@ -13,11 +13,9 @@ namespace VRSF.Core.CBRA
     /// <summary>
     /// Let you assign a response to one of the button on the Controllers of your choice.
     /// </summary>
-    [RequireComponent(typeof(SetupVRDestroyer))]
+    [RequireComponent(typeof(SetupVRDestroyer), typeof(VRInteractionAuthoring))]
     public class ControllersButtonResponseAssigner : MonoBehaviour
     {
-        [SerializeField] public VRInteractionSet InteractionParameters;
-
         [Header("The UnityEvents called when the user is Touching")]
         [HideInInspector] public UnityEvent OnButtonStartTouching;
         [HideInInspector] public UnityEvent OnButtonStopTouching;
@@ -41,8 +39,10 @@ namespace VRSF.Core.CBRA
 
         private void CreateEntity(OnSetupVRReady info)
         {
+            var interactionParameters = GetComponent<VRInteractionAuthoring>();
+
             // If the device loaded is included in the device using this CBRA
-            if ((InteractionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
+            if ((interactionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.Active.EntityManager;
 
@@ -57,21 +57,21 @@ namespace VRSF.Core.CBRA
                 entityManager.SetComponentData(entity, new CBRATag());
 
                 // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddButtonInputComponent(ref entityManager, ref entity, InteractionParameters))
+                if (!InteractionSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
                 }
 
                 // If the Hand wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddButtonHand(ref entityManager, ref entity, InteractionParameters.ButtonHand))
+                if (!InteractionSetupHelper.AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
                 }
 
                 // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddInteractionType(ref entityManager, ref entity, InteractionParameters.InteractionType, InteractionParameters.ButtonToUse))
+                if (!InteractionSetupHelper.AddInteractionType(ref entityManager, ref entity, interactionParameters.InteractionType, interactionParameters.ButtonToUse))
                 {
                     entityManager.DestroyEntity(entity);
                     return;

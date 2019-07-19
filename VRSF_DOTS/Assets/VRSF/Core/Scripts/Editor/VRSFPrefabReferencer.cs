@@ -10,11 +10,8 @@ namespace VRSF.Core.Utils
 
         public static GameObject GetPrefab(string name)
         {
-            Debug.Log("Instance " + Instance.PrefabsReferences);
             foreach (var prefab in Instance.PrefabsReferences)
             {
-                Debug.Log("prefab.name : " + prefab.name);
-                Debug.Log("name : " + name);
                 if (prefab.name == name)
                     return prefab;
             }

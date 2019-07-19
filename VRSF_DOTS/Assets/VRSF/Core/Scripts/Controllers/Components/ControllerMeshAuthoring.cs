@@ -11,7 +11,7 @@ namespace VRSF.Core.Controllers
         [Tooltip("To which hand should this controller's mesh be assigned to ?")]
         [SerializeField] private EHand _controllersHand;
 
-        [Header("Destroy GameObject on Setup ended")]
+        [Header("Destroy GameObject when Setup has ended")]
         [Tooltip("Should this gameobject be destroyed when the setup ended, or should only this script be destroyed ?")]
         [SerializeField] private bool _destroyOnSetup = true;
 
@@ -29,6 +29,7 @@ namespace VRSF.Core.Controllers
                 _controllersPerDevice.Add(vrController.ControllersDevice, vrController.ControllersMeshPrefabs);
             }
         }
+
         private void OnDestroy()
         {
             OnSetupVRReady.Listeners -= SetupControllersMesh;
@@ -38,11 +39,11 @@ namespace VRSF.Core.Controllers
         {
             try
             {
-                if (VRSF_Components.DeviceLoaded == EDevice.SIMULATOR)
-                    return;
-
-                var parent = _controllersHand == EHand.LEFT ? VRSF_Components.LeftController.transform : VRSF_Components.RightController.transform;
-                GameObject.Instantiate(_controllersPerDevice[VRSF_Components.DeviceLoaded], parent);
+                if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+                {
+                    var parent = _controllersHand == EHand.LEFT ? VRSF_Components.LeftController.transform : VRSF_Components.RightController.transform;
+                    GameObject.Instantiate(_controllersPerDevice[VRSF_Components.DeviceLoaded], parent);
+                }
 
                 if (_destroyOnSetup)
                     Destroy(gameObject);

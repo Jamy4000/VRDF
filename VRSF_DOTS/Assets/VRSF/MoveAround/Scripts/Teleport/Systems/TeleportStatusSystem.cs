@@ -27,14 +27,14 @@ namespace VRSF.MoveAround.Teleport
                             if ((cit.HasClickInteraction && bic.IsClicking) || (cit.HasTouchInteraction && bic.IsTouching))
                                 gtp.CurrentTeleportState = ETeleportState.Selecting;
                             break;
-                    case ETeleportState.Selecting:
-                        if ((cit.HasClickInteraction && !bic.IsClicking) || (cit.HasTouchInteraction && !bic.IsTouching))
-                        {
-                            gtp.CurrentTeleportState = ETeleportState.Teleporting;
-                            gtp.HasTeleported = false;
-                        }
-                        break;
-                    case ETeleportState.Teleporting:
+                        case ETeleportState.Selecting:
+                            if ((cit.HasClickInteraction && !bic.IsClicking) || (cit.HasTouchInteraction && !bic.IsTouching))
+                            {
+                                gtp.CurrentTeleportState = ETeleportState.Teleporting;
+                                gtp.HasTeleported = false;
+                            }
+                            break;
+                        case ETeleportState.Teleporting:
                             if (gtp.HasTeleported)
                                 gtp.CurrentTeleportState = ETeleportState.None;
                             break;

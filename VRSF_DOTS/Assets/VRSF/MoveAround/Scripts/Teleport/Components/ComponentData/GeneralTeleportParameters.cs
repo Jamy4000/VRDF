@@ -11,11 +11,6 @@ namespace VRSF.MoveAround.Teleport
         public bool IsUsingFadingEffect;
 
         /// <summary>
-        /// Layer on which we shouldn't check the teleport hit
-        /// </summary>
-        public LayerMask ExcludedLayers;
-
-        /// <summary>
         /// Indicates the current use of teleportation.
         /// None: The player is not using teleportation right now
         /// Selecting: The player is currently selecting a teleport destination (holding down on touchpad)

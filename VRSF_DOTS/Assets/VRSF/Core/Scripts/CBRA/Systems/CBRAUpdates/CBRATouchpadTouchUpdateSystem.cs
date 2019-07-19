@@ -1,5 +1,6 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Inputs;
+using VRSF.Core.Interactions;
 
 namespace VRSF.Core.CBRA
 {
