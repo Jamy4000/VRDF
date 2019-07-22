@@ -1,5 +1,30 @@
 # Change Log
 
+## [Unreleased](https://github.com/Jamy4000/VRSF_DOTS/tree/HEAD)
+
+[Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.2-preview...HEAD)
+
+**Closed issues:**
+
+- v0.2 Summary [\#13](https://github.com/Jamy4000/VRSF_DOTS/issues/13)
+- Refactor MoveAround Extension [\#2](https://github.com/Jamy4000/VRSF_DOTS/issues/2)
+
+## Summary
+Rewrote most of the Systems for the MoveAround package, including : 
+- Linear Rotation : With acceleration and deceleration effect
+- Non Linear Rotation : just rotating the user of a certain amount of degrees
+- Step by Step Teleport : The all step by step system, now way simpler as before.
+- Curve Teleporter : This one was quite tricky. May be improved in the future.
+
+Debugged a couple of stuffs, like : 
+- The CBRA feature wasn't working when using the touchpad and click feature
+- The fade canvas was always at 0.5 in Speed.
+
+Things remaining are listed in the issues #6, #11, and #12
+
+## [v0.2-preview](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.2-preview) (2019-07-22)
+[Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.1...v0.2-preview)
+
 ## Summary
 First version of the Core Package.
 
@@ -9,7 +34,7 @@ Every Systems and Components have been simplified and optimizied compared to the
 - SetupVR in now devided in two Authoring Monobehaviour, DeviceToLoadAuthoring and VRObjectsAuthoring.
 - Pointers Objects have been divided in three prefabs : BasicPointer (only check for Raycast), LaserPointer (Display a LineRenderer for the Pointer), and LaserPointerWithClick (Display a LineRenderer and let you click on objects like the UI using the trigger button).
 
-## [v0.1](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.1) (2019-07-17)
+## [v0.1](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.1) (2019-07-22)
 **Closed issues:**
 
 - v0.1 Summary [\#8](https://github.com/Jamy4000/VRSF_DOTS/issues/8)
