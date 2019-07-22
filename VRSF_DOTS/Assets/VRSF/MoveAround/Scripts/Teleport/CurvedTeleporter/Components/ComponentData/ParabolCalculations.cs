@@ -10,6 +10,7 @@ namespace VRSF.MoveAround.Teleport
     {
         public float3 Velocity;
         public float3 Normal;
+        public Core.Controllers.EHand Origin;
 
         /// <summary>
         /// Reference to the pointer's distance

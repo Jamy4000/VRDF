@@ -22,13 +22,13 @@ namespace VRSF.MoveAround.Teleport
             return inputDeps;
         }
 
-        struct ParaboleCalculationsJob : IJobForEach<CurveTeleporterCalculations, ParabolPointParameter, ParabolCalculations, GeneralTeleportParameters, TeleportNavMesh, VRRaycastParameters>
+        struct ParaboleCalculationsJob : IJobForEach<CurveTeleporterCalculations, ParabolPointsParameters, ParabolCalculations, GeneralTeleportParameters, TeleportNavMesh, VRRaycastParameters>
         {
             // TODO : float3 BaseVelocity = e.PointerObjects.transform.TransformDirection(PointerCalculations.InitialVelocity);
             public float3 BaseVelocity;
             public float3 ParabolOrigin;
 
-            public void Execute(ref CurveTeleporterCalculations ctc, ref ParabolPointParameter ppp, ref ParabolCalculations parabolCalc, ref GeneralTeleportParameters gtp, ref TeleportNavMesh tnm, ref VRRaycastParameters raycastParam)
+            public void Execute(ref CurveTeleporterCalculations ctc, ref ParabolPointsParameters ppp, ref ParabolCalculations parabolCalc, ref GeneralTeleportParameters gtp, ref TeleportNavMesh tnm, ref VRRaycastParameters raycastParam)
             {
                 if (gtp.CurrentTeleportState == ETeleportState.Selecting)
                 {

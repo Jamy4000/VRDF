@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace VRSF.MoveAround.Teleport
 {
-    public struct ParabolPointParameter : IComponentData
+    public struct ParabolPointsParameters : IComponentData
     {
         /// <summary>
         /// Number of points on the parabola mesh.  Greater point counts lead to a higher poly/smoother mesh.

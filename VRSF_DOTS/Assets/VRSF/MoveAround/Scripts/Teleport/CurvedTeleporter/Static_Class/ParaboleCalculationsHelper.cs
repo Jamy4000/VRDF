@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Unity.Collections;
+﻿using Unity.Collections;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace VRSF.MoveAround.Teleport
@@ -79,7 +79,7 @@ namespace VRSF.MoveAround.Teleport
         /// <param name="e">The reference to the entity to check</param>
         /// <param name="velocity">The velocity of the Parabole</param>
         /// <returns>The normal of the Curve</returns>
-        public static float3 ParabolaPointsCalculations(ref ParabolPoints pp, ref CurveTeleporterCalculations ctc, ParabolPointParameter ppp, ref ParabolCalculations parabolCalc, TeleportNavMesh tnm, float3 parabolOrigin, LayerMask excludedLayer, Vector3 velocity)
+        public static float3 ParabolaPointsCalculations(ref NativeArray<Translation> pp, ref CurveTeleporterCalculations ctc, ParabolPointsParameters ppp, TeleportNavMesh tnm, float3 parabolOrigin, LayerMask excludedLayer, Vector3 velocity)
         {
             ctc.PointOnNavMesh = CalculateParabolicCurve
             (
@@ -90,12 +90,12 @@ namespace VRSF.MoveAround.Teleport
                 ppp.PointCount,
                 tnm,
                 excludedLayer,
-                out pp.ParabolaPoints,
+                out pp,
                 out float3 normal,
                 out int lastPointIndex
             );
 
-            ctc.TempPointToGoTo = pp.ParabolaPoints[lastPointIndex];
+            ctc.TempPointToGoTo = pp[lastPointIndex].Value;
             return normal;
         }
 
@@ -113,11 +113,11 @@ namespace VRSF.MoveAround.Teleport
         /// <param name="normal">normal of hit point</param>
         /// 
         /// <returns>true if the the parabole is at the end of the NavMesh</returns>
-        private static bool CalculateParabolicCurve(float3 p0, Vector3 v0, Vector3 a, float dist, int points, TeleportNavMesh tnm, int excludedLayer, out NativeList<float3> outPts, out float3 normal, out int lastPointIndex)
+        private static bool CalculateParabolicCurve(float3 p0, Vector3 v0, Vector3 a, float dist, int points, TeleportNavMesh tnm, int excludedLayer, out NativeArray<Translation> outPts, out float3 normal, out int lastPointIndex)
         {
             // Init new list of points with p0 as the first point
-            outPts = new NativeList<float3>(points, Allocator.TempJob);
-            outPts[0] = p0;
+            outPts = new NativeArray<Translation>(points, Allocator.TempJob);
+            outPts[0] = new Translation { Value = p0 };
 
             float3 last = p0;
             float t = 0;
@@ -129,14 +129,14 @@ namespace VRSF.MoveAround.Teleport
 
                 if (TeleportNavMeshHelper.Linecast(last, next, out bool endOnNavmesh, excludedLayer, out float3 castHit, out float3 norm, tnm))
                 {
-                    outPts[i] = castHit;
+                    outPts[i] = new Translation { Value = castHit };
                     normal = norm;
                     lastPointIndex = i;
                     return endOnNavmesh;
                 }
                 else
                 {
-                    outPts[i] = next;
+                    outPts[i] = new Translation { Value = next };
                 }
 
                 last = next;
