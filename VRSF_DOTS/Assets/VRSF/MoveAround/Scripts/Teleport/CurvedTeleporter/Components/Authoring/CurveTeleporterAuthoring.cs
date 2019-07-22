@@ -36,10 +36,10 @@ namespace VRSF.MoveAround.Teleport
         public Material GraphicMaterial;
 
         [Header("Selection Pad Properties")]
-        [Tooltip("Prefab to use as the selection pad when the player is pointing at a valid teleportable surface.")]
-        public GameObject SelectionPadPrefab;
-        [Tooltip("Prefab to use as the invalid pad when the player is pointing at an invalid teleportable surface.")]
-        public GameObject InvalidPadPrefab;
+        [Tooltip("GameObject to use as the selection pad when the player is pointing at a valid teleportable surface. Turned to Entity at runtime.")]
+        public GameObject SelectionPad;
+        [Tooltip("GameObject to use as the invalid pad when the player is pointing at an invalid teleportable surface. Turned to Entity at runtime.")]
+        public GameObject InvalidPad;
 
 #if UNITY_EDITOR
         // Only used for the OnDrawGizmos method
@@ -64,7 +64,7 @@ namespace VRSF.MoveAround.Teleport
                     typeof(VRRaycastParameters),
                     typeof(CurveTeleporterCalculations),
                     typeof(CurveTeleporterRendering),
-                    typeof(ParabolPadPrefabs),
+                    typeof(ParabolPadsEntities),
                     typeof(ParabolPointsParameters),
                     typeof(ParabolCalculations),
                     typeof(RenderMesh),
@@ -134,15 +134,27 @@ namespace VRSF.MoveAround.Teleport
                     GraphicThickness = GraphicThickness
                 });
 
-                entityManager.SetComponentData(teleporterEntity, new ParabolPadPrefabs
+                // Create the valid and Invalid Pads
+                var selectionPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(SelectionPad, World.Active);
+                var invalidPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(InvalidPad, World.Active);
+
+                entityManager.SetEnabled(selectionPad, false);
+                entityManager.SetEnabled(invalidPad, false);
+
+                entityManager.SetComponentData(teleporterEntity, new ParabolPadsEntities
                 {
-                    SelectionPadPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(SelectionPadPrefab, World.Active),
-                    InvalidPadPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(InvalidPadPrefab, World.Active)
+                    SelectionPadInstance = selectionPad,
+                    InvalidPadInstance = invalidPad
                 });
+
+                Destroy(SelectionPad);
+                Destroy(InvalidPad);
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window
                 entityManager.SetName(teleporterEntity, "Curve Teleporter Entity");
+                entityManager.SetName(selectionPad, "Curve Teleporter Valid Pad Entity");
+                entityManager.SetName(invalidPad, "Curve Teleporter Invalid Pad Entity");
 #endif
 
                 // Create parabol points as entities, as List can't be used in ComponentData

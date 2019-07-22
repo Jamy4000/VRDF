@@ -4,7 +4,7 @@ using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.Interactions;
 
-namespace VRSF.MoveAround.Rotation
+namespace VRSF.MoveAround.VRRotation
 {
     /// <summary>
     /// Component used by the rotation systems to rotate the user using the thumbstick/Touchpad

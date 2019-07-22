@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace VRSF.MoveAround.Rotation
+namespace VRSF.MoveAround.VRRotation
 {
     [CustomEditor(typeof(NonLinearRotationAuthoring))]
     public class NonLinearRotationEditorScript : Editor

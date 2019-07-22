@@ -2,18 +2,8 @@
 
 namespace VRSF.MoveAround.Teleport
 {
-    public struct ParabolPadPrefabs : IComponentData
+    public struct ParabolPadsEntities : IComponentData
     {
-        /// <summary>
-        /// Prefab to use as the selection pad when the player is pointing at a valid teleportable surface.
-        /// </summary>
-        public Entity SelectionPadPrefab;
-
-        /// <summary>
-        /// Prefab to use as the selection pad when the player is pointing at an invalid teleportable surface.
-        /// </summary>
-        public Entity InvalidPadPrefab;
-
         /// <summary>
         /// Instance Reference to the selection pad when the player is pointing at a valid teleportable surface.
         /// </summary>

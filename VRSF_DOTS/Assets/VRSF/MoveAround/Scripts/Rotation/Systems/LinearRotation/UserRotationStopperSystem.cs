@@ -6,7 +6,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using VRSF.Core.Interactions;
 
-namespace VRSF.MoveAround.Rotation
+namespace VRSF.MoveAround.VRRotation
 {
     /// <summary>
     /// Used when rotation doesn't use a deceleration, reset the variables

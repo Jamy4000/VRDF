@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using VRSF.Core.Interactions;
 
-namespace VRSF.MoveAround.Rotation
+namespace VRSF.MoveAround.VRRotation
 {
     /// <summary>
     /// Rotate the user based on an amount of degrees set in the editor

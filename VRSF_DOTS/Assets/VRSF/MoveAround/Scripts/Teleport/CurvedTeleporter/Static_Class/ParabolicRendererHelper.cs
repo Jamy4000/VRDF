@@ -1,4 +1,5 @@
 ﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
@@ -7,38 +8,6 @@ namespace VRSF.MoveAround.Teleport
 {
     public static class ParabolicRendererHelper
     {
-        /// <summary>
-        /// Render the targets of the parabola at the end of the curve, to give a visual feedback to the user on whether he can or cannot teleport.
-        /// </summary>
-        /// <param name="e">Entity to check</param>
-        /// <param name="normal">The normal of the curve</param>
-        public static void RenderParabolePads(float3 tempPointToGoTo, bool isOnNavMesh, ParabolPadPrefabs parabolObjects, Vector3 normal)
-        {
-            // TODO
-            //// Display the valid pad if the user is on the navMesh
-            //if (e.PointerObjects._selectionPadObject != null)
-            //{
-            //    e.PointerObjects._selectionPadObject.SetActive(isOnNavMesh);
-            //    if (e.PointerCalculations.PointOnNavMesh)
-            //    {
-            //        e.PointerObjects._selectionPadObject.transform.position = tempPointToGoTo + (new float3(1.0f, 1.0f, 1.0f) * 0.005f);
-            //        e.PointerObjects._selectionPadObject.transform.rotation = Quaternion.LookRotation(normal);
-            //        e.PointerObjects._selectionPadObject.transform.Rotate(90, 0, 0);
-            //    }
-            //}
-
-            //// Display the invalid pad if the user is not on the navMesh
-            //if (e.PointerObjects._invalidPadObject != null)
-            //{
-            //    e.PointerObjects._invalidPadObject.SetActive(!isOnNavMesh);
-            //    if (!e.PointerCalculations.PointOnNavMesh)
-            //    {
-            //        e.PointerObjects._invalidPadObject.transform.position = tempPointToGoTo + (new float3(1.0f, 1.0f, 1.0f) * 0.005f);
-            //        e.PointerObjects._invalidPadObject.transform.rotation = Quaternion.LookRotation(normal);
-            //        e.PointerObjects._invalidPadObject.transform.Rotate(90, 0, 0);
-            //    }
-            //}
-        }
 
         /// <summary>
         /// Generate the mesh of the parabole

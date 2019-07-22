@@ -7,7 +7,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using VRSF.Core.Interactions;
 
-namespace VRSF.MoveAround.Rotation
+namespace VRSF.MoveAround.VRRotation
 {
     /// <summary>
     /// Rotate the user based on the Speed parameter using a sliding effect.
