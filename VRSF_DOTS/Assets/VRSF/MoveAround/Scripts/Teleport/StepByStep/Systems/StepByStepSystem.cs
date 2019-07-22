@@ -1,39 +1,42 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using VRSF.Core.FadingEffect;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.MoveAround.Teleport
 {
     /// <summary>
-    /// Using the ButtonActionChoser, this System allow the user to move Step by Step, ie in the direction of its laser to which this feature is linked.
+    /// This System allow the user to move Step by Step, ie in the direction of its laser to which this feature is linked.
     /// </summary>
     public class StepByStepSystem : ComponentSystem
     {
+        private float3 _tempPointToGoTo;
+
         protected override void OnUpdate()
         {
-            float3 newPos = float3.zero;
-            bool canTeleport = false;
-
             Entities.ForEach((ref StepByStepComponent sbs, ref VRRaycastParameters raycastParam, ref GeneralTeleportParameters gtp, ref TeleportNavMesh tnm, ref VRRaycastOutputs raycastOutputs) =>
             {
-                switch (gtp.CurrentTeleportState)
+                if (gtp.CurrentTeleportState == ETeleportState.Teleporting)
                 {
-                    case ETeleportState.Teleporting:
-                        canTeleport = UserIsOnNavMesh(sbs, tnm, raycastOutputs, raycastParam.ExcludedLayer, out float3 newUsersPos);
-                        newPos = newUsersPos;
-
-                        // We teleport the user as soon as we go out of the job
-                        gtp.HasTeleported = true;
-                        break;
-                    default:
-                        canTeleport = false;
-                        break;
+                    // We teleport the user as soon as we go out of the job
+                    gtp.HasTeleported = true;
+                    if (UserIsOnNavMesh(sbs, tnm, raycastOutputs, raycastParam.ExcludedLayer, out float3 newUsersPos))
+                    {
+                        if (gtp.IsUsingFadingEffect)
+                        {
+                            OnFadingOutEndedEvent.Listeners += TeleportUser;
+                            _tempPointToGoTo = newUsersPos;
+                            new StartFadingOutEvent(true);
+                        }
+                        else
+                        {
+                            VRSF_Components.SetCameraRigPosition(newUsersPos);
+                        }
+                    }
                 }
             });
-
-            if (canTeleport) VRSF_Components.SetCameraRigPosition(newPos, false);
         }
 
         private bool UserIsOnNavMesh(StepByStepComponent sbs, TeleportNavMesh tnm, VRRaycastOutputs raycastOutputs, LayerMask excludedLayers, out float3 newCameraRigPos)
@@ -90,6 +93,12 @@ namespace VRSF.MoveAround.Teleport
                 float3 origin = isCheckingCameraRig ? cameraRigTransform.position : vrCamTransform.position;
                 return origin + new float3(scaledDirection.x, 0.0f, scaledDirection.z);
             }
+        }
+
+        private void TeleportUser(OnFadingOutEndedEvent info)
+        {
+            OnFadingOutEndedEvent.Listeners -= TeleportUser;
+            VRSF_Components.SetCameraRigPosition(_tempPointToGoTo);
         }
     }
 }

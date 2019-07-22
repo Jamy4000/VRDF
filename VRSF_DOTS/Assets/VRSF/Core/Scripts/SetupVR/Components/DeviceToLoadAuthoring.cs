@@ -1,7 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SpatialTracking;
-using VRSF.Core.FadingEffect;
 
 namespace VRSF.Core.SetupVR
 { 
@@ -36,7 +34,6 @@ namespace VRSF.Core.SetupVR
 
             VRSF_Components.SetupVRIsReady = true;
             new OnSetupVRReady();
-            new StartFadingInEvent(0.5f);
         }
 
         private void RemoveVRStuffs()

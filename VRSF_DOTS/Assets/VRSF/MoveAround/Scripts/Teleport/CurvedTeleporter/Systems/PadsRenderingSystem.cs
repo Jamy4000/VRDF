@@ -107,7 +107,7 @@ namespace VRSF.MoveAround.Teleport
 
             _entityManager.SetComponentData(currentPad, new Translation { Value = pointToGoTo + (new float3(1.0f, 1.0f, 1.0f) * 0.005f) });
 
-            Quaternion newRotation = Quaternion.LookRotation(normal);
+            Quaternion newRotation = normal != Vector3.zero ? Quaternion.LookRotation(normal) : Quaternion.identity;
             newRotation.eulerAngles += new Vector3(90.0f, 0.0f, 0.0f);
             _entityManager.SetComponentData(currentPad, new Rotation { Value = newRotation });
         }

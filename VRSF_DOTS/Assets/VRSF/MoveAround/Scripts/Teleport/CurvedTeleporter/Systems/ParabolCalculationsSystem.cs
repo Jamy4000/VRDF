@@ -1,14 +1,16 @@
 ﻿using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using VRSF.Core.FadingEffect;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.MoveAround.Teleport
 {
     /// <summary>
-    /// A generic component that calculate the points positions for a curveTeleporter.  
+    /// 
     /// 
     /// Disclaimer : This script is based on the Flafla2 Vive-Teleporter Repository. You can check it out here :
     /// https://github.com/Flafla2/Vive-Teleporter
@@ -16,6 +18,7 @@ namespace VRSF.MoveAround.Teleport
     public class ParabolCalculationsSystem : ComponentSystem
     {
         private EntityManager _entityManager;
+        private float3 _tempPointToGoTo;
 
         protected override void OnCreate()
         {
@@ -53,11 +56,28 @@ namespace VRSF.MoveAround.Teleport
                 else if (gtp.CurrentTeleportState == ETeleportState.Teleporting && !gtp.HasTeleported)
                 {
                     if (ctc.PointOnNavMesh)
-                        VRSF_Components.SetCameraRigPosition(ctc.PointToGoTo);
+                    {
+                        if (gtp.IsUsingFadingEffect)
+                        {
+                            OnFadingOutEndedEvent.Listeners += TeleportUser;
+                            _tempPointToGoTo = ctc.PointToGoTo;
+                            new StartFadingOutEvent(true);
+                        }
+                        else
+                        {
+                            VRSF_Components.SetCameraRigPosition(ctc.PointToGoTo);
+                        }
+                    }
 
                     gtp.HasTeleported = true;
                 }
             });
+        }
+
+        private void TeleportUser(OnFadingOutEndedEvent info)
+        {
+            OnFadingOutEndedEvent.Listeners -= TeleportUser;
+            VRSF_Components.SetCameraRigPosition(_tempPointToGoTo);
         }
     }
 }

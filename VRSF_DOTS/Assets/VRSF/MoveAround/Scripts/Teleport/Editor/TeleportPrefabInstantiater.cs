@@ -12,10 +12,22 @@ namespace VRSF.MoveAround.Teleport
         /// <param name="menuCommand"></param>
         [MenuItem("GameObject/VRSF/Move Around/Teleport/Step by Step", priority = 1)]
         [MenuItem("VRSF/Move Around/Teleport/Step by Step", priority = 1)]
-        private static void AddBasicPointer(MenuCommand menuCommand)
+        private static void AddStepByStepTeleporter(MenuCommand menuCommand)
         {
-            var pointerPrefab = VRSFPrefabReferencer.GetPrefab("StepByStepTeleporter");
-            CreateGameObject(pointerPrefab, menuCommand);
+            var sbsTeleporter = VRSFPrefabReferencer.GetPrefab("StepByStepTeleporter");
+            CreateGameObject(sbsTeleporter, menuCommand);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="menuCommand"></param>
+        [MenuItem("GameObject/VRSF/Move Around/Teleport/Curve Teleporter", priority = 1)]
+        [MenuItem("VRSF/Move Around/Teleport/Curve Teleporter", priority = 1)]
+        private static void AddCurveTeleporter(MenuCommand menuCommand)
+        {
+            var curveTeleporter = VRSFPrefabReferencer.GetPrefab("CurveTeleporter");
+            CreateGameObject(curveTeleporter, menuCommand);
         }
 
         private static void CreateGameObject(GameObject pointerPrefab, MenuCommand menuCommand)

@@ -2,6 +2,8 @@
 using Unity.Entities;
 using Unity.Rendering;
 using Unity.Collections;
+using UnityEngine.SceneManagement;
+using System;
 
 namespace VRSF.Core.FadingEffect
 {
@@ -9,12 +11,14 @@ namespace VRSF.Core.FadingEffect
     {
         private EntityManager _entityManager;
         private NativeArray<Entity> _entities;
+        private bool _entityArrayHasBeenSet;
         private RenderMesh _renderMesh;
 
         protected override void OnCreate()
         {
             StartFadingInEvent.Listeners += OnStartFadingIn;
             StartFadingOutEvent.Listeners += OnStartFadingOut;
+            SceneManager.sceneLoaded += OnNewSceneLoaded;
 
             base.OnCreate();
             _entityManager = World.Active.EntityManager;
@@ -23,8 +27,14 @@ namespace VRSF.Core.FadingEffect
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
-            int cameraFadeEntities = GetEntityQuery(typeof(CameraFadeParameters)).CalculateLength();
-            _entities = new NativeArray<Entity>(cameraFadeEntities, Allocator.Persistent);
+
+            if (!_entityArrayHasBeenSet)
+            {
+                int cameraFadeEntities = GetEntityQuery(typeof(CameraFadeParameters)).CalculateLength();
+                _entities = new NativeArray<Entity>(cameraFadeEntities, Allocator.Persistent);
+                _entityArrayHasBeenSet = true;
+            }
+
             Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
                 _renderMesh = _entityManager.GetSharedComponentData<RenderMesh>(e);
@@ -81,6 +91,7 @@ namespace VRSF.Core.FadingEffect
                 // If the fadingIn is finished
                 if (color.a < 0)
                 {
+                    color.a = 0.0f;
                     new OnFadingInEndedEvent();
                     this.Enabled = false;
                 }
@@ -93,6 +104,7 @@ namespace VRSF.Core.FadingEffect
                 // if the alpha is completely dark, we're done with the fade Out
                 if (color.a > 1)
                 {
+                    color.a = 1.0f;
                     new OnFadingOutEndedEvent();
                     this.Enabled = !cameraFade.ShouldImmediatlyFadeIn;
                 }
@@ -116,6 +128,11 @@ namespace VRSF.Core.FadingEffect
         protected void OnStartFadingOut(StartFadingOutEvent info)
         {
             this.Enabled = true;
+        }
+
+        private void OnNewSceneLoaded(Scene newScene, LoadSceneMode loadMode)
+        {
+            _entityArrayHasBeenSet = !(SceneManager.GetActiveScene() == newScene);
         }
     }
 }

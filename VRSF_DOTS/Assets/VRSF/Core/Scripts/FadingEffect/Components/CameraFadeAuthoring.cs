@@ -39,7 +39,7 @@ namespace VRSF.Core.FadingEffect
                 FadingInProgress = true,
                 IsFadingIn = true,
                 ShouldImmediatlyFadeIn = false,
-                OldFadingSpeedFactor = -1.0f
+                OldFadingSpeedFactor = FadingSpeed
             });
 
 #if UNITY_EDITOR
