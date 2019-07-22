@@ -56,6 +56,13 @@ namespace VRSF.MoveAround.Teleport
 
                     pointsTranslation.Dispose();
                 }
+                else if (gtp.CurrentTeleportState == ETeleportState.Teleporting && !gtp.HasTeleported)
+                {
+                    if (ctc.PointOnNavMesh)
+                        VRSF_Components.SetCameraRigPosition(ctc.TempPointToGoTo);
+
+                    gtp.HasTeleported = true;
+                }
             });
         }
     }
