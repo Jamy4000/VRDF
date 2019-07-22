@@ -23,6 +23,7 @@ namespace VRSF.MoveAround.Teleport
             _entityManager = World.Active.EntityManager;
         }
 
+        [Unity.Burst.BurstCompile]
         protected override void OnUpdate()
         {
             Entities.ForEach((Entity teleportEntity, ref CurveTeleporterCalculations ctc, ref ParabolPointsParameters ppp, ref ParabolCalculations parabolCalc, ref GeneralTeleportParameters gtp, ref TeleportNavMesh tnm, ref VRRaycastParameters raycastParam) =>
