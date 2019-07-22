@@ -58,7 +58,8 @@ namespace VRSF.Core.Utils
 
                 case EControllersButton.TOUCHPAD:
                     // We check that the thumbposition give in the inspector is not set as none
-                    if (interactionSet.TouchThumbPosition != EThumbPosition.NONE)
+                    if (((interactionSet.InteractionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH && interactionSet.TouchThumbPosition != EThumbPosition.NONE) || 
+                        ((interactionSet.InteractionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK && interactionSet.ClickThumbPosition != EThumbPosition.NONE)) 
                     {
                         entityManager.AddComponentData(entity, new TouchpadInputCapture(interactionSet.ButtonHand));
                         entityManager.AddComponentData(entity, new InteractionThumbPosition { TouchThumbPosition = interactionSet.TouchThumbPosition, IsTouchingThreshold = interactionSet.IsTouchingThreshold, ClickThumbPosition = interactionSet.ClickThumbPosition, IsClickingThreshold = interactionSet.IsClickingThreshold });
