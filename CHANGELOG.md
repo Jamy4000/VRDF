@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/Jamy4000/VRSF_DOTS/tree/HEAD)
-
-[Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.2-preview...HEAD)
+## [v0.2](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.2) (2019-07-22)
+[Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.1...v0.2)
 
 **Closed issues:**
 
