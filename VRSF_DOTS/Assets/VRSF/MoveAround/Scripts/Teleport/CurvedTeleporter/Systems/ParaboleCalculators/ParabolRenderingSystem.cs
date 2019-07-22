@@ -1,9 +1,7 @@
 ﻿using Unity.Entities;
-using Unity.Jobs;
-using Unity.Mathematics;
+using Unity.Rendering;
+using Unity.Transforms;
 using UnityEngine;
-using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -14,32 +12,46 @@ namespace VRSF.MoveAround.Teleport
     /// Disclaimer : This script is based on the Flafla2 Vive-Teleporter Repository. You can check it out here :
     /// https://github.com/Flafla2/Vive-Teleporter
     /// </summary>
-    public class ParabolRenderingSystem : JobComponentSystem
+    public class ParabolRenderingSystem : ComponentSystem
     {
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        private EntityQuery _pointsQuery;
+        private EntityManager _entityManager;
+
+        protected override void OnCreate()
         {
-            // TODO
-            return inputDeps;
+            base.OnCreate();
+            _entityManager = World.Active.EntityManager;
+            _pointsQuery = GetEntityQuery(typeof(Translation), typeof(ParabolPointParent));
         }
 
-        struct ParaboleCalculationsJob : IJobForEach<CurveTeleporterCalculations, ParabolPointsParameters, ParabolCalculations, GeneralTeleportParameters, TeleportNavMesh, VRRaycastParameters>
+        protected override void OnUpdate()
         {
-            // TODO : float3 BaseVelocity = e.PointerObjects.transform.TransformDirection(PointerCalculations.InitialVelocity);
-            public float3 BaseVelocity;
-            public float3 ParabolOrigin;
-
-            public void Execute(ref CurveTeleporterCalculations ctc, ref ParabolPointsParameters ppp, ref ParabolCalculations parabolCalc, ref GeneralTeleportParameters gtp, ref TeleportNavMesh tnm, ref VRRaycastParameters raycastParam)
+            Entities.ForEach((Entity e, ref GeneralTeleportParameters gtp, ref CurveTeleporterCalculations ctc, ref CurveTeleporterRendering ctr, ref ParabolPointsParameters ppp, ref ParabolPadPrefabs parabolObjects, ref ParabolCalculations parabolCalculations) =>
             {
-                if (gtp.CurrentTeleportState == ETeleportState.Selecting)
+                switch (gtp.CurrentTeleportState)
                 {
-                    //// 2. Render the Parabole's pads, aka the targets at the end of the parabole
-                    //ParabolicRendererHelper.RenderParabolePads(e, normal);
+                    case ETeleportState.Selecting:
+                        var parabolMesh = _entityManager.GetSharedComponentData<RenderMesh>(e);
 
-                    //// 3. Draw parabola (BEFORE the outside faces of the selection pad, to avoid depth issues)
-                    //ParaboleCalculationsHelper.GenerateMesh(ref e.PointerObjects._parabolaMesh, e.PointerObjects.ParabolaPoints, velocity, Time.time % 1, e.PointerCalculations.GraphicThickness);
-                    //Graphics.DrawMesh(e.PointerObjects._parabolaMesh, Matrix4x4.identity, e.PointerCalculations.GraphicMaterial, e.PointerObjects.gameObject.layer);
+                        _pointsQuery.SetFilter(new ParabolPointParent { TeleporterEntityIndex = e.Index });
+                        var points = _pointsQuery.ToComponentDataArray<Translation>(Unity.Collections.Allocator.TempJob);
+
+                        // Render the Parabole's pads, aka the targets at the end of the parabole
+                        ParabolicRendererHelper.RenderParabolePads(ctc.PointToGoTo, ctc.PointOnNavMesh, parabolObjects, parabolCalculations.Normal);
+
+                        // Draw parabola (BEFORE the outside faces of the selection pad, to avoid depth issues)
+                        ParabolicRendererHelper.GenerateMesh(ref parabolMesh.mesh, points, ctc.LastPointIndex, parabolCalculations.Velocity, Time.time % 1, ctr.GraphicThickness);
+                        Graphics.DrawMesh(parabolMesh.mesh, Matrix4x4.identity, parabolMesh.material, parabolMesh.layer);
+                        points.Dispose();
+                        break;
                 }
-            }
+            });
+            // TODO : Deactivate laser if it's still active
+            //if (e.PointerObjects._ControllerPointer.enabled)
+            //    ParabolicRendererHelper.ToggleHandLaser(e, false);
+
+            //
+
         }
     }
 }

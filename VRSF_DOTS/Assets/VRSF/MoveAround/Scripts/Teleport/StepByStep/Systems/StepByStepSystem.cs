@@ -13,9 +13,6 @@ namespace VRSF.MoveAround.Teleport
     {
         protected override void OnUpdate()
         {
-            if (!VRSF_Components.SetupVRIsReady)
-                return;
-
             float3 newPos = float3.zero;
             bool canTeleport = false;
 

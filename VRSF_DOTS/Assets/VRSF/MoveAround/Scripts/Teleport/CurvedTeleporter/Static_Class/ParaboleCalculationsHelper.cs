@@ -92,10 +92,10 @@ namespace VRSF.MoveAround.Teleport
                 excludedLayer,
                 out pp,
                 out float3 normal,
-                out int lastPointIndex
+                out ctc.LastPointIndex
             );
 
-            ctc.TempPointToGoTo = pp[lastPointIndex].Value;
+            ctc.PointToGoTo = pp[ctc.LastPointIndex].Value;
             return normal;
         }
 

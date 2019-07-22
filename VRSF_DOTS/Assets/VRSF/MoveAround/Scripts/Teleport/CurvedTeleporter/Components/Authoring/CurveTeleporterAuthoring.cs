@@ -6,6 +6,7 @@ using VRSF.Core.SetupVR;
 using VRSF.Core.Inputs;
 using VRSF.Core.Interactions;
 using VRSF.Core.Raycast;
+using Unity.Rendering;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -53,7 +54,7 @@ namespace VRSF.MoveAround.Teleport
             if ((interactionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.Active.EntityManager;
-                
+
                 var archetype = entityManager.CreateArchetype
                 (
                     typeof(BaseInputCapture),
@@ -63,9 +64,10 @@ namespace VRSF.MoveAround.Teleport
                     typeof(VRRaycastParameters),
                     typeof(CurveTeleporterCalculations),
                     typeof(CurveTeleporterRendering),
-                    typeof(ParabolObjects),
+                    typeof(ParabolPadPrefabs),
                     typeof(ParabolPointsParameters),
                     typeof(ParabolCalculations),
+                    typeof(RenderMesh),
                     typeof(GeneralTeleportParameters),
                     typeof(TeleportNavMesh)
                 );
@@ -91,27 +93,14 @@ namespace VRSF.MoveAround.Teleport
                 // Setting up General Teleporter Stuffs
                 TeleporterSetupHelper.SetupTeleportStuffs(ref entityManager, ref teleporterEntity, GetComponent<GeneralTeleportAuthoring>());
 
-                // Setup Specific curve teleporter stuffs
+                // Setup Specific curve teleporter calculations stuffs
                 entityManager.SetComponentData(teleporterEntity, new CurveTeleporterCalculations
                 {
                     Acceleration = Acceleration,
                     InitialVelocity = InitialVelocity
                 });
 
-                var parabolaMesh = new Mesh
-                {
-                    name = "Parabolic Pointer",
-                    vertices = new Vector3[0],
-                    triangles = new int[0]
-                };
-                parabolaMesh.MarkDynamic();
-
-                entityManager.SetComponentData(teleporterEntity, new CurveTeleporterRendering
-                {
-                    //_parabolaMesh = parabolaMesh,
-                    //GraphicMaterial = GraphicMaterial,
-                    GraphicThickness = GraphicThickness
-                });
+                entityManager.SetComponentData(teleporterEntity, new ParabolCalculations { Origin = GetComponent<VRInteractionAuthoring>().ButtonHand });
 
                 entityManager.SetComponentData(teleporterEntity, new ParabolPointsParameters
                 {
@@ -119,13 +108,37 @@ namespace VRSF.MoveAround.Teleport
                     PointSpacing = PointSpacing
                 });
 
-                entityManager.SetComponentData(teleporterEntity, new ParabolObjects
+                // Setup Specific curve teleporter rendering stuffs
+                var parabolMesh = new Mesh
+                {
+                    name = "Parabolic Pointer",
+                    vertices = new Vector3[0],
+                    triangles = new int[0]
+                };
+                parabolMesh.MarkDynamic();
+
+                // This rendermesh is only here to store the mesh, material and layer of the curve teleporter and draw it later in a system
+                entityManager.SetSharedComponentData(teleporterEntity, new RenderMesh
+                {
+                    mesh = parabolMesh,
+                    material = GraphicMaterial,
+                    castShadows = UnityEngine.Rendering.ShadowCastingMode.Off,
+                    layer = 0,
+                    receiveShadows = false,
+                    subMesh = 0
+                });
+
+                entityManager.SetComponentData(teleporterEntity, new CurveTeleporterRendering
+                {
+                    //GraphicMaterial = GraphicMaterial,
+                    GraphicThickness = GraphicThickness
+                });
+
+                entityManager.SetComponentData(teleporterEntity, new ParabolPadPrefabs
                 {
                     SelectionPadPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(SelectionPadPrefab, World.Active),
                     InvalidPadPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(InvalidPadPrefab, World.Active)
                 });
-
-                entityManager.SetComponentData(teleporterEntity, new ParabolCalculations { Origin = GetComponent<VRInteractionAuthoring>().ButtonHand });
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

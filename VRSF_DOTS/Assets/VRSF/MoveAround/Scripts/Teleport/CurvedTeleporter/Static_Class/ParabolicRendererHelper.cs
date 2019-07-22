@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Unity.Collections;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
-using VRSF.Core.Controllers;
-using VRSF.Core.Interactions;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -13,7 +12,7 @@ namespace VRSF.MoveAround.Teleport
         /// </summary>
         /// <param name="e">Entity to check</param>
         /// <param name="normal">The normal of the curve</param>
-        public static void RenderParabolePads(float3 tempPointToGoTo, bool isOnNavMesh, ParabolObjects parabolObjects, Vector3 normal)
+        public static void RenderParabolePads(float3 tempPointToGoTo, bool isOnNavMesh, ParabolPadPrefabs parabolObjects, Vector3 normal)
         {
             // TODO
             //// Display the valid pad if the user is on the navMesh
@@ -49,23 +48,23 @@ namespace VRSF.MoveAround.Teleport
         /// <param name="fwd">The forward Vector for the parabole</param>
         /// <param name="uvoffset">The offset for the UV</param>
         /// <param name="graphicThickness">The thickness of the parabole to dispaly</param>
-        public static void GenerateMesh(ref Mesh m, List<Vector3> points, Vector3 fwd, float uvoffset, float graphicThickness)
+        public static void GenerateMesh(ref Mesh m, NativeArray<Translation> points, int lastPointIndex, Vector3 fwd, float uvoffset, float graphicThickness)
         {
-            Vector3[] verts = new Vector3[points.Count * 2];
-            Vector2[] uv = new Vector2[points.Count * 2];
+            Vector3[] verts = new Vector3[lastPointIndex * 2];
+            Vector2[] uv = new Vector2[lastPointIndex * 2];
 
-            Vector3 right = Vector3.Cross(fwd, Vector3.up).normalized;
+            float3 right = Vector3.Cross(fwd, Vector3.up).normalized;
 
-            for (int x = 0; x < points.Count; x++)
+            for (int x = 0; x < lastPointIndex; x++)
             {
-                verts[2 * x] = points[x] - right * graphicThickness / 2;
-                verts[2 * x + 1] = points[x] + right * graphicThickness / 2;
+                verts[2 * x] = points[x].Value - right * graphicThickness / 2;
+                verts[2 * x + 1] = points[x].Value + right * graphicThickness / 2;
 
                 float uvoffset_mod = uvoffset;
-                if (x == points.Count - 1 && x > 1)
+                if (x == lastPointIndex - 1 && x > 1)
                 {
-                    float dist_last = (points[x - 2] - points[x - 1]).magnitude;
-                    float dist_cur = (points[x] - points[x - 1]).magnitude;
+                    float dist_last = ((Vector3)points[x - 2].Value - (Vector3)points[x - 1].Value).magnitude;
+                    float dist_cur = ((Vector3)points[x].Value - (Vector3)points[x - 1].Value).magnitude;
                     uvoffset_mod += 1 - dist_cur / dist_last;
                 }
 

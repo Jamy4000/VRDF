@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using Unity.Collections;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -11,10 +8,5 @@ namespace VRSF.MoveAround.Teleport
         public float3 Velocity;
         public float3 Normal;
         public Core.Controllers.EHand Origin;
-
-        /// <summary>
-        /// Reference to the pointer's distance
-        /// </summary>
-        public float _ControllerPointerDistance;
     }
 }

@@ -25,19 +25,12 @@ namespace VRSF.MoveAround.Teleport
 
         protected override void OnUpdate()
         {
-            if (!VRSF_Components.SetupVRIsReady)
-                return;
-
             Entities.ForEach((Entity teleportEntity, ref CurveTeleporterCalculations ctc, ref ParabolPointsParameters ppp, ref ParabolCalculations parabolCalc, ref GeneralTeleportParameters gtp, ref TeleportNavMesh tnm, ref VRRaycastParameters raycastParam) =>
             {
                 if (gtp.CurrentTeleportState == ETeleportState.Selecting)
                 {
                     NativeArray<Translation> pointsTranslation = new NativeArray<Translation>(ppp.PointCount, Allocator.Temp);
                     Transform controller = parabolCalc.Origin == Core.Controllers.EHand.LEFT ? VRSF_Components.LeftController.transform : VRSF_Components.RightController.transform;
-
-                    // TODO : Deactivate laser if it's still active
-                    //if (e.PointerObjects._ControllerPointer.enabled)
-                    //    ParabolicRendererHelper.ToggleHandLaser(e, false);
 
                     // Calculate Parabola Points
                     parabolCalc.Velocity = ParaboleCalculationsHelper.ForceUpdateCurrentAngle(ctc, controller.TransformDirection(ctc.InitialVelocity));
@@ -59,7 +52,7 @@ namespace VRSF.MoveAround.Teleport
                 else if (gtp.CurrentTeleportState == ETeleportState.Teleporting && !gtp.HasTeleported)
                 {
                     if (ctc.PointOnNavMesh)
-                        VRSF_Components.SetCameraRigPosition(ctc.TempPointToGoTo);
+                        VRSF_Components.SetCameraRigPosition(ctc.PointToGoTo);
 
                     gtp.HasTeleported = true;
                 }

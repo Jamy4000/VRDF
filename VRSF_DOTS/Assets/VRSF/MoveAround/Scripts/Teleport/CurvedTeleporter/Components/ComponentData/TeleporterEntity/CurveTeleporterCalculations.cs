@@ -15,6 +15,7 @@ namespace VRSF.MoveAround.Teleport
         /// </summary>
         public float3 Acceleration;
 
+        public int LastPointIndex;
         public bool PointOnNavMesh { get; set; }
         public float CurrentParabolaAngleY { get; set; }
         public float3 CurrentPointVector { get; set; }
@@ -22,6 +23,6 @@ namespace VRSF.MoveAround.Teleport
         /// <summary>
         /// Temporary point where we wanna go
         /// </summary>
-        public float3 TempPointToGoTo;
+        public float3 PointToGoTo;
     }
 }
