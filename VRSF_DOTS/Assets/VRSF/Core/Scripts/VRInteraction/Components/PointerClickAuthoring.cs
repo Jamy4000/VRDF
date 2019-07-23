@@ -1,38 +1,30 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Controllers;
-using VRSF.Core.Inputs;
+using VRSF.Core.Utils;
 
-namespace VRSF.Core.Interactions
+namespace VRSF.Core.VRInteractions
 {
     /// <summary>
     /// Contains the variables for the PointerClickingSystem. 
     /// WARNING : This needs to be place on the same GameObject as where the VRRaycastAuthoring component is placed.
     /// </summary>
     [RequiresEntityConversion]
+    [RequireComponent(typeof(VRInteractionAuthoring))]
     public class PointerClickAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
-        [Header("The Hand attached to this click interaction")]
-        [Tooltip("We always use the trigger for clicking on stuff. If you wanna modify that, check the TriggerInputCapture component in script by the one you want to use.")]
-        [SerializeField] private EHand _handClicking;
-
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
-            // We add a new trigger input capture as we click using this trigger
-            dstManager.AddComponentData(entity, new TriggerInputCapture
-            {
-                Hand = _handClicking
-            });
+            var interactionSet = GetComponent<VRInteractionAuthoring>();
+            InteractionSetupHelper.AddInputCaptureComponent(ref dstManager, ref entity, interactionSet);
+            InteractionSetupHelper.AddButtonHand(ref dstManager, ref entity, interactionSet.ButtonHand);
 
             // We add a new pointer click to store
             dstManager.AddComponentData(entity, new PointerClick
             {
-                HandClicking = _handClicking,
-                CanClick = true,
-                ClickEventWasFired = false
+                HandClicking = interactionSet.ButtonHand,
+                CanClick = true
             });
-
-            Destroy(this);
         }
     }
 
@@ -45,10 +37,5 @@ namespace VRSF.Core.Interactions
         /// Whether the user is able to click on stuffs
         /// </summary>
         public bool CanClick;
-
-        /// <summary>
-        /// Whether the click event was already fired. Avoid the repeating of the event
-        /// </summary>
-        public bool ClickEventWasFired;
     }
 }

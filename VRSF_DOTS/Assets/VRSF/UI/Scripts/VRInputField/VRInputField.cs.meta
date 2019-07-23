@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: ee08bae67c1e7ea4d9ff0d100401298c
+timeCreated: 1525122022
+licenseType: Free
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_TargetGraphic: {instanceID: 0}
+  - m_TextComponent: {instanceID: 0}
+  - m_Placeholder: {instanceID: 0}
+  - UseControllers: {fileID: 11400000, guid: 80b6c11bc96547b4e912977f320ce897, type: 2}
+  - UseGaze: {fileID: 11400000, guid: 7571193aca0d3ae4f80d53954e42f357, type: 2}
+  - RightClickedSomething: {fileID: 11400000, guid: d950e288b5a70f94e996d9d436b42c57,
+      type: 2}
+  - LeftClickedSomething: {fileID: 11400000, guid: 15ddfd9adffbaa74da38eada75f74d63,
+      type: 2}
+  - GazeClickedSomething: {fileID: 11400000, guid: 80b7c4c0489ac954d9c9cf6ab954e431,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

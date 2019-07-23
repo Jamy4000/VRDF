@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Inputs;
 
-namespace VRSF.Core.Interactions
+namespace VRSF.Core.VRInteractions
 {
     public struct ControllersInteractionType : IComponentData
     {

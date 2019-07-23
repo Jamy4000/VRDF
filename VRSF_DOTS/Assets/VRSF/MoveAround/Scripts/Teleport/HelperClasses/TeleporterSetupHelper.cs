@@ -3,7 +3,7 @@ using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Raycast;
 using VRSF.Core.Utils;
-using VRSF.Core.VRInteraction;
+using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.Teleport
 {

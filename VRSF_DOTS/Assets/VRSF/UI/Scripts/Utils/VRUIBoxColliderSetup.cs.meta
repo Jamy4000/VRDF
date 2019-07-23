@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 7186122a4f9fe894c8e5db4ee563fdf7
+timeCreated: 1525426034
+licenseType: Pro
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - UseControllers: {fileID: 11400000, guid: 80b6c11bc96547b4e912977f320ce897, type: 2}
+  - UseGaze: {fileID: 11400000, guid: 7571193aca0d3ae4f80d53954e42f357, type: 2}
+  - RightClickedSomething: {fileID: 11400000, guid: d950e288b5a70f94e996d9d436b42c57,
+      type: 2}
+  - LeftClickedSomething: {fileID: 11400000, guid: 15ddfd9adffbaa74da38eada75f74d63,
+      type: 2}
+  - GazeClickedSomething: {fileID: 11400000, guid: 80b7c4c0489ac954d9c9cf6ab954e431,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -15,7 +15,7 @@ namespace VRSF.Core.CBRA
         #region PRIVATE_VARIABLES
         // The reference to the target
         private ControllersButtonResponseAssigner _cbraTarget;
-        private VRInteraction.VRInteractionAuthoring _interactionSet;
+        private VRInteractions.VRInteractionAuthoring _interactionSet;
 
         private bool _showUnityEvents = false;
 
@@ -36,7 +36,7 @@ namespace VRSF.Core.CBRA
         {
             // We set the buttonActionChoser reference
             _cbraTarget = (ControllersButtonResponseAssigner)target;
-            _interactionSet = _cbraTarget.GetComponent<VRInteraction.VRInteractionAuthoring>();
+            _interactionSet = _cbraTarget.GetComponent<VRInteractions.VRInteractionAuthoring>();
 
             _onButtonStartTouchingProperty = serializedObject.FindProperty("OnButtonStartTouching");
             _onButtonStopTouchingProperty = serializedObject.FindProperty("OnButtonStopTouching");

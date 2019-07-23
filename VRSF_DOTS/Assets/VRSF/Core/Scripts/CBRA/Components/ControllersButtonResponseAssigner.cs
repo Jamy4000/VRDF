@@ -5,8 +5,8 @@ using Unity.Entities;
 using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
 using System;
-using VRSF.Core.Interactions;
-using VRSF.Core.VRInteraction;
+using VRSF.Core.VRInteractions;
+using VRSF.Core.VRInteractions;
 
 namespace VRSF.Core.CBRA
 {

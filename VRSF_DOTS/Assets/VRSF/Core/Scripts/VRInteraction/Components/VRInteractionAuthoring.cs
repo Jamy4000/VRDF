@@ -3,7 +3,7 @@ using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.SetupVR;
 
-namespace VRSF.Core.VRInteraction
+namespace VRSF.Core.VRInteractions
 {
     public class VRInteractionAuthoring : MonoBehaviour
     {

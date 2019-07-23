@@ -1,0 +1,33 @@
+fileFormatVersion: 2
+guid: 9b7dbf988d52ded4a9642cee58acc4d8
+timeCreated: 1525277843
+licenseType: Pro
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_TargetGraphic: {instanceID: 0}
+  - m_HandleRect: {instanceID: 0}
+  - UseControllers: {fileID: 11400000, guid: 80b6c11bc96547b4e912977f320ce897, type: 2}
+  - UseGaze: {fileID: 11400000, guid: 7571193aca0d3ae4f80d53954e42f357, type: 2}
+  - RightClickedSomething: {fileID: 11400000, guid: d950e288b5a70f94e996d9d436b42c57,
+      type: 2}
+  - LeftClickedSomething: {fileID: 11400000, guid: 15ddfd9adffbaa74da38eada75f74d63,
+      type: 2}
+  - GazeClickedSomething: {fileID: 11400000, guid: 80b7c4c0489ac954d9c9cf6ab954e431,
+      type: 2}
+  - RightClickListener: {instanceID: 0}
+  - LeftClickListener: {instanceID: 0}
+  - GazeClickListener: {instanceID: 0}
+  - RightClickIsDown: {fileID: 11400000, guid: 24671222ab3e7ab49aa70caf83e5456a, type: 2}
+  - LeftClickIsDown: {fileID: 11400000, guid: bd8f74b363e67a345b3ff5f3aaa5c32d, type: 2}
+  - GazeClickIsDown: {fileID: 11400000, guid: 3a578cb63b55c3148a0506a4bca056bf, type: 2}
+  - GameEventListenersContainer: {instanceID: 0}
+  - RightHitPoint: {fileID: 11400000, guid: 59d5466b3e75ec547bb1920296fcfa00, type: 2}
+  - LeftHitPoint: {fileID: 11400000, guid: d16c4f1f1f37d42419d9fa8f6b050802, type: 2}
+  - GazeHitPoint: {fileID: 11400000, guid: a37975abb0fc52843a2064290bb07819, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

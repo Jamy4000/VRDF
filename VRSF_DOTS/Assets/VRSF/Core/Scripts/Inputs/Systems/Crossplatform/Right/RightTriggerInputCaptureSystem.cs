@@ -8,7 +8,7 @@ namespace VRSF.Core.Inputs
     /// <summary>
     /// System common for the VR Headsets, capture the trigger inputs for the left controller
     /// </summary>
-    public class TriggerInputCaptureSystem : JobComponentSystem
+    public class RightTriggerInputCaptureSystem : JobComponentSystem
     {
         private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
 

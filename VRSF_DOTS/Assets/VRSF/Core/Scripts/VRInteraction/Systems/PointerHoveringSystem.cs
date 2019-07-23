@@ -3,11 +3,10 @@ using UnityEngine;
 using VRSF.Core.Events;
 using VRSF.Core.Raycast;
 
-namespace VRSF.Core.Interactions
+namespace VRSF.Core.VRInteractions
 {
     public class PointerHoveringSystem : ComponentSystem
     {
-        #region ComponentSystem_Methods
         protected override void OnUpdate()
         {
             Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs) =>
@@ -15,25 +14,22 @@ namespace VRSF.Core.Interactions
                 switch (raycastOrigin.RayOrigin)
                 {
                     case ERayOrigin.LEFT_HAND:
-                        HandleOver(ref InteractionVariableContainer.PreviousLeftHit, ref InteractionVariableContainer.IsOverSomethingLeft, raycastOutputs.RaycastHitVar, ERayOrigin.LEFT_HAND);
+                        HandleOver(ref InteractionVariableContainer.PreviousLeftHit, ref InteractionVariableContainer.IsOverSomethingLeft, ref raycastOutputs.RaycastHitVar, ERayOrigin.LEFT_HAND);
                         break;
                     case ERayOrigin.RIGHT_HAND:
-                        HandleOver(ref InteractionVariableContainer.PreviousRightHit, ref InteractionVariableContainer.IsOverSomethingRight, raycastOutputs.RaycastHitVar, ERayOrigin.RIGHT_HAND);
+                        HandleOver(ref InteractionVariableContainer.PreviousRightHit, ref InteractionVariableContainer.IsOverSomethingRight, ref raycastOutputs.RaycastHitVar, ERayOrigin.RIGHT_HAND);
                         break;
                     case ERayOrigin.CAMERA:
-                        HandleOver(ref InteractionVariableContainer.PreviousGazeHit, ref InteractionVariableContainer.IsOverSomethingGaze, raycastOutputs.RaycastHitVar, ERayOrigin.CAMERA);
+                        HandleOver(ref InteractionVariableContainer.PreviousGazeHit, ref InteractionVariableContainer.IsOverSomethingGaze, ref raycastOutputs.RaycastHitVar, ERayOrigin.CAMERA);
                         break;
                 }
             });
         }
-        #endregion
 
-
-        #region PRIVATE_METHODS
         /// <summary>
         /// Handle the raycastHits to check if one of them touch something
         /// </summary>
-        private void HandleOver(ref Transform previousHit, ref bool isOverSomething, RaycastHitVariable hitVar, ERayOrigin origin)
+        private void HandleOver(ref Transform previousHit, ref bool isOverSomething, ref RaycastHitVariable hitVar, ERayOrigin origin)
         {
             //If nothing is hit, we set the isOver value to false
             if (hitVar.IsNull && isOverSomething)
@@ -51,6 +47,5 @@ namespace VRSF.Core.Interactions
                 new ObjectWasHoveredEvent(origin, hitTransform);
             }
         }
-        #endregion PRIVATE_METHODS
     }
 }

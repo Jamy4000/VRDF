@@ -1,0 +1,38 @@
+fileFormatVersion: 2
+guid: e47736c81576fc54f80c8df906e09878
+timeCreated: 1525090859
+licenseType: Free
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_TargetGraphic: {instanceID: 0}
+  - m_FillRect: {instanceID: 0}
+  - m_HandleRect: {instanceID: 0}
+  - RightClickIsDown: {fileID: 11400000, guid: 24671222ab3e7ab49aa70caf83e5456a, type: 2}
+  - LeftClickIsDown: {fileID: 11400000, guid: bd8f74b363e67a345b3ff5f3aaa5c32d, type: 2}
+  - GazeClickIsDown: {fileID: 11400000, guid: 3a578cb63b55c3148a0506a4bca056bf, type: 2}
+  - RightIsOverSomething: {fileID: 11400000, guid: e4af7546d84d07a4eabe05d5d54a7986,
+      type: 2}
+  - LeftIsOverSomething: {fileID: 11400000, guid: 0daffa7486ad84748897c181625ce7b7,
+      type: 2}
+  - GazeIsOverSomething: {fileID: 11400000, guid: e02255ccfbf76d948a328cfb0301b382,
+      type: 2}
+  - RightClickedSomething: {fileID: 11400000, guid: d950e288b5a70f94e996d9d436b42c57,
+      type: 2}
+  - LeftClickedSomething: {fileID: 11400000, guid: 15ddfd9adffbaa74da38eada75f74d63,
+      type: 2}
+  - GazeClickedSomething: {fileID: 11400000, guid: 80b7c4c0489ac954d9c9cf6ab954e431,
+      type: 2}
+  - RightOverSomething: {fileID: 11400000, guid: 727e4033ea83fee43a190ca7f021c4e2,
+      type: 2}
+  - LeftOverSomething: {fileID: 11400000, guid: 1d0f1345b760b4d40b2f15fc143005ef,
+      type: 2}
+  - GazeOverSomething: {fileID: 11400000, guid: 3c6a71e81ab29f24c9b1b0ec66411bdc,
+      type: 2}
+  - GameEventListenersContainer: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

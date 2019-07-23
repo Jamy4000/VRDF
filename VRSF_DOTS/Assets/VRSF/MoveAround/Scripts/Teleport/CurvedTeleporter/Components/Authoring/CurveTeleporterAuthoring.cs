@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-using VRSF.Core.VRInteraction;
+using VRSF.Core.VRInteractions;
 using Unity.Entities;
 using System.Collections.Generic;
 using VRSF.Core.SetupVR;
 using VRSF.Core.Inputs;
-using VRSF.Core.Interactions;
+using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
 using Unity.Rendering;
 

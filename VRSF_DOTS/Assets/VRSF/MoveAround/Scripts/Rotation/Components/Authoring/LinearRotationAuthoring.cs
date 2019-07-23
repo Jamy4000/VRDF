@@ -2,7 +2,7 @@
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
-using VRSF.Core.Interactions;
+using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.VRRotation
 {

@@ -5,7 +5,7 @@ using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
 
-namespace VRSF.Core.Interactions
+namespace VRSF.Core.VRInteractions
 {
     /// <summary>
     /// Handle the Click event in VR. Basically link the Raycast system and the Input System.
@@ -22,25 +22,19 @@ namespace VRSF.Core.Interactions
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref PointerClick pointerClick, ref TriggerInputCapture triggerInputCapture, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs) =>
+            Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref TriggerInputCapture triggerInputCapture, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs) =>
             {
-                if (!pointerClick.ClickEventWasFired && pointerClick.CanClick && baseInput.IsClicking)
+                if (pointerClick.CanClick)
                 {
                     switch (triggerInputCapture.Hand)
                     {
                         case EHand.LEFT:
-                            CheckHit(raycastOutputs.RaycastHitVar, InteractionVariableContainer.HasClickSomethingLeft, ERayOrigin.LEFT_HAND);
+                            CheckHit(raycastOutputs.RaycastHitVar, out InteractionVariableContainer.IsClickingSomethingLeft, ERayOrigin.LEFT_HAND);
                             break;
                         case EHand.RIGHT:
-                            CheckHit(raycastOutputs.RaycastHitVar, InteractionVariableContainer.HasClickSomethingRight, ERayOrigin.RIGHT_HAND);
+                            CheckHit(raycastOutputs.RaycastHitVar, out InteractionVariableContainer.IsClickingSomethingRight, ERayOrigin.RIGHT_HAND);
                             break;
                     }
-
-                    pointerClick.ClickEventWasFired = true;
-                }
-                else if (pointerClick.ClickEventWasFired && !baseInput.IsClicking)
-                {
-                    pointerClick.ClickEventWasFired = false;
                 }
             });
         }
@@ -54,7 +48,7 @@ namespace VRSF.Core.Interactions
 
 
         #region PRIVATE_METHODS
-        void CheckHit(RaycastHitVariable hitVar, bool hasClickSomething, ERayOrigin origin)
+        private void CheckHit(RaycastHitVariable hitVar, out bool hasClickSomething, ERayOrigin origin)
         {
             //If nothing is hit, we set the hasClickSomething value to false
             if (hitVar.IsNull)

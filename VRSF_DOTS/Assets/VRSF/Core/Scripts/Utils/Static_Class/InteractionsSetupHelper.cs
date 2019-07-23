@@ -2,7 +2,7 @@
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
-using VRSF.Core.Interactions;
+using VRSF.Core.VRInteractions;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Utils
@@ -12,10 +12,13 @@ namespace VRSF.Core.Utils
         /// <summary>
         /// Add the corresponding Input component for the selected button. 
         /// </summary>
-        public static bool AddInputCaptureComponent(ref EntityManager entityManager, ref Entity entity, VRInteraction.VRInteractionAuthoring interactionSet)
+        public static bool AddInputCaptureComponent(ref EntityManager entityManager, ref Entity entity, VRInteractionAuthoring interactionSet)
         {
             // Add the BaseInputCapture component to the entity
-            entityManager.SetComponentData(entity, new BaseInputCapture());
+            if (entityManager.HasComponent<BaseInputCapture>(entity))
+                entityManager.SetComponentData(entity, new BaseInputCapture());
+            else
+                entityManager.AddComponentData(entity, new BaseInputCapture());
 
             // Add the specific inputCapture component for our button
             switch (interactionSet.ButtonToUse)

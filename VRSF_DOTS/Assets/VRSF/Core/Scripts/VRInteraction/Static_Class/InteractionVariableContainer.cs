@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VRSF.Core.Interactions
+namespace VRSF.Core.VRInteractions
 {
     /// <summary>
     /// TODO Refactor, static classes shouldn't be used in Jobs
@@ -10,9 +10,9 @@ namespace VRSF.Core.Interactions
         /// <summary>
         /// Bool to verify if something is Hit
         /// </summary>
-        public static bool HasClickSomethingRight;
-        public static bool HasClickSomethingLeft;
-        public static bool HasClickSomethingGaze;
+        public static bool IsClickingSomethingRight;
+        public static bool IsClickingSomethingLeft;
+        public static bool IsClickingSomethingGaze;
         
         /// <summary>
         /// Bool to verify if something is being hovered

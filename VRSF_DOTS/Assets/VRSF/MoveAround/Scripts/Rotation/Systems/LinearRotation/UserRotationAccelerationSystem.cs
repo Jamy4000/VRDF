@@ -5,7 +5,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Collections;
 using Unity.Mathematics;
-using VRSF.Core.Interactions;
+using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.VRRotation
 {
