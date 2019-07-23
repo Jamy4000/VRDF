@@ -12,71 +12,113 @@ namespace VRSF.UI.Editor
     public class VRAutoFillSliderEditor : UnityEditor.UI.SliderEditor
     {
         #region PRIVATE_VARIABLES
+        private SerializedProperty _setColliderAuto;
+        private SerializedProperty _clickableWithRaycast;
+        private SerializedProperty _clickableUsingControllers;
+        private SerializedProperty _valueGoingDown;
+        private SerializedProperty _resetFillOnRelease;
+        private SerializedProperty _fillWithClick;
+        private SerializedProperty _fillTime;
+
         private SerializedProperty m_OnBarFilled;
         private SerializedProperty m_OnBarReleased;
 
         private static GameObject vrSliderPrefab;
-        private VRAutoFillSlider autoSlider;
+        private VRAutoFillSlider _autoSlider;
         #endregion PRIVATE_VARIABLES
 
 
-        #region MONOBEHAVIOUR_METHODS
         protected override void OnEnable()
         {
             base.OnEnable();
 
-            autoSlider = (VRAutoFillSlider)target;
+            _autoSlider = (VRAutoFillSlider)target;
+
+            _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
+            _clickableWithRaycast = serializedObject.FindProperty("LaserClickable");
+            _clickableUsingControllers = serializedObject.FindProperty("ControllerClickable");
+            _valueGoingDown = serializedObject.FindProperty("ValueIsGoingDown");
+            _resetFillOnRelease = serializedObject.FindProperty("ResetFillOnRelease");
+            _fillWithClick = serializedObject.FindProperty("FillWithClick");
+            _fillTime = serializedObject.FindProperty("FillTime");
 
             m_OnBarFilled = serializedObject.FindProperty("OnBarFilled");
             m_OnBarReleased = serializedObject.FindProperty("OnBarReleased");
         }
-        #endregion
 
-
-        #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            Undo.RecordObject(autoSlider.gameObject, "Add BoxCollider");
             EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "Add BoxCollider");
 
-            if (autoSlider.gameObject.GetComponent<BoxCollider>() != null)
+            if (_autoSlider.gameObject.GetComponent<BoxCollider>() != null)
             {
-                autoSlider.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", autoSlider.SetColliderAuto);
+                EditorGUILayout.LabelField("Set Box Collider Automatically", EditorStyles.miniBoldLabel);
+                EditorGUILayout.PropertyField(_setColliderAuto);
+                CheckEndChanges();
             }
             else
             {
                 EditorGUILayout.LabelField("This option required a BoxCollider Component.", EditorStyles.miniLabel);
-                autoSlider.SetColliderAuto = false;
-                autoSlider.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
+                _autoSlider.SetColliderAuto = false;
+                _autoSlider.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
                 
                 // Add a button to replace the collider by a BoxCollider2D
                 if (GUILayout.Button("Add BoxCollider"))
                 {
-                    autoSlider.gameObject.AddComponent<BoxCollider>();
-                    DestroyImmediate(autoSlider.GetComponent<Collider>());
-                    autoSlider.SetColliderAuto = true;
+                    DestroyImmediate(_autoSlider.GetComponent<Collider>());
+                    _autoSlider.gameObject.AddComponent<BoxCollider>();
+                    _autoSlider.SetColliderAuto = true;
                 }
             }
 
             EditorGUILayout.Space();
 
-            autoSlider.LaserClickable = EditorGUILayout.ToggleLeft("Clickable using Raycast", autoSlider.LaserClickable);
-            autoSlider.ControllerClickable = EditorGUILayout.ToggleLeft("Clickable using Controllers' meshes", autoSlider.ControllerClickable);
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "LaserClickable");
+            EditorGUILayout.LabelField("Clickable using Laser Pointer with Click", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_clickableWithRaycast);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "MeshClickable");
+            EditorGUILayout.LabelField("Clickable using Controllers' meshes", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_clickableUsingControllers);
+            CheckEndChanges();
 
             EditorGUILayout.Space();
 
-            autoSlider.ValueIsGoingDown = EditorGUILayout.ToggleLeft("Should the value decrease when not interacting", autoSlider.ValueIsGoingDown);
-            
-            autoSlider.ResetFillOnRelease = autoSlider.ValueIsGoingDown ? false : EditorGUILayout.ToggleLeft("Should the value be reset On Release", autoSlider.ResetFillOnRelease);
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "ValueGoingDown");
+            EditorGUILayout.LabelField("Should the value decrease when not interacting", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_valueGoingDown);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "ResetFill");
+            EditorGUILayout.LabelField("Should the value be reset On Release", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_resetFillOnRelease);
+            CheckEndChanges();
 
             EditorGUILayout.Space();
 
-            autoSlider.FillWithClick = EditorGUILayout.ToggleLeft("Should the user click to Fill the Slider", autoSlider.FillWithClick);
-            autoSlider.FillTime = EditorGUILayout.FloatField("Time to Fill the slider", autoSlider.FillTime);
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "FillWithClick");
+            EditorGUILayout.LabelField("Should the user click to Fill the Slider", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_fillWithClick);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "FillTime");
+            EditorGUILayout.LabelField("Time to Fill the slider", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_fillTime);
+            CheckEndChanges();
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();
@@ -89,20 +131,28 @@ namespace VRSF.UI.Editor
 
             EditorGUILayout.Space();
 
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "m_OnBarFilled");
             EditorGUILayout.PropertyField(m_OnBarFilled);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_autoSlider, "m_OnBarReleased");
             EditorGUILayout.PropertyField(m_OnBarReleased);
-
-            serializedObject.Update();
-            serializedObject.ApplyModifiedProperties();
-            EditorGUI.EndChangeCheck();
-
-            if (GUI.changed)
-                EditorUtility.SetDirty(target);
+            CheckEndChanges();
         }
-        #endregion PUBLIC_METHODS
 
+        private bool CheckEndChanges()
+        {
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_autoSlider);
+                return true;
+            }
+            return false;
+        }
 
-        #region PRIVATE_METHODS
         /// <summary>
         /// Add a new VR Auto Filling Slider to the Scene
         /// </summary>
@@ -127,7 +177,6 @@ namespace VRSF.UI.Editor
             Undo.RegisterCreatedObjectUndo(newSlider, "Create " + newSlider.name);
             Selection.activeObject = newSlider;
         }
-        #endregion PRIVATE_METHODS
     }
 }
 #endif

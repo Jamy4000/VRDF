@@ -17,32 +17,49 @@ namespace VRSF.UI
     public class VRAutoFillSlider : Slider
     {
         #region PUBLIC_VARIABLES
-        [Tooltip("If you want to set the collider yourself, set this value to false.")]
-        [SerializeField] public bool SetColliderAuto = true;
+        /// <summary>
+        /// If you want to set the collider yourself, set this value to false.
+        /// </summary>
+        [SerializeField] [HideInInspector] public bool SetColliderAuto = true;
 
-        [Tooltip("If this slider can be click using a Raycast and the trigger of your controller.")]
-        [SerializeField] public bool LaserClickable = true;
+        /// <summary>
+        /// If this slider can be click using a Raycast and the trigger of your controller.
+        /// </summary>
+        [SerializeField] [HideInInspector] public bool LaserClickable = true;
 
-        [Tooltip("If this slider can be click using the meshcollider of your controller.")]
-        [SerializeField] public bool ControllerClickable = true;
+        /// <summary>
+        /// If this slider can be click using the meshcollider of your controller.
+        /// </summary>
+        [SerializeField] [HideInInspector] public bool ControllerClickable = true;
 
-        [Tooltip("If UseController is at false, will automatically be set at false.\n" +
-            "If true, slider will fill only when the user is clicking on it.\n" +
-            "If false, slider will fill only when the user is pointing at it.")]
-        [SerializeField] public bool FillWithClick;
+        /// <summary>
+        /// If UseController is at false, will automatically be set at false.
+        /// If true, slider will fill only when the user is clicking on it.
+        /// If false, slider will fill only when the user is pointing at it.
+        /// </summary>
+        [SerializeField] [HideInInspector] public bool FillWithClick;
 
-        [Tooltip("The time it takes to fill the slider.")]
-        [SerializeField] public float FillTime;
+        /// <summary>
+        /// The time it takes to fill the slider.
+        /// </summary>
+        [SerializeField] [HideInInspector] public float FillTime;
 
-        [Header("Whether the value should go down when user is not clicking")]
-        [SerializeField] public bool ValueIsGoingDown = true;
+        /// <summary>
+        /// Whether the value should go down when user is not clicking
+        /// </summary>
+        [SerializeField] [HideInInspector] public bool ValueIsGoingDown = true;
 
-        [SerializeField] public bool ResetFillOnRelease = true;
+        [SerializeField] [HideInInspector] public bool ResetFillOnRelease = true;
 
-        [Header("Unity Events for bar filled and released.")]
-        [SerializeField] public UnityEvent OnBarFilled;
-        [Tooltip("The OnBarReleased will only be called if the bar was filled before the user release it.")]
-        [SerializeField] public UnityEvent OnBarReleased;
+        /// <summary>
+        /// Unity Events for bar filled and released.
+        /// </summary>
+        [SerializeField] [HideInInspector] public UnityEvent OnBarFilled;
+
+        /// <summary>
+        /// The OnBarReleased will only be called if the bar was filled before the user release it
+        /// </summary>
+        [SerializeField] [HideInInspector] public UnityEvent OnBarReleased;
 
         /// <summary>
         /// Used to determine how much of the bar should be filled.
