@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace VRSF.Core.Utils
 {
-    [CreateAssetMenu()]
+    //[CreateAssetMenu()]
     public class VRSFPrefabReferencer : ScriptableSingleton<VRSFPrefabReferencer>
     {
         [SerializeField] public List<GameObject> PrefabsReferences;

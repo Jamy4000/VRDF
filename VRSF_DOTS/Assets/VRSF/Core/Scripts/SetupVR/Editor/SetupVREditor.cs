@@ -8,8 +8,8 @@ namespace VRSF.Core.SetupVR
     /// Script to add some Editor feature for the SetupVR GameObject.
     /// </summary>
     [CustomEditor(typeof(DeviceToLoadAuthoring), true)]
-    public class SetupVREditor : UnityEditor.Editor
-	{
+    public class SetupVREditor : Editor
+    {
         #region PRIVATE_VARIABLES
         private static GameObject _setupVRPrefab;
         #endregion
@@ -23,20 +23,20 @@ namespace VRSF.Core.SetupVR
         [MenuItem("VRSF/Add SetupVR to Scene", priority = 0)]
         private static void InstantiateSetupVR(MenuCommand menuCommand)
         {
-            GameObject setupVR = GameObject.FindObjectOfType<DeviceToLoadAuthoring>().gameObject;
+            var deviceAuthoring = GameObject.FindObjectOfType<DeviceToLoadAuthoring>();
 
-            if (setupVR != null)
+            if (deviceAuthoring != null)
             {
                 Debug.LogError("<b>[VRSF] :</b> SetupVR is already present in the scene.\n" +
                     "If multiple instance of this object are placed in the same scene, you will encounter conflict problems.");
-                Selection.activeObject = setupVR;
+                Selection.activeObject = deviceAuthoring.gameObject;
                 return;
             }
 
             _setupVRPrefab = Utils.VRSFPrefabReferencer.GetPrefab("SetupVR");
 
             // Create a custom game object
-            setupVR = PrefabUtility.InstantiatePrefab(_setupVRPrefab) as GameObject;
+            var setupVR = PrefabUtility.InstantiatePrefab(_setupVRPrefab) as GameObject;
 
             // Ensure it gets reparented if this was a context click (otherwise does nothing)
             GameObjectUtility.SetParentAndAlign(setupVR, menuCommand.context as GameObject);
