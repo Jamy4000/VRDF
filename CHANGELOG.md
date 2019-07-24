@@ -1,39 +1,59 @@
 # Change Log
 
+## [v0.2.1](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.2.1) (2019-07-24)
+[Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.2...v0.2.1)
+**Summary:**
+First version of the UI Extension Package.
+
+Rewrote all VR UI Scripts for the UI Extension package, including, as well as all editor scripts to fit the new prefab workflow.
+Now using TMP for the InputField.
+
+Debug :
+- General bug with InputField, already present in VRSF_Hybrid_ECS
+- Fixed error in which VR Button onClick event were called two times (commit #62b9r71 )
+- Interaction bug that didn't appeared before (commit #7a09736 )
+- Impossibility to setup VRSF in scene
+
+Things remaining are listed in the newly created UI Project
+
+
+**Implemented enhancements:**
+
+- Try Unity Multiplayer HLAPI [\#14](https://github.com/Jamy4000/VRSF_DOTS/issues/14)
+
+**Closed issues:**
+
+- v0.2.1 Summary [\#18](https://github.com/Jamy4000/VRSF_DOTS/issues/18)
+- Refactor UI Package [\#4](https://github.com/Jamy4000/VRSF_DOTS/issues/4)
+
 ## [v0.2](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.2) (2019-07-22)
 [Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.1...v0.2)
+**Summary:**
+First version of the MoveAround Extension Package.
+
+Rewrote most of the Systems for the MoveAround package, including :
+
+- Linear Rotation : With acceleration and deceleration effect
+- Non Linear Rotation : just rotating the user of a certain amount of degrees
+- Step by Step Teleport : The all step by step system, now way simpler as before.
+- Curve Teleporter : This one was quite tricky. May be improved in the future.
+
+Things remaining are listed in the issues #6, #11, and #12
 
 **Closed issues:**
 
 - v0.2 Summary [\#13](https://github.com/Jamy4000/VRSF_DOTS/issues/13)
 - Refactor MoveAround Extension [\#2](https://github.com/Jamy4000/VRSF_DOTS/issues/2)
 
-## Summary
-Rewrote most of the Systems for the MoveAround package, including : 
-- Linear Rotation : With acceleration and deceleration effect
-- Non Linear Rotation : just rotating the user of a certain amount of degrees
-- Step by Step Teleport : The all step by step system, now way simpler as before.
-- Curve Teleporter : This one was quite tricky. May be improved in the future.
-
-Debugged a couple of stuffs, like : 
-- The CBRA feature wasn't working when using the touchpad and click feature
-- The fade canvas was always at 0.5 in Speed.
-
-Things remaining are listed in the issues #6, #11, and #12
-
-## [v0.2-preview](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.2-preview) (2019-07-22)
-[Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.1...v0.2-preview)
-
-## Summary
+## [v0.1](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.1) (2019-07-22)
+**Summary:**
 First version of the Core Package.
 
-Every Systems and Components have been simplified and optimizied compared to the last VRSF_Hybrid_Version. Here are some of the new stuffs when compared to VRSF_Hybrid_ECS :
-
+Every Systems and Components have been simplified and optimizied compared to the last VRSF_Hybrid_Version. here are some of the new stuffs in this release :
 - BAC are now called CBRA (ControllersButtonResponseAssigner) and only have one Authoring Monobehaviour.
 - SetupVR in now devided in two Authoring Monobehaviour, DeviceToLoadAuthoring and VRObjectsAuthoring.
 - Pointers Objects have been divided in three prefabs : BasicPointer (only check for Raycast), LaserPointer (Display a LineRenderer for the Pointer), and LaserPointerWithClick (Display a LineRenderer and let you click on objects like the UI using the trigger button).
 
-## [v0.1](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.1) (2019-07-22)
 **Closed issues:**
 
 - v0.1 Summary [\#8](https://github.com/Jamy4000/VRSF_DOTS/issues/8)
