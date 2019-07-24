@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.Events;
 using VRSF.Core.Raycast;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -91,17 +92,7 @@ namespace VRSF.UI
             if (Application.isPlaying)
             {
                 _boxColliderSetup = false;
-
-                GetFillRectReference();
-
-                if (LaserClickable)
-                {
-                    ObjectWasClickedEvent.Listeners += CheckSliderClick;
-                    ObjectWasHoveredEvent.Listeners += CheckSliderHovered;
-                }
-
-                if (ControllerClickable)
-                    GetComponent<BoxCollider>().isTrigger = true;
+                OnSetupVRReady.Listeners += Init;
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
@@ -112,6 +103,9 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
             {
                 ObjectWasClickedEvent.Listeners -= CheckSliderClick;
@@ -315,6 +309,23 @@ namespace VRSF.UI
                 VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
             
             _boxColliderSetup = true;
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            {
+                GetFillRectReference();
+
+                if (LaserClickable)
+                {
+                    ObjectWasClickedEvent.Listeners += CheckSliderClick;
+                    ObjectWasHoveredEvent.Listeners += CheckSliderHovered;
+                }
+
+                if (ControllerClickable)
+                    GetComponent<BoxCollider>().isTrigger = true;
+            }
         }
 
         /// <summary>

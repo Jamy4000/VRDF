@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VRSF.Core.Events;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -29,11 +30,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                if (LaserClickable)
-                    ObjectWasClickedEvent.Listeners += CheckToggleClick;
-
-                if (ControllerClickable)
-                    GetComponent<BoxCollider>().isTrigger = true;
+                OnSetupVRReady.Listeners += Init;
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
@@ -44,6 +41,9 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckToggleClick))
                 ObjectWasClickedEvent.Listeners -= CheckToggleClick;
         }
@@ -72,12 +72,24 @@ namespace VRSF.UI
         /// We use a coroutine and wait for the end of the first frame as the element cannot be correctly setup on the first frame
         /// </summary>
         /// <returns></returns>
-        IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
+        private IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
 
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            {
+                if (LaserClickable)
+                    ObjectWasClickedEvent.Listeners += CheckToggleClick;
+
+                if (ControllerClickable)
+                    GetComponent<BoxCollider>().isTrigger = true;
+            }
         }
         #endregion PRIVATE_METHODS
     }

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.Events;
 using VRSF.Core.Raycast;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -41,8 +42,7 @@ namespace VRSF.UI
             if (Application.isPlaying)
             {
                 _boxColliderSetup = false;
-
-                SetupUIElement();
+                OnSetupVRReady.Listeners += Init;
 
                 // We setup the BoxCollider size and center
                 StartCoroutine(SetupBoxCollider());
@@ -52,6 +52,9 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
                 ObjectWasClickedEvent.Listeners -= CheckSliderClick;
         }
@@ -82,18 +85,6 @@ namespace VRSF.UI
 
 
         #region PRIVATE_METHODS
-        private void SetupUIElement()
-        {
-            _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), minValue, maxValue, wholeNumbers);
-
-            CheckSliderReferences();
-            
-            ObjectWasClickedEvent.Listeners += CheckSliderClick;
-
-            _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
-        }
-
-
         /// <summary>
         /// Event called when the user is clicking on something
         /// </summary>
@@ -105,19 +96,6 @@ namespace VRSF.UI
             bool ObjectClickedIsThis()
             {
                 return clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE;
-            }
-        }
-
-        private void CheckSliderReferences()
-        {
-            try
-            {
-                handleRect = transform.FindDeepChild("Handle").GetComponent<RectTransform>();
-                fillRect = transform.FindDeepChild("Fill").GetComponent<RectTransform>();
-            }
-            catch
-            {
-                Debug.LogError("<b>[VRSF] :</b> Please specify a HandleRect in the inspector as a child of this VR Handle Slider.", gameObject);
             }
         }
 
@@ -135,6 +113,31 @@ namespace VRSF.UI
                 VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
             
             _boxColliderSetup = true;
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            {
+                ObjectWasClickedEvent.Listeners += CheckSliderClick;
+                CheckSliderReferences();
+
+                _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), minValue, maxValue, wholeNumbers);
+                _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
+            }
+        }
+
+        private void CheckSliderReferences()
+        {
+            try
+            {
+                handleRect = transform.FindDeepChild("Handle").GetComponent<RectTransform>();
+                fillRect = transform.FindDeepChild("Fill").GetComponent<RectTransform>();
+            }
+            catch
+            {
+                Debug.LogError("<b>[VRSF] :</b> Please specify a HandleRect in the inspector as a child of this VR Handle Slider.", gameObject);
+            }
         }
         #endregion
     }

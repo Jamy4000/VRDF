@@ -1,10 +1,10 @@
 ﻿using VRSF.Core.Utils;
-using VRSF.Core.Controllers;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using VRSF.Core.Events;
 using UnityEngine.Events;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -41,7 +41,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                SetupUIElement();
+                OnSetupVRReady.Listeners += Init;
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
@@ -52,6 +52,9 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             if (_eventWereRegistered)
             {
                 onValueChanged.RemoveListener(_onValueChangedAction);
@@ -63,20 +66,6 @@ namespace VRSF.UI
 
 
         #region PRIVATE_METHODS
-        private void SetupUIElement()
-        {
-            _onValueChangedAction = delegate { SetDropDownNewState(); };
-            onValueChanged.AddListener(_onValueChangedAction);
-            ObjectWasClickedEvent.RegisterListener(CheckObjectClicked);
-
-            _eventWereRegistered = true;
-
-            // We setup the Template and Options to fit the VRFramework
-            _template = transform.Find("Template").gameObject;
-            SetToggleReferences();
-            ChangeTemplate();
-        }
-
         /// <summary>
         /// Event called when the DropDown or its children is clicked
         /// </summary>
@@ -114,9 +103,9 @@ namespace VRSF.UI
         IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
 
-            BoxCollider box = GetComponent<BoxCollider>();
-            box = VRUIBoxColliderSetup.CheckBoxColliderSize(box, GetComponent<RectTransform>());
+            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
         /// <summary>
@@ -150,6 +139,26 @@ namespace VRSF.UI
             }
 
             _template.SetActive(false);
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+                SetupUIElement();
+        }
+
+        private void SetupUIElement()
+        {
+            _onValueChangedAction = delegate { SetDropDownNewState(); };
+            onValueChanged.AddListener(_onValueChangedAction);
+            ObjectWasClickedEvent.Listeners += CheckObjectClicked;
+
+            _eventWereRegistered = true;
+
+            // We setup the Template and Options to fit the VRFramework
+            _template = transform.Find("Template").gameObject;
+            SetToggleReferences();
+            ChangeTemplate();
         }
         #endregion PRIVATE_METHODS
     }
