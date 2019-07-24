@@ -11,7 +11,9 @@ namespace VRSF.UI.Editor
     public class VRScrollRectEditor : UnityEditor.UI.ScrollRectEditor
     {
         #region PRIVATE_VARIABLES
-        private VRScrollRect vrScrollRect;
+        private VRScrollRect _scrollview;
+        private SerializedProperty _setColliderAuto;
+        private SerializedProperty _direction;
         #endregion PRIVATE_VARIABLES
 
 
@@ -19,7 +21,9 @@ namespace VRSF.UI.Editor
         protected override void OnEnable()
         {
             base.OnEnable();
-            vrScrollRect = (VRScrollRect)target;
+            _scrollview = (VRScrollRect)target;
+            _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
+            _direction = serializedObject.FindProperty("Direction");
         }
         #endregion
 
@@ -27,33 +31,41 @@ namespace VRSF.UI.Editor
         #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.Space();
+            serializedObject.Update();
 
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            Undo.RecordObject(vrScrollRect.gameObject, "Add BoxCollider");
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_scrollview.gameObject, "Add BoxCollider");
 
-            if (vrScrollRect.gameObject.GetComponent<BoxCollider>() != null)
+            if (_scrollview.gameObject.GetComponent<BoxCollider>() != null)
             {
-                vrScrollRect.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", vrScrollRect.SetColliderAuto);
+                EditorGUILayout.LabelField("Set Box Collider Automatically", EditorStyles.miniBoldLabel);
+                EditorGUILayout.PropertyField(_setColliderAuto);
+                CheckEndChanges();
             }
             else
             {
                 EditorGUILayout.LabelField("This option required a BoxCollider Component.", EditorStyles.miniLabel);
-                vrScrollRect.SetColliderAuto = false;
-                vrScrollRect.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
+                _scrollview.SetColliderAuto = false;
+                _scrollview.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
 
                 // Add a button to replace the collider by a BoxCollider2D
                 if (GUILayout.Button("Add BoxCollider"))
                 {
-                    vrScrollRect.gameObject.AddComponent<BoxCollider>();
-                    DestroyImmediate(vrScrollRect.GetComponent<Collider>());
-                    vrScrollRect.SetColliderAuto = true;
+                    DestroyImmediate(_scrollview.GetComponent<Collider>());
+                    _scrollview.gameObject.AddComponent<BoxCollider>();
+                    _scrollview.SetColliderAuto = true;
                 }
             }
-            
-            vrScrollRect.Direction = (EUIDirection)EditorGUILayout.EnumPopup("Direction", vrScrollRect.Direction);
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_scrollview, "Direction");
+            EditorGUILayout.LabelField("The direction of this ScrollView", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_direction);
+            CheckEndChanges();
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();
@@ -63,15 +75,22 @@ namespace VRSF.UI.Editor
             EditorGUILayout.Space();
 
             base.OnInspectorGUI();
-
-            serializedObject.ApplyModifiedProperties();
-            serializedObject.Update();
-            if (GUI.changed) EditorUtility.SetDirty(target);
         }
         #endregion PUBLIC_METHODS
 
 
         #region PRIVATE_METHODS
+        private bool CheckEndChanges()
+        {
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_scrollview);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Add a new VR ScrollView to the Scene
         /// </summary>
@@ -81,7 +100,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRScrollRect(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newScrollRect = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollview"));
+            GameObject newScrollRect = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollview"));
 
             RectTransform rt = newScrollRect.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

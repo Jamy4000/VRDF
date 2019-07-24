@@ -20,7 +20,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRCanvas(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newCanvas = GameObject.Instantiate(VRSFPrefabReferencer.GetPrefab("VRCanvas"));
+            GameObject newCanvas = (GameObject)PrefabUtility.InstantiatePrefab(VRSFPrefabReferencer.GetPrefab("VRCanvas"));
 
             RectTransform rt = newCanvas.GetComponent<RectTransform>();
             rt.localPosition = Vector3.zero;

@@ -162,7 +162,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRAutoFillSlider(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newSlider = Instantiate(VRSFPrefabReferencer.GetPrefab("VRAutoFillSlider"));
+            GameObject newSlider = (GameObject)PrefabUtility.InstantiatePrefab(VRSFPrefabReferencer.GetPrefab("VRAutoFillSlider"));
 
             RectTransform rt = newSlider.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

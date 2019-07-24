@@ -12,7 +12,8 @@ namespace VRSF.UI.Editor
     public class VRHandleSliderEditor : UnityEditor.UI.SliderEditor
     {
         #region PRIVATE_VARIABLES
-        private VRHandleSlider vrHandleSlider;
+        private SerializedProperty _setColliderAuto;
+        private VRHandleSlider _handleSlider;
         #endregion
 
 
@@ -20,37 +21,42 @@ namespace VRSF.UI.Editor
         protected override void OnEnable()
         {
             base.OnEnable();
-            vrHandleSlider = (VRHandleSlider)target;
+            _handleSlider = (VRHandleSlider)target;
+            _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
         }
         #endregion
 
-        
+
         #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.Space();
+            serializedObject.Update();
 
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            Undo.RecordObject(vrHandleSlider.gameObject, "Add BoxCollider");
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_handleSlider.gameObject, "Add BoxCollider");
 
-            if (vrHandleSlider.gameObject.GetComponent<BoxCollider>() != null)
+            if (_handleSlider.gameObject.GetComponent<BoxCollider>() != null)
             {
-                vrHandleSlider.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", vrHandleSlider.SetColliderAuto);
+                EditorGUILayout.LabelField("Set Box Collider Automatically", EditorStyles.miniBoldLabel);
+                EditorGUILayout.PropertyField(_setColliderAuto);
+                CheckEndChanges();
             }
             else
             {
                 EditorGUILayout.LabelField("This option required a BoxCollider Component.", EditorStyles.miniLabel);
-                vrHandleSlider.SetColliderAuto = false;
-                vrHandleSlider.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
+                _handleSlider.SetColliderAuto = false;
+                _handleSlider.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
 
                 // Add a button to replace the collider by a BoxCollider2D
                 if (GUILayout.Button("Add BoxCollider"))
                 {
-                    vrHandleSlider.gameObject.AddComponent<BoxCollider>();
-                    DestroyImmediate(vrHandleSlider.GetComponent<Collider>());
-                    vrHandleSlider.SetColliderAuto = true;
+                    DestroyImmediate(_handleSlider.GetComponent<Collider>());
+                    _handleSlider.gameObject.AddComponent<BoxCollider>();
+                    _handleSlider.SetColliderAuto = true;
                 }
             }
 
@@ -62,15 +68,22 @@ namespace VRSF.UI.Editor
             EditorGUILayout.Space();
 
             base.OnInspectorGUI();
-
-            serializedObject.ApplyModifiedProperties();
-            serializedObject.Update();
-            if (GUI.changed) EditorUtility.SetDirty(target);
         }
         #endregion
 
 
         #region PRIVATE_METHODS
+        private bool CheckEndChanges()
+        {
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_handleSlider);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Add a new VR Slider with Handle to the Scene
         /// </summary>
@@ -80,7 +93,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRHandleSlider(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newSlider = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRHandleSlider"));
+            GameObject newSlider = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRHandleSlider"));
 
             RectTransform rt = newSlider.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

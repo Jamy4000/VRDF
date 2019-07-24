@@ -12,7 +12,8 @@ namespace VRSF.UI.Editor
     public class VRScrollbarEditor : UnityEditor.UI.ScrollbarEditor
     {
         #region PRIVATE_VARIABLES
-        private VRScrollBar vrScrollBar;
+        private SerializedProperty _setColliderAuto;
+        private VRScrollBar _scrollbar;
         #endregion
 
 
@@ -20,37 +21,42 @@ namespace VRSF.UI.Editor
         protected override void OnEnable()
         {
             base.OnEnable();
-            vrScrollBar = (VRScrollBar)target;
+            _scrollbar = (VRScrollBar)target;
+            _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
         }
         #endregion
-        
+
 
         #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.Space();
+            serializedObject.Update();
 
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            Undo.RecordObject(vrScrollBar.gameObject, "Add BoxCollider");
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_scrollbar.gameObject, "Add BoxCollider");
 
-            if (vrScrollBar.gameObject.GetComponent<BoxCollider>() != null)
+            if (_scrollbar.gameObject.GetComponent<BoxCollider>() != null)
             {
-                vrScrollBar.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", vrScrollBar.SetColliderAuto);
+                EditorGUILayout.LabelField("Set Box Collider Automatically", EditorStyles.miniBoldLabel);
+                EditorGUILayout.PropertyField(_setColliderAuto);
+                CheckEndChanges();
             }
             else
             {
                 EditorGUILayout.LabelField("This option required a BoxCollider Component.", EditorStyles.miniLabel);
-                vrScrollBar.SetColliderAuto = false;
-                vrScrollBar.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
+                _scrollbar.SetColliderAuto = false;
+                _scrollbar.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
 
-                // Add a vrScrollBar to replace the collider by a BoxCollider2D
+                // Add a button to replace the collider by a BoxCollider2D
                 if (GUILayout.Button("Add BoxCollider"))
                 {
-                    vrScrollBar.gameObject.AddComponent<BoxCollider>();
-                    DestroyImmediate(vrScrollBar.GetComponent<Collider>());
-                    vrScrollBar.SetColliderAuto = true;
+                    DestroyImmediate(_scrollbar.GetComponent<Collider>());
+                    _scrollbar.gameObject.AddComponent<BoxCollider>();
+                    _scrollbar.SetColliderAuto = true;
                 }
             }
 
@@ -62,15 +68,22 @@ namespace VRSF.UI.Editor
             EditorGUILayout.Space();
 
             base.OnInspectorGUI();
-
-            serializedObject.ApplyModifiedProperties();
-            serializedObject.Update();
-            if (GUI.changed) EditorUtility.SetDirty(target);
         }
         #endregion
 
 
         #region PRIVATE_METHODS
+        private bool CheckEndChanges()
+        {
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_scrollbar);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Add a new VR Scrollbar to the Scene
         /// </summary>
@@ -80,7 +93,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRScrollbarVertical(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newScrollbar = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollbarVertical"));
+            GameObject newScrollbar = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollbarVertical"));
 
             RectTransform rt = newScrollbar.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
@@ -103,7 +116,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRScrollbarHorizontal(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newScrollbar = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollbarHorizontal"));
+            GameObject newScrollbar = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollbarHorizontal"));
 
             RectTransform rt = newScrollbar.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

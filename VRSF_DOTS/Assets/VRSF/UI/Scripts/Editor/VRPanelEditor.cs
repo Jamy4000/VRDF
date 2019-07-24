@@ -19,7 +19,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRPanel(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newPanel = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRPanel"));
+            GameObject newPanel = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRPanel"));
 
             RectTransform rt = newPanel.GetComponent<RectTransform>();
             rt.localPosition = Vector3.zero;

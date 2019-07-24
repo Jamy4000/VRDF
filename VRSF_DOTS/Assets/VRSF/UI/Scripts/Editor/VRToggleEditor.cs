@@ -12,7 +12,11 @@ namespace VRSF.UI.Editor
     public class VRToggleEditor : UnityEditor.UI.ToggleEditor
 	{
         #region PRIVATE_VARIABLES
-        private VRToggle vrToggle;
+        private SerializedProperty _setColliderAuto;
+        private SerializedProperty _clickableWithRaycast;
+        private SerializedProperty _clickableUsingControllers;
+
+        private VRToggle _toggle;
         #endregion
 
 
@@ -20,8 +24,10 @@ namespace VRSF.UI.Editor
         protected override void OnEnable()
         {
             base.OnEnable();
-
-            vrToggle = (VRToggle)target;
+            _toggle = (VRToggle)target;
+            _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
+            _clickableWithRaycast = serializedObject.FindProperty("LaserClickable");
+            _clickableUsingControllers = serializedObject.FindProperty("ControllerClickable");
         }
         #endregion
 
@@ -29,37 +35,50 @@ namespace VRSF.UI.Editor
         #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.Space();
+            serializedObject.Update();
 
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            Undo.RecordObject(vrToggle.gameObject, "Add BoxCollider");
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_toggle.gameObject, "Add BoxCollider");
 
-            if (vrToggle.gameObject.GetComponent<BoxCollider>() != null)
+            if (_toggle.gameObject.GetComponent<BoxCollider>() != null)
             {
-                vrToggle.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", vrToggle.SetColliderAuto);
+                EditorGUILayout.LabelField("Set Box Collider Automatically", EditorStyles.miniBoldLabel);
+                EditorGUILayout.PropertyField(_setColliderAuto);
+                CheckEndChanges();
             }
             else
             {
                 EditorGUILayout.LabelField("This option required a BoxCollider Component.", EditorStyles.miniLabel);
-                vrToggle.SetColliderAuto = false;
-                vrToggle.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
+                _toggle.SetColliderAuto = false;
+                _toggle.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
 
                 // Add a button to replace the collider by a BoxCollider2D
                 if (GUILayout.Button("Add BoxCollider"))
                 {
-                    vrToggle.gameObject.AddComponent<BoxCollider>();
-                    DestroyImmediate(vrToggle.GetComponent<Collider>());
-                    vrToggle.SetColliderAuto = true;
+                    DestroyImmediate(_toggle.GetComponent<Collider>());
+                    _toggle.gameObject.AddComponent<BoxCollider>();
+                    _toggle.SetColliderAuto = true;
                 }
             }
 
             EditorGUILayout.Space();
 
-            vrToggle.LaserClickable = EditorGUILayout.ToggleLeft("Clickable using Raycast", vrToggle.LaserClickable);
-            vrToggle.ControllerClickable = EditorGUILayout.ToggleLeft("Clickable using Controllers' meshes", vrToggle.ControllerClickable);
-            
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_toggle, "LaserClickable");
+            EditorGUILayout.LabelField("Clickable using Laser Pointer with Click", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_clickableWithRaycast);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_toggle, "MeshClickable");
+            EditorGUILayout.LabelField("Clickable using Controllers' meshes", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_clickableUsingControllers);
+            CheckEndChanges();
+
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
@@ -68,14 +87,22 @@ namespace VRSF.UI.Editor
             EditorGUILayout.Space();
 
             base.OnInspectorGUI();
-
-            serializedObject.ApplyModifiedProperties();
-            serializedObject.Update();
         }
         #endregion
 
 
         #region PRIVATE_METHODS
+        private bool CheckEndChanges()
+        {
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_toggle);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Add a new VR Toggle to the Scene
         /// </summary>
@@ -85,7 +112,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRToggle(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newToggle = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRToggle"));
+            GameObject newToggle = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRToggle"));
 
             RectTransform rt = newToggle.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

@@ -12,7 +12,8 @@ namespace VRSF.UI.Editor
     public class VRDropdownEditor : UnityEditor.UI.DropdownEditor
     {
         #region PRIVATE_VARIABLES
-        private VRDropdown vrDropdown;
+        private SerializedProperty _setColliderAuto;
+        private VRDropdown _dropdown;
         #endregion
 
 
@@ -20,7 +21,8 @@ namespace VRSF.UI.Editor
         protected override void OnEnable()
         {
             base.OnEnable();
-            vrDropdown = (VRDropdown)target;
+            _dropdown = (VRDropdown)target;
+            _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
         }
         #endregion
 
@@ -28,29 +30,33 @@ namespace VRSF.UI.Editor
         #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.Space();
+            serializedObject.Update();
 
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            Undo.RecordObject(vrDropdown.gameObject, "Add BoxCollider");
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_dropdown.gameObject, "Add BoxCollider");
 
-            if (vrDropdown.gameObject.GetComponent<BoxCollider>() != null)
+            if (_dropdown.gameObject.GetComponent<BoxCollider>() != null)
             {
-                vrDropdown.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", vrDropdown.SetColliderAuto);
+                EditorGUILayout.LabelField("Set Box Collider Automatically", EditorStyles.miniBoldLabel);
+                EditorGUILayout.PropertyField(_setColliderAuto);
+                CheckEndChanges();
             }
             else
             {
                 EditorGUILayout.LabelField("This option required a BoxCollider Component.", EditorStyles.miniLabel);
-                vrDropdown.SetColliderAuto = false;
-                vrDropdown.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
+                _dropdown.SetColliderAuto = false;
+                _dropdown.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
 
                 // Add a button to replace the collider by a BoxCollider2D
                 if (GUILayout.Button("Add BoxCollider"))
                 {
-                    vrDropdown.gameObject.AddComponent<BoxCollider>();
-                    DestroyImmediate(vrDropdown.GetComponent<Collider>());
-                    vrDropdown.SetColliderAuto = true;
+                    DestroyImmediate(_dropdown.GetComponent<Collider>());
+                    _dropdown.gameObject.AddComponent<BoxCollider>();
+                    _dropdown.SetColliderAuto = true;
                 }
             }
 
@@ -62,15 +68,22 @@ namespace VRSF.UI.Editor
             EditorGUILayout.Space();
 
             base.OnInspectorGUI();
-
-            serializedObject.ApplyModifiedProperties();
-            serializedObject.Update();
-            if (GUI.changed) EditorUtility.SetDirty(target);
         }
         #endregion
 
 
         #region PRIVATE_METHODS
+        private bool CheckEndChanges()
+        {
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_dropdown);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Add a new VR Dropdown to the Scene
         /// </summary>
@@ -80,7 +93,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRDropDown(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newDropdown = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRDropdown"));
+            GameObject newDropdown = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRDropdown"));
 
             RectTransform rt = newDropdown.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

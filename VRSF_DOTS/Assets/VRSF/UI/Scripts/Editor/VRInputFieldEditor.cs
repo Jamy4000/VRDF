@@ -12,7 +12,13 @@ namespace VRSF.UI.Editor
     public class VRInputFieldEditor : TMPro.EditorUtilities.TMP_InputFieldEditor
     {
         #region PRIVATE_VARIABLES
-        private VRInputField vrInputField;
+        private SerializedProperty _setColliderAuto;
+        private SerializedProperty _clickableWithRaycast;
+        private SerializedProperty _clickableUsingControllers;
+        private SerializedProperty _useVRKeyboard;
+        private SerializedProperty _vrKeyboardInScene;
+
+        private VRInputField _inputField;
         #endregion PRIVATE_VARIABLES
 
 
@@ -20,7 +26,12 @@ namespace VRSF.UI.Editor
         protected override void OnEnable()
         {
             base.OnEnable();
-            vrInputField = (VRInputField)target;
+            _inputField = (VRInputField)target;
+            _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
+            _clickableWithRaycast = serializedObject.FindProperty("LaserClickable");
+            _clickableUsingControllers = serializedObject.FindProperty("ControllerClickable");
+            _useVRKeyboard = serializedObject.FindProperty("UseVRKeyboard");
+            _vrKeyboardInScene = serializedObject.FindProperty("VRKeyboard");
         }
         #endregion
 
@@ -28,55 +39,86 @@ namespace VRSF.UI.Editor
         #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
+            serializedObject.Update();
 
             EditorGUILayout.Space();
-
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            Undo.RecordObject(vrInputField.gameObject, "Add BoxCollider");
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_inputField.gameObject, "Add BoxCollider");
 
-            if (vrInputField.gameObject.GetComponent<BoxCollider>() != null)
+            if (_inputField.gameObject.GetComponent<BoxCollider>() != null)
             {
-                vrInputField.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", vrInputField.SetColliderAuto);
+                EditorGUILayout.LabelField("Set Box Collider Automatically", EditorStyles.miniBoldLabel);
+                EditorGUILayout.PropertyField(_setColliderAuto);
+                CheckEndChanges();
             }
             else
             {
                 EditorGUILayout.LabelField("This option required a BoxCollider Component.", EditorStyles.miniLabel);
-                vrInputField.SetColliderAuto = false;
-                vrInputField.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
+                _inputField.SetColliderAuto = false;
+                _inputField.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
 
                 // Add a button to replace the collider by a BoxCollider2D
                 if (GUILayout.Button("Add BoxCollider"))
                 {
-                    vrInputField.gameObject.AddComponent<BoxCollider>();
-                    DestroyImmediate(vrInputField.GetComponent<Collider>());
-                    vrInputField.SetColliderAuto = true;
+                    DestroyImmediate(_inputField.GetComponent<Collider>());
+                    _inputField.gameObject.AddComponent<BoxCollider>();
+                    _inputField.SetColliderAuto = true;
                 }
             }
 
             EditorGUILayout.Space();
 
-            vrInputField.LaserClickable = EditorGUILayout.ToggleLeft("Clickable using Raycast", vrInputField.LaserClickable);
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_inputField, "LaserClickable");
+            EditorGUILayout.LabelField("Clickable using Laser Pointer with Click", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_clickableWithRaycast);
+            CheckEndChanges();
 
-            vrInputField.ControllerClickable = EditorGUILayout.ToggleLeft("Clickable using Controllers' meshes", vrInputField.ControllerClickable);
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_inputField, "MeshClickable");
+            EditorGUILayout.LabelField("Clickable using Controllers' meshes", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_clickableUsingControllers);
+            CheckEndChanges();
+
+            EditorGUILayout.Space();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_inputField, "useVRKeyboard");
+            EditorGUILayout.PropertyField(_useVRKeyboard);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_inputField, "VRKeyboard");
+            EditorGUILayout.PropertyField(_vrKeyboardInScene);
+            CheckEndChanges();
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
-            vrInputField.UseVRKeyboard = EditorGUILayout.ToggleLeft("Use VRKeyboard", vrInputField.UseVRKeyboard);
-            vrInputField.VRKeyboard = EditorGUILayout.ObjectField("VRKeyboard in scene", vrInputField.VRKeyboard, typeof(VRKeyboard), true) as VRKeyboard;
+            EditorGUILayout.LabelField("Basic InputField Parameters", EditorStyles.boldLabel);
 
-           serializedObject.Update();
-            
-            serializedObject.ApplyModifiedProperties();
-            if (GUI.changed) EditorUtility.SetDirty(target);
+            EditorGUILayout.Space();
+
+            base.OnInspectorGUI();
         }
         #endregion PUBLIC_METHODS
 
 
         #region PRIVATE_METHODS
+        private bool CheckEndChanges()
+        {
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_inputField);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Add a new VR InputField to the Scene
         /// </summary>
@@ -86,7 +128,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRInputField(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newInputField = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRInputField"));
+            GameObject newInputField = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRInputField"));
 
             RectTransform rt = newInputField.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
@@ -109,10 +151,10 @@ namespace VRSF.UI.Editor
         static void InstantiateVRKeyboard(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newKeyboard = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRKeyboard"));
+            GameObject newKeyboard = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRKeyboard"));
 
             // Ensure it gets reparented if this was a context click (otherwise does nothing)
-            GameObjectUtility.SetParentAndAlign(newKeyboard, menuCommand.context as GameObject);
+            GameObjectUtility.SetParentAndAlign(newKeyboard, null);
 
             // Register the creation in the undo system
             Undo.RegisterCreatedObjectUndo(newKeyboard, "Create " + newKeyboard.name);

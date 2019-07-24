@@ -13,7 +13,11 @@ namespace VRSF.UI.Editor
     public class VRButtonEditor : UnityEditor.UI.ButtonEditor
 	{
         #region PRIVATE_VARIABLES
-        private VRButton button;
+        private SerializedProperty _setColliderAuto;
+        private SerializedProperty _clickableWithRaycast;
+        private SerializedProperty _clickableUsingControllers;
+
+        private VRButton _button;
         #endregion
 
 
@@ -21,7 +25,10 @@ namespace VRSF.UI.Editor
         protected override void OnEnable()
         {
             base.OnEnable();
-            button = (VRButton)target;
+            _button = (VRButton)target;
+            _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
+            _clickableWithRaycast = serializedObject.FindProperty("LaserClickable");
+            _clickableUsingControllers = serializedObject.FindProperty("ControllerClickable");
         }
         #endregion
 
@@ -29,46 +36,55 @@ namespace VRSF.UI.Editor
         #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.Space();
+            serializedObject.Update();
 
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
-            Undo.RecordObject(button.gameObject, "Add BoxCollider");
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_button.gameObject, "Add BoxCollider");
 
-            if (button.gameObject.GetComponent<BoxCollider>() != null)
+            if (_button.gameObject.GetComponent<BoxCollider>() != null)
             {
-                button.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", button.SetColliderAuto);
+                EditorGUILayout.LabelField("Set Box Collider Automatically", EditorStyles.miniBoldLabel);
+                EditorGUILayout.PropertyField(_setColliderAuto);
+                CheckEndChanges();
             }
             else
             {
                 EditorGUILayout.LabelField("This option required a BoxCollider Component.", EditorStyles.miniLabel);
-                button.SetColliderAuto = false;
-                button.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
-
+                _button.SetColliderAuto = false;
+                _button.SetColliderAuto = EditorGUILayout.ToggleLeft("Set Box Collider Automatically", false);
+                
                 // Add a button to replace the collider by a BoxCollider2D
                 if (GUILayout.Button("Add BoxCollider"))
                 {
-                    button.gameObject.AddComponent<BoxCollider>();
-                    DestroyImmediate(button.GetComponent<Collider>());
-                    button.SetColliderAuto = true;
+                    DestroyImmediate(_button.GetComponent<Collider>());
+                    _button.gameObject.AddComponent<BoxCollider>();
+                    _button.SetColliderAuto = true;
                 }
             }
 
             EditorGUILayout.Space();
 
-            button.LaserClickable = EditorGUILayout.ToggleLeft("Clickable using Raycast", button.LaserClickable);
-            
-            button.ControllerClickable = EditorGUILayout.ToggleLeft("Clickable using Controllers' meshes", button.ControllerClickable);
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_button, "LaserClickable");
+            EditorGUILayout.LabelField("Clickable using Laser Pointer with Click", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_clickableWithRaycast);
+            CheckEndChanges();
 
-            EditorGUILayout.Space();
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_button, "MeshClickable");
+            EditorGUILayout.LabelField("Clickable using Controllers' meshes", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_clickableUsingControllers);
+            CheckEndChanges();
+
             EditorGUILayout.Space();
 
             // Add a button to call the OnClick Event if the application is playing
             if (Application.isPlaying && GUILayout.Button("Invoke OnClick Event"))
-            {
-                button.onClick.Invoke();
-            }
+                _button.onClick.Invoke();
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();
@@ -78,15 +94,22 @@ namespace VRSF.UI.Editor
             EditorGUILayout.Space();
 
             base.OnInspectorGUI();
-            
-            serializedObject.ApplyModifiedProperties();
-            serializedObject.Update();
-            if (GUI.changed) EditorUtility.SetDirty(target);
         }
         #endregion
 
 
         #region PRIVATE_METHODS
+        private bool CheckEndChanges()
+        {
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_button);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Add a new VR Button to the Scene
         /// </summary>
@@ -96,7 +119,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRButton(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newButton = Instantiate(VRSFPrefabReferencer.GetPrefab("VRButton"));
+            GameObject newButton = (GameObject)PrefabUtility.InstantiatePrefab(VRSFPrefabReferencer.GetPrefab("VRButton"));
 
             RectTransform rt = newButton.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
