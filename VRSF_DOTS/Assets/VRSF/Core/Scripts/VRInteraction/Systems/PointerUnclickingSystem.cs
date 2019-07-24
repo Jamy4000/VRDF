@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+using VRSF.Core.Events;
 using VRSF.Core.Inputs;
 using VRSF.Core.SetupVR;
 
@@ -17,16 +18,22 @@ namespace VRSF.Core.VRInteractions
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref StopClickingEventComp stopClickingEvent, ref LeftHand leftHand) =>
+            Entities.WithAll<LeftHand>().ForEach((ref StopClickingEventComp stopClickingEvent, ref PointerClick pointerClick) =>
             {
-                if (stopClickingEvent.ButtonInteracting == EControllersButton.TRIGGER)
+                if (stopClickingEvent.ButtonInteracting == pointerClick.ControllersButton)
+                {
                     InteractionVariableContainer.IsClickingSomethingLeft = false;
+                    new ObjectWasClickedEvent(Raycast.ERayOrigin.LEFT_HAND, null);
+                }
             });
 
-            Entities.ForEach((ref StopClickingEventComp stopClickingEvent, ref RightHand rightHand) =>
+            Entities.WithAll<RightHand>().ForEach((ref StopClickingEventComp stopClickingEvent, ref PointerClick pointerClick) =>
             {
-                if (stopClickingEvent.ButtonInteracting == EControllersButton.TRIGGER)
+                if (stopClickingEvent.ButtonInteracting == pointerClick.ControllersButton)
+                {
                     InteractionVariableContainer.IsClickingSomethingRight = false;
+                    new ObjectWasClickedEvent(Raycast.ERayOrigin.RIGHT_HAND, null);
+                }
             });
         }
 
@@ -39,6 +46,13 @@ namespace VRSF.Core.VRInteractions
         private void Setup(OnSetupVRReady info)
         {
             this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0;
+            if (VRSF_Components.DeviceLoaded == EDevice.SIMULATOR)
+            {
+                Entities.ForEach((ref PointerClick pointerClick) =>
+                {
+                    pointerClick.ControllersButton = EControllersButton.TRIGGER;
+                });
+            }
         }
     }
 }

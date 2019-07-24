@@ -4,6 +4,7 @@ using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
+using VRSF.Core.CBRA;
 
 namespace VRSF.Core.VRInteractions
 {
@@ -22,17 +23,20 @@ namespace VRSF.Core.VRInteractions
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref TriggerInputCapture triggerInputCapture, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs) =>
+            Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
             {
                 if (pointerClick.CanClick)
                 {
-                    switch (triggerInputCapture.Hand)
+                    switch (raycastOrigin.RayOrigin)
                     {
-                        case EHand.LEFT:
+                        case ERayOrigin.LEFT_HAND:
                             CheckHit(raycastOutputs.RaycastHitVar, out InteractionVariableContainer.IsClickingSomethingLeft, ERayOrigin.LEFT_HAND);
                             break;
-                        case EHand.RIGHT:
+                        case ERayOrigin.RIGHT_HAND:
                             CheckHit(raycastOutputs.RaycastHitVar, out InteractionVariableContainer.IsClickingSomethingRight, ERayOrigin.RIGHT_HAND);
+                            break;
+                        case ERayOrigin.CAMERA:
+                            CheckHit(raycastOutputs.RaycastHitVar, out InteractionVariableContainer.IsClickingSomethingGaze, ERayOrigin.CAMERA);
                             break;
                     }
                 }

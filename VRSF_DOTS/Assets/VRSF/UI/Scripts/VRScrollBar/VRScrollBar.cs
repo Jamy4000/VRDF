@@ -26,9 +26,7 @@ namespace VRSF.UI
 
         private ERayOrigin _rayHoldingHandle = ERayOrigin.NONE;
 
-        private Dictionary<ERayOrigin, Transform> _hitTransformDictionary;
-
-        private IUISetupScrollable _scrollableSetup;
+        private VRUIScrollableSetup _scrollableSetup;
 
         private bool _boxColliderSetup;
         #endregion
@@ -62,8 +60,18 @@ namespace VRSF.UI
             {
                 CheckClickDown();
 
-                if (_rayHoldingHandle != ERayOrigin.NONE)
-                    value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, _hitTransformDictionary[_rayHoldingHandle].position);
+                switch (_rayHoldingHandle)
+                {
+                    case ERayOrigin.LEFT_HAND:
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
+                        break;
+                    case ERayOrigin.RIGHT_HAND:
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
+                        break;
+                    case ERayOrigin.CAMERA:
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
+                        break;
+                }
             }
         }
         #endregion
@@ -75,21 +83,12 @@ namespace VRSF.UI
             _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));
 
             GetHandleRectReference();
-            
-            // We initialize the RaycastHitDictionary
-            _hitTransformDictionary = new Dictionary<ERayOrigin, Transform>
-            {
-                { ERayOrigin.RIGHT_HAND, InteractionVariableContainer.PreviousRightHit },
-                { ERayOrigin.LEFT_HAND, InteractionVariableContainer.PreviousLeftHit },
-                { ERayOrigin.CAMERA, InteractionVariableContainer.PreviousGazeHit }
-            };
 
             // We register the Listener
             ObjectWasClickedEvent.Listeners += CheckBarClick;
 
             // Check if the Min and Max object are already created, and set there references
-            _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));
-            _scrollableSetup.SetMinMaxPos(ref _minPosBar, ref _maxPosBar, handleRect.parent);
+            _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
 
             value = 1;
         }
@@ -102,6 +101,8 @@ namespace VRSF.UI
         {
             if (interactable && clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
                 _rayHoldingHandle = clickEvent.RayOrigin;
+            else
+                _rayHoldingHandle = ERayOrigin.NONE;
         }
 
         /// <summary>

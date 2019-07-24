@@ -2,6 +2,7 @@
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Inputs
 {
@@ -14,8 +15,16 @@ namespace VRSF.Core.Inputs
 
         protected override void OnCreate()
         {
+            base.OnCreate();
             // Cache the EndSimulationEntityCommandBufferSystem in a field, so we don't have to get it every frame
             _endSimEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            OnSetupVRReady.Listeners += Init;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            OnSetupVRReady.Listeners -= Init;
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -62,6 +71,11 @@ namespace VRSF.Core.Inputs
                     Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
                 }
             }
+        }
+
+        private void Init(OnSetupVRReady info)
+        {
+            this.Enabled = VRSF_Components.DeviceLoaded != EDevice.SIMULATOR;
         }
     }
 }

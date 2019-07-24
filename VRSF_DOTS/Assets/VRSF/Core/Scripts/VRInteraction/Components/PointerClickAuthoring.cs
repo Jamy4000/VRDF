@@ -10,7 +10,7 @@ namespace VRSF.Core.VRInteractions
     /// WARNING : This needs to be place on the same GameObject as where the VRRaycastAuthoring component is placed.
     /// </summary>
     [RequiresEntityConversion]
-    [RequireComponent(typeof(VRInteractionAuthoring))]
+    [RequireComponent(typeof(VRInteractionAuthoring), typeof(Raycast.VRRaycastAuthoring))]
     public class PointerClickAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
@@ -22,15 +22,17 @@ namespace VRSF.Core.VRInteractions
             // We add a new pointer click to store
             dstManager.AddComponentData(entity, new PointerClick
             {
+                ControllersButton = interactionSet.ButtonToUse,
                 HandClicking = interactionSet.ButtonHand,
                 CanClick = true
             });
         }
     }
 
-    [RequireComponentTag(typeof(Raycast.VRRaycastAuthoring))]
     public struct PointerClick : IComponentData
     {
+        public Inputs.EControllersButton ControllersButton;
+
         public EHand HandClicking;
 
         /// <summary>

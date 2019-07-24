@@ -6,6 +6,7 @@ namespace VRSF.Core.CBRA
     /// <summary>
     /// TODO
     /// </summary>
+    [UpdateAfter(typeof(VRInteractions.PointerUnclickingSystem))]
     public class CBRAStopClickingSystem : ComponentSystem
     {
         private EntityManager _entityManager;

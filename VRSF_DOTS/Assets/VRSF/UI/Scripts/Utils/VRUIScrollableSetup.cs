@@ -6,7 +6,7 @@ namespace VRSF.UI
     /// <summary>
     /// Class that implement the IUISetupScrollable, used in the Scrollable UI Elements.
     /// </summary>
-	public class VRUIScrollableSetup : IUISetupScrollable
+	public class VRUIScrollableSetup
     {
         public VRUIScrollableSetup(EUIDirection dir, float minVal = 0.0f, float maxVal = 1.0f, bool wholeNum = false)
         {
@@ -87,27 +87,14 @@ namespace VRSF.UI
 
 
         /// <summary>
-        /// Call at runtime, set the min and max pos transform by looking in the children of the Handle Rect
-        /// </summary>
-        /// <param name="minPos">The min pos transform of the Scrollable element</param>
-        /// <param name="maxPos">The max pos transform of the Scrollable element</param>
-        /// <param name="handleRectParent">The handle rect of the scrollable element</param>
-        public void SetMinMaxPos(ref Transform minPos, ref Transform maxPos, Transform handleRectParent)
-        {
-            minPos = handleRectParent.Find("MinPos");
-            maxPos = handleRectParent.Find("MaxPos");
-        }
-
-
-        /// <summary>
         /// Check if the MinPos and MaxPos of the element are correctly instantiated and Check there RectTransform
         /// </summary>
         /// <param name="handleRectParent">The parent of the HandleRect</param>
         /// <param name="direction">The UIDirection of the element</param>
-        public void CheckMinMaxGameObjects(Transform handleRectParent, EUIDirection direction)
+        public void CheckMinMaxGameObjects(Transform handleRectParent, EUIDirection direction, ref Transform minPosRect, ref Transform maxPosRect)
         {
-            RectTransform minPosRect = handleRectParent.Find("MinPos") == null ? InstantiateNewPosObject("MinPos", handleRectParent) : handleRectParent.Find("MinPos").GetComponent<RectTransform>();
-            RectTransform maxPosRect = handleRectParent.Find("MaxPos") == null ? InstantiateNewPosObject("MaxPos", handleRectParent) : handleRectParent.Find("MaxPos").GetComponent<RectTransform>();
+            minPosRect = handleRectParent.Find("MinPos") == null ? InstantiateNewPosObject("MinPos", handleRectParent) : handleRectParent.Find("MinPos").GetComponent<RectTransform>();
+            maxPosRect = handleRectParent.Find("MaxPos") == null ? InstantiateNewPosObject("MaxPos", handleRectParent) : handleRectParent.Find("MaxPos").GetComponent<RectTransform>();
 
             if (direction == EUIDirection.BottomToTop || direction == EUIDirection.TopToBottom)
             {
@@ -139,8 +126,9 @@ namespace VRSF.UI
         /// </summary>
         /// <param name="rect">The rect to check, passed as reference</param>
         /// <param name="anchor">The Vector2 to which we set the pivot, anchor min and anchor max</param>
-        public void CheckRectTrans(ref RectTransform rect, Vector2 anchor)
+        public void CheckRectTrans(ref Transform trans, Vector2 anchor)
         {
+            var rect = trans as RectTransform;
             rect.anchorMax = anchor;
             rect.anchorMin = anchor;
             rect.pivot = anchor;
@@ -150,8 +138,12 @@ namespace VRSF.UI
             rect.anchoredPosition3D = Vector3.zero;
         }
 
-
-        public void CheckContentStatus(RectTransform viewport, RectTransform content, bool vertical, bool horizontal)
+        /// <summary>
+        /// Check whether the Items present in the scrollview should be active or not
+        /// </summary>
+        /// <param name="viewport">The viewport for our scrollable</param>
+        /// <param name="content">the content of our scrollable</param>
+        public void CheckContentStatus(RectTransform viewport, RectTransform content)
         {
             foreach (var collider in content.GetComponentsInChildren<Collider>())
             {

@@ -27,9 +27,7 @@ namespace VRSF.UI
 
         private ERayOrigin _rayHoldingHandle = ERayOrigin.NONE;
 
-        private Dictionary<ERayOrigin, Transform> _hitTransformDictionary;
-
-        private IUISetupScrollable _scrollableSetup;
+        private VRUIScrollableSetup _scrollableSetup;
 
         private bool _boxColliderSetup;
         #endregion
@@ -63,10 +61,21 @@ namespace VRSF.UI
             base.Update();
             if (Application.isPlaying && _boxColliderSetup)
             {
-                CheckClickDown();
-
-                if (_rayHoldingHandle != ERayOrigin.NONE)
-                    value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, _hitTransformDictionary[_rayHoldingHandle].position);
+                switch (_rayHoldingHandle)
+                {
+                    case ERayOrigin.LEFT_HAND:
+                        _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingLeft);
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
+                        break;
+                    case ERayOrigin.RIGHT_HAND:
+                        _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingRight);
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
+                        break;
+                    case ERayOrigin.CAMERA:
+                        _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingGaze);
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
+                        break;
+                }
             }
         }
         #endregion
@@ -81,16 +90,7 @@ namespace VRSF.UI
             
             ObjectWasClickedEvent.Listeners += CheckSliderClick;
 
-            _hitTransformDictionary = new Dictionary<ERayOrigin, Transform>
-            {
-                { ERayOrigin.RIGHT_HAND, InteractionVariableContainer.PreviousRightHit },
-                { ERayOrigin.LEFT_HAND, InteractionVariableContainer.PreviousLeftHit },
-                { ERayOrigin.CAMERA, InteractionVariableContainer.PreviousGazeHit }
-            };
-
-            _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.SliderDirectionToUIDirection(direction));
-
-            _scrollableSetup.SetMinMaxPos(ref _minPosBar, ref _maxPosBar, handleRect.parent);
+            _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
         }
 
 
@@ -100,32 +100,13 @@ namespace VRSF.UI
         /// <param name="clickEvent">The event raised when an object is clicked</param>
         private void CheckSliderClick(ObjectWasClickedEvent clickEvent)
         {
-            if (interactable && clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
+            _rayHoldingHandle = interactable && ObjectClickedIsThis() ? clickEvent.RayOrigin : ERayOrigin.NONE;
+
+            bool ObjectClickedIsThis()
             {
-                _rayHoldingHandle = clickEvent.RayOrigin;
+                return clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE;
             }
         }
-
-
-        /// <summary>
-        /// Depending on the hand holding the trigger, call the CheckClickStillDown with the right boolean
-        /// </summary>
-        private void CheckClickDown()
-        {
-            switch (_rayHoldingHandle)
-            {
-                case ERayOrigin.CAMERA:
-                    _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingGaze);
-                    break;
-                case ERayOrigin.LEFT_HAND:
-                    _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingLeft);
-                    break;
-                case ERayOrigin.RIGHT_HAND:
-                    _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingRight);
-                    break;
-            }
-        }
-
 
         private void CheckSliderReferences()
         {

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Mathematics;
+using UnityEngine;
 
 namespace VRSF.Core.VRInteractions
 {
@@ -22,10 +23,17 @@ namespace VRSF.Core.VRInteractions
         public static bool IsOverSomethingGaze;
 
         /// <summary>
-        /// The previous Transform hit for the Controllers and Gaze.
+        /// The current Transform hit for the Controllers and Gaze.
         /// </summary>
-        public static Transform PreviousRightHit;
-        public static Transform PreviousLeftHit;
-        public static Transform PreviousGazeHit;
+        public static Transform CurrentRightHit;
+        public static Transform CurrentLeftHit;
+        public static Transform CurrentGazeHit;
+
+        /// <summary>
+        /// The current hit position for the Controllers and Gaze.
+        /// </summary>
+        public static float3 CurrentRightHitPosition;
+        public static float3 CurrentLeftHitPosition;
+        public static float3 CurrentGazeHitPosition;
     }
 }

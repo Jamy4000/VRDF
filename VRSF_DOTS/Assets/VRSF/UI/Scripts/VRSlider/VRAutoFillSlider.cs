@@ -80,11 +80,6 @@ namespace VRSF.UI
         private bool _boxColliderSetup;
 
         private bool _isFillingWithMesh;
-
-        /// <summary>
-        /// true when the events for ObjectWasClicked or Hovered were registered.
-        /// </summary>
-        private bool _eventWereRegistered;
         #endregion
 
 
@@ -96,7 +91,6 @@ namespace VRSF.UI
             if (Application.isPlaying)
             {
                 _boxColliderSetup = false;
-                _eventWereRegistered = false;
 
                 GetFillRectReference();
 
@@ -104,7 +98,6 @@ namespace VRSF.UI
                 {
                     ObjectWasClickedEvent.Listeners += CheckSliderClick;
                     ObjectWasHoveredEvent.Listeners += CheckSliderHovered;
-                    _eventWereRegistered = true;
                 }
 
                 if (ControllerClickable)
@@ -119,7 +112,7 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (_eventWereRegistered)
+            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
             {
                 ObjectWasClickedEvent.Listeners -= CheckSliderClick;
                 ObjectWasHoveredEvent.Listeners -= CheckSliderHovered;
@@ -235,13 +228,11 @@ namespace VRSF.UI
                 // Set the value of the slider or the UV based on the normalised time.
                 value = (Timer / FillTime);
 
-                onValueChanged.Invoke(value);
-
                 // Wait until next frame.
                 yield return new WaitForEndOfFrame();
 
                 // If the user is still looking at the bar, go on to the next iteration of the loop.
-                if (_handFilling == ERayOrigin.LEFT_HAND || _handFilling == ERayOrigin.LEFT_HAND || _handFilling == ERayOrigin.CAMERA)
+                if (_handFilling == ERayOrigin.LEFT_HAND || _handFilling == ERayOrigin.RIGHT_HAND || _handFilling == ERayOrigin.CAMERA)
                     continue;
 
                 // If the user is no longer looking at the bar, reset the timer and bar and leave the function.

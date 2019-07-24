@@ -30,9 +30,7 @@ namespace VRSF.UI
 
         private ERayOrigin _rayHoldingHandle = ERayOrigin.NONE;
 
-        private Dictionary<ERayOrigin, Transform> _hitTransformDictionary;
-
-        private IUISetupScrollable _scrollableSetup;
+        private VRUIScrollableSetup _scrollableSetup;
 
         private bool _boxColliderSetup;
 
@@ -68,7 +66,7 @@ namespace VRSF.UI
                 if (horizontalScrollbar != null)
                     horizontalScrollbar.onValueChanged.RemoveAllListeners();
 
-                ObjectWasClickedEvent.Listeners += CheckRectClick;
+                ObjectWasClickedEvent.Listeners -= CheckRectClick;
                 _eventWereRegistered = false;
             }
         }
@@ -82,10 +80,10 @@ namespace VRSF.UI
                 if (_rayHoldingHandle != ERayOrigin.NONE)
                 {
                     if (vertical && verticalScrollbar)
-                        verticalScrollbar.value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, _hitTransformDictionary[_rayHoldingHandle].position);
+                        verticalScrollbar.value = CheckScrollbarValue();
 
                     if (horizontal && horizontalScrollbar)
-                        horizontalScrollbar.value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, _hitTransformDictionary[_rayHoldingHandle].position);
+                        horizontalScrollbar.value = CheckScrollbarValue();
                 }
             }
         }
@@ -93,6 +91,22 @@ namespace VRSF.UI
 
 
         #region PRIVATE_METHODS
+        private float CheckScrollbarValue()
+        {
+            switch (_rayHoldingHandle)
+            {
+                case ERayOrigin.LEFT_HAND:
+                    return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
+                case ERayOrigin.RIGHT_HAND:
+                    return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
+                case ERayOrigin.CAMERA:
+                    return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
+                default:
+                    // Never happening
+                    return 0.0f;
+            }
+        }
+
         private void SetupUIElement()
         {
             // We setup the references to the ScrollRect elements
@@ -116,17 +130,8 @@ namespace VRSF.UI
             ObjectWasClickedEvent.Listeners += CheckRectClick;
             _eventWereRegistered = true;
 
-            // We initialize the _RaycastHitDictionary
-            _hitTransformDictionary = new Dictionary<ERayOrigin, Transform>
-            {
-                { ERayOrigin.RIGHT_HAND, InteractionVariableContainer.PreviousRightHit },
-                { ERayOrigin.LEFT_HAND, InteractionVariableContainer.PreviousLeftHit },
-                { ERayOrigin.CAMERA, InteractionVariableContainer.PreviousGazeHit }
-            };
-
             // We setup the Min and Max pos transform
-            _scrollableSetup.CheckMinMaxGameObjects(transform, Direction);
-            _scrollableSetup.SetMinMaxPos(ref _minPosBar, ref _maxPosBar, GetComponent<Transform>());
+            _scrollableSetup.CheckMinMaxGameObjects(transform, Direction, ref _minPosBar, ref _maxPosBar);
         }
 
         /// <summary>
@@ -137,6 +142,8 @@ namespace VRSF.UI
         {
             if (clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
                 _rayHoldingHandle = clickEvent.RayOrigin;
+            else
+                _rayHoldingHandle = ERayOrigin.NONE;
         }
 
         /// <summary>
@@ -190,7 +197,7 @@ namespace VRSF.UI
                 }
             }
 
-            _scrollableSetup.CheckContentStatus(viewport, content, vertical, horizontal);
+            _scrollableSetup.CheckContentStatus(viewport, content);
             _boxColliderSetup = true;
         }
 
@@ -235,7 +242,7 @@ namespace VRSF.UI
 
         private void OnValueChangedCallback()
         {
-            _scrollableSetup.CheckContentStatus(viewport, content, vertical, horizontal);
+            _scrollableSetup.CheckContentStatus(viewport, content);
         }
         #endregion
     }
