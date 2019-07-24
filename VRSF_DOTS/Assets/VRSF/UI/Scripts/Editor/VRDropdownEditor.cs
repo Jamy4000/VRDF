@@ -11,15 +11,7 @@ namespace VRSF.UI.Editor
     [CanEditMultipleObjects]
     public class VRDropdownEditor : UnityEditor.UI.DropdownEditor
     {
-        // EMPTY
-        #region PUBLIC_VARIABLES
-
-        #endregion
-
-
         #region PRIVATE_VARIABLES
-        private static GameObject vrDropdownPrefab;
-
         private VRDropdown vrDropdown;
         #endregion
 
@@ -87,10 +79,8 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/VR Dropdown", priority = 0)]
         static void InstantiateVRDropDown(MenuCommand menuCommand)
         {
-            vrDropdownPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRDropdown.prefab");
-
             // Create a custom game object
-            GameObject newDropdown = PrefabUtility.InstantiatePrefab(vrDropdownPrefab) as GameObject;
+            GameObject newDropdown = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRDropdown"));
 
             RectTransform rt = newDropdown.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
@@ -103,12 +93,6 @@ namespace VRSF.UI.Editor
             Undo.RegisterCreatedObjectUndo(newDropdown, "Create " + newDropdown.name);
             Selection.activeObject = newDropdown;
         }
-        #endregion
-
-
-        // EMPTY
-        #region GETTERS_SETTERS
-
         #endregion
     }
 }

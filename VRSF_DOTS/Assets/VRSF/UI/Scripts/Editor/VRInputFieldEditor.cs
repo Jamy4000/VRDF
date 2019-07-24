@@ -12,8 +12,6 @@ namespace VRSF.UI.Editor
     public class VRInputFieldEditor : TMPro.EditorUtilities.TMP_InputFieldEditor
     {
         #region PRIVATE_VARIABLES
-        static GameObject vrInputFieldPrefab;
-
         private VRInputField vrInputField;
         #endregion PRIVATE_VARIABLES
 
@@ -83,14 +81,12 @@ namespace VRSF.UI.Editor
         /// Add a new VR InputField to the Scene
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("VRSF/UI/VR Input Field", priority = 0)]
-        [MenuItem("GameObject/VRSF/UI/VR InputField", priority = 0)]
+        [MenuItem("VRSF/UI/Input Field/VR Input Field", priority = 0)]
+        [MenuItem("GameObject/VRSF/UI/Input Field/VR Input Field", priority = 0)]
         static void InstantiateVRInputField(MenuCommand menuCommand)
         {
-            vrInputFieldPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRInputField.prefab");
-
             // Create a custom game object
-            GameObject newInputField = PrefabUtility.InstantiatePrefab(vrInputFieldPrefab) as GameObject;
+            GameObject newInputField = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRInputField"));
 
             RectTransform rt = newInputField.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
@@ -102,6 +98,25 @@ namespace VRSF.UI.Editor
             // Register the creation in the undo system
             Undo.RegisterCreatedObjectUndo(newInputField, "Create " + newInputField.name);
             Selection.activeObject = newInputField;
+        }
+
+        /// <summary>
+        /// Add a new VR Keyboard to the Scene
+        /// </summary>
+        /// <param name="menuCommand"></param>
+        [MenuItem("VRSF/UI/Input Field/VR Keyboard", priority = 0)]
+        [MenuItem("GameObject/VRSF/UI/Input Field/VR Keyboard", priority = 0)]
+        static void InstantiateVRKeyboard(MenuCommand menuCommand)
+        {
+            // Create a custom game object
+            GameObject newKeyboard = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRKeyboard"));
+
+            // Ensure it gets reparented if this was a context click (otherwise does nothing)
+            GameObjectUtility.SetParentAndAlign(newKeyboard, menuCommand.context as GameObject);
+
+            // Register the creation in the undo system
+            Undo.RegisterCreatedObjectUndo(newKeyboard, "Create " + newKeyboard.name);
+            Selection.activeObject = newKeyboard;
         }
         #endregion PRIVATE_METHODS
     }

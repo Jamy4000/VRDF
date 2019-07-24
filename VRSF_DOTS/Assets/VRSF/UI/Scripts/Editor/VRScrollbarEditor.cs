@@ -11,15 +11,7 @@ namespace VRSF.UI.Editor
     [CanEditMultipleObjects]
     public class VRScrollbarEditor : UnityEditor.UI.ScrollbarEditor
     {
-        // EMPTY
-        #region PUBLIC_VARIABLES
-
-        #endregion
-
-
         #region PRIVATE_VARIABLES
-        private static GameObject vrScrollBarPrefab;
-
         private VRScrollBar vrScrollBar;
         #endregion
 
@@ -87,10 +79,8 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/VR Scrollbar/Vertical", priority = 0)]
         static void InstantiateVRScrollbarVertical(MenuCommand menuCommand)
         {
-            vrScrollBarPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRScrollbarVertical.prefab");
-
             // Create a custom game object
-            GameObject newScrollbar = PrefabUtility.InstantiatePrefab(vrScrollBarPrefab) as GameObject;
+            GameObject newScrollbar = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollbarVertical"));
 
             RectTransform rt = newScrollbar.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
@@ -112,10 +102,8 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/VR Scrollbar/Horizontal", priority = 0)]
         static void InstantiateVRScrollbarHorizontal(MenuCommand menuCommand)
         {
-            vrScrollBarPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRScrollbarHorizontal.prefab");
-
             // Create a custom game object
-            GameObject newScrollbar = PrefabUtility.InstantiatePrefab(vrScrollBarPrefab) as GameObject;
+            GameObject newScrollbar = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollbarHorizontal"));
 
             RectTransform rt = newScrollbar.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
@@ -128,11 +116,6 @@ namespace VRSF.UI.Editor
             Undo.RegisterCreatedObjectUndo(newScrollbar, "Create " + newScrollbar.name);
             Selection.activeObject = newScrollbar;
         }
-        #endregion
-
-        // EMPTY
-        #region GETTERS_SETTERS
-
         #endregion
     }
 }

@@ -10,25 +10,6 @@ namespace VRSF.UI.Editor
     /// </summary>
 	public static class VRPanelEditor
     {
-        // EMPTY
-        #region PUBLIC_VARIABLES
-        #endregion
-
-
-        #region PRIVATE_VARIABLES
-        private static GameObject vrPanel;
-        #endregion
-
-        // EMPTY
-        #region MONOBEHAVIOUR_METHODS
-        #endregion
-
-        // EMPTY
-        #region PUBLIC_METHODS
-        #endregion
-
-
-        #region PRIVATE_METHODS
         /// <summary>
         /// Add a new VR Panel to the Scene
         /// </summary>
@@ -37,10 +18,8 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/VR Panel", priority = 0)]
         static void InstantiateVRPanel(MenuCommand menuCommand)
         {
-            vrPanel = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRPanel.prefab");
-
             // Create a custom game object
-            GameObject newPanel = PrefabUtility.InstantiatePrefab(vrPanel) as GameObject;
+            GameObject newPanel = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRPanel"));
 
             RectTransform rt = newPanel.GetComponent<RectTransform>();
             rt.localPosition = Vector3.zero;
@@ -53,12 +32,6 @@ namespace VRSF.UI.Editor
             Undo.RegisterCreatedObjectUndo(newPanel, "Create " + newPanel.name);
             Selection.activeObject = newPanel;
         }
-        #endregion
-
-        // EMPTY
-        #region GETTERS_SETTERS
-
-        #endregion
     }
 }
 #endif

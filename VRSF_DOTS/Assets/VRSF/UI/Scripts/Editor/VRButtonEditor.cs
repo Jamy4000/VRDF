@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
+using VRSF.Core.Utils;
 
 namespace VRSF.UI.Editor
 {
@@ -11,14 +12,7 @@ namespace VRSF.UI.Editor
     [CanEditMultipleObjects]
     public class VRButtonEditor : UnityEditor.UI.ButtonEditor
 	{
-        // EMPTY
-        #region PUBLIC_VARIABLES
-
-        #endregion
-
-
         #region PRIVATE_VARIABLES
-        private static GameObject vrButtonPrefab;
         private VRButton button;
         #endregion
 
@@ -101,11 +95,9 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/VR Button", priority = 0)]
         static void InstantiateVRButton(MenuCommand menuCommand)
         {
-            vrButtonPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRButton.prefab");
-            
             // Create a custom game object
-            GameObject newButton = PrefabUtility.InstantiatePrefab(vrButtonPrefab) as GameObject;
-            
+            GameObject newButton = Instantiate(VRSFPrefabReferencer.GetPrefab("VRButton"));
+
             RectTransform rt = newButton.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
             rt.localScale = Vector3.one;
@@ -117,12 +109,6 @@ namespace VRSF.UI.Editor
             Undo.RegisterCreatedObjectUndo(newButton, "Create " + newButton.name);
             Selection.activeObject = newButton;
         }
-        #endregion
-
-
-        // EMPTY
-        #region GETTERS_SETTERS
-
         #endregion
     }
 }

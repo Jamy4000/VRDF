@@ -11,15 +11,7 @@ namespace VRSF.UI.Editor
     [CanEditMultipleObjects]
     public class VRHandleSliderEditor : UnityEditor.UI.SliderEditor
     {
-        // EMPTY
-        #region PUBLIC_VARIABLES
-
-        #endregion
-
-
         #region PRIVATE_VARIABLES
-        private static GameObject vrHandleSliderPrefab;
-
         private VRHandleSlider vrHandleSlider;
         #endregion
 
@@ -87,10 +79,8 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/Sliders/VR Handle Slider", priority = 0)]
         static void InstantiateVRHandleSlider(MenuCommand menuCommand)
         {
-            vrHandleSliderPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRHandleSlider.prefab");
-
             // Create a custom game object
-            GameObject newSlider = PrefabUtility.InstantiatePrefab(vrHandleSliderPrefab) as GameObject;
+            GameObject newSlider = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRHandleSlider"));
 
             RectTransform rt = newSlider.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
@@ -103,12 +93,6 @@ namespace VRSF.UI.Editor
             Undo.RegisterCreatedObjectUndo(newSlider, "Create " + newSlider.name);
             Selection.activeObject = newSlider;
         }
-        #endregion
-
-
-        // EMPTY
-        #region GETTERS_SETTERS
-
         #endregion
     }
 }

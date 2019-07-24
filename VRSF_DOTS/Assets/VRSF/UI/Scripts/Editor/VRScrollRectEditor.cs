@@ -10,14 +10,7 @@ namespace VRSF.UI.Editor
     [CanEditMultipleObjects]
     public class VRScrollRectEditor : UnityEditor.UI.ScrollRectEditor
     {
-        // EMPTY
-        #region PUBLIC_VARIABLES
-        #endregion PUBLIC_VARIABLES
-
-
         #region PRIVATE_VARIABLES
-        private static GameObject vrScrollRectPrefab;
-
         private VRScrollRect vrScrollRect;
         #endregion PRIVATE_VARIABLES
 
@@ -87,10 +80,8 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/VR ScrollView", priority = 0)]
         static void InstantiateVRScrollRect(MenuCommand menuCommand)
         {
-            vrScrollRectPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRScrollView.prefab");
-
             // Create a custom game object
-            GameObject newScrollRect = PrefabUtility.InstantiatePrefab(vrScrollRectPrefab) as GameObject;
+            GameObject newScrollRect = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollview"));
 
             RectTransform rt = newScrollRect.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

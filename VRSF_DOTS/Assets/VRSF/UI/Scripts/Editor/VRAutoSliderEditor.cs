@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
+using VRSF.Core.Utils;
 
 namespace VRSF.UI.Editor
 {
@@ -23,7 +24,6 @@ namespace VRSF.UI.Editor
         private SerializedProperty m_OnBarFilled;
         private SerializedProperty m_OnBarReleased;
 
-        private static GameObject vrSliderPrefab;
         private VRAutoFillSlider _autoSlider;
         #endregion PRIVATE_VARIABLES
 
@@ -161,10 +161,8 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/Sliders/VR AutoFill Slider", priority = 0)]
         static void InstantiateVRAutoFillSlider(MenuCommand menuCommand)
         {
-            vrSliderPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRAutoFillSlider.prefab");
-
             // Create a custom game object
-            GameObject newSlider = PrefabUtility.InstantiatePrefab(vrSliderPrefab) as GameObject;
+            GameObject newSlider = Instantiate(VRSFPrefabReferencer.GetPrefab("VRAutoFillSlider"));
 
             RectTransform rt = newSlider.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

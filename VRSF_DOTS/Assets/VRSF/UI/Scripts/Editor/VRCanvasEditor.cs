@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
+using VRSF.Core.Utils;
 
 namespace VRSF.UI.Editor
 {
@@ -10,26 +11,6 @@ namespace VRSF.UI.Editor
     /// </summary>
 	public static class VRCanvasEditor
     {
-        // EMPTY
-        #region PUBLIC_VARIABLES
-
-        #endregion
-
-
-        #region PRIVATE_VARIABLES
-        private static GameObject vrCanvas;
-        #endregion
-
-        // EMPTY
-        #region MONOBEHAVIOUR_METHODS
-        #endregion
-
-        // EMPTY
-        #region PUBLIC_METHODS
-        #endregion
-
-
-        #region PRIVATE_METHODS
         /// <summary>
         /// Add a new VR Canvas to the Scene
         /// </summary>
@@ -38,10 +19,8 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/VR Canvas", priority = 0)]
         static void InstantiateVRCanvas(MenuCommand menuCommand)
         {
-            vrCanvas = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRCanvas.prefab");
-
             // Create a custom game object
-            GameObject newCanvas = PrefabUtility.InstantiatePrefab(vrCanvas) as GameObject;
+            GameObject newCanvas = GameObject.Instantiate(VRSFPrefabReferencer.GetPrefab("VRCanvas"));
 
             RectTransform rt = newCanvas.GetComponent<RectTransform>();
             rt.localPosition = Vector3.zero;
@@ -54,12 +33,6 @@ namespace VRSF.UI.Editor
             Undo.RegisterCreatedObjectUndo(newCanvas, "Create " + newCanvas.name);
             Selection.activeObject = newCanvas;
         }
-        #endregion
-
-        // EMPTY
-        #region GETTERS_SETTERS
-
-        #endregion
     }
 }
 #endif

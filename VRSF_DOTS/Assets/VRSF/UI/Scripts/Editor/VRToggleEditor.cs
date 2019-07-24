@@ -11,15 +11,7 @@ namespace VRSF.UI.Editor
     [CanEditMultipleObjects]
     public class VRToggleEditor : UnityEditor.UI.ToggleEditor
 	{
-        // EMPTY
-        #region PUBLIC_VARIABLES
-
-        #endregion
-
-
         #region PRIVATE_VARIABLES
-        private static GameObject vrTogglePrefab;
-
         private VRToggle vrToggle;
         #endregion
 
@@ -92,28 +84,20 @@ namespace VRSF.UI.Editor
         [MenuItem("GameObject/VRSF/UI/VR Toggle", priority = 0)]
         static void InstantiateVRToggle(MenuCommand menuCommand)
         {
-            vrTogglePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VRSF/Prefabs/UI/UIElements/VRToggle.prefab");
-
             // Create a custom game object
-            GameObject newButton = PrefabUtility.InstantiatePrefab(vrTogglePrefab) as GameObject;
+            GameObject newToggle = GameObject.Instantiate(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRToggle"));
 
-            RectTransform rt = newButton.GetComponent<RectTransform>();
+            RectTransform rt = newToggle.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);
             rt.localScale = Vector3.one;
 
             // Ensure it gets reparented if this was a context click (otherwise does nothing)
-            GameObjectUtility.SetParentAndAlign(newButton, menuCommand.context as GameObject);
+            GameObjectUtility.SetParentAndAlign(newToggle, menuCommand.context as GameObject);
 
             // Register the creation in the undo system
-            Undo.RegisterCreatedObjectUndo(newButton, "Create " + newButton.name);
-            Selection.activeObject = newButton;
+            Undo.RegisterCreatedObjectUndo(newToggle, "Create " + newToggle.name);
+            Selection.activeObject = newToggle;
         }
-        #endregion
-
-
-        // EMPTY
-        #region GETTERS_SETTERS
-
         #endregion
     }
 }
