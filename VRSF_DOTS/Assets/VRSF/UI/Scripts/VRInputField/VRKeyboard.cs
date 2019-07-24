@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
+using VRSF.Core.Utils;
 
 namespace VRSF.UI
 {
@@ -18,33 +18,20 @@ namespace VRSF.UI
 
         #region PRIVATE_VARIABLES
         [Tooltip("This can be set via a script by referencing the VRKeyboard")]
-        private InputField inputField;
+        private TMPro.TMP_InputField inputField;
         #endregion PRIVATE_VARIABLES
 
 
         #region MONOBEHAVIOUR_METHODS
-        private void Start()
+        private void Awake()
         {
             VRButton[] buttons = GetComponentsInChildren<VRButton>();
             foreach (VRButton button in buttons)
             {
-                button.onClick.AddListener(delegate { ClickKey(button.name); });
+                button.onClick.AddListenerExtend(delegate { ClickKey(button.name); });
             }
         }
         #endregion MONOBEHAVIOUR_METHODS
-
-
-        #region PUBLIC_METHODS
-        /// <summary>
-        /// Called from the GameEventTransformListener using UIObjectHit
-        /// </summary>
-        /// <param name="objectHit">The UI object that was hit</param>
-        public void CheckObjectHit(Transform objectHit)
-        {
-            if (objectHit.tag == "KeyboardKey")
-                ClickKey(objectHit.transform.name);
-        }
-        #endregion PUBLIC_METHODS
 
 
         #region PRIVATE_METHODS
@@ -96,7 +83,7 @@ namespace VRSF.UI
 
 
         #region GETTERS_SETTERS
-        public InputField InputField
+        public TMPro.TMP_InputField InputField
         {
             get
             {

@@ -1,7 +1,5 @@
-﻿using VRSF.Core.Controllers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using VRSF.Core.Events;
 
 namespace VRSF.UI
@@ -10,7 +8,7 @@ namespace VRSF.UI
     /// Create a new VRInputField element based on the InputField from Unity, but usable in VR with the Scriptable Framework
     /// </summary>
     [RequireComponent(typeof(Collider))]
-    public class VRInputField : InputField
+    public class VRInputField : TMPro.TMP_InputField
     {
         #region PUBLIC_VARIABLES
         [Header("The VRKeyboard parameters and references")]
@@ -27,6 +25,7 @@ namespace VRSF.UI
         [SerializeField] public bool ControllerClickable = true;
         #endregion PUBLIC_VARIABLES
 
+        private TMPro.TMP_Text _placeHolderText;
 
         #region MONOBEHAVIOUR_METHODS
         protected override void Awake()
@@ -77,7 +76,7 @@ namespace VRSF.UI
 
         private void StartTyping()
         {
-            placeholder.GetComponent<Text>().text = "";
+            _placeHolderText.text = "";
             ActivateInputField();
             CheckForVRKeyboard();
         }
@@ -116,8 +115,12 @@ namespace VRSF.UI
         {
             try
             {
-                textComponent = transform.Find("Text").GetComponent<Text>();
-                placeholder = transform.Find("Placeholder").GetComponent<Text>();
+                if (textComponent == null)
+                    textComponent = transform.Find("Text").GetComponent<TMPro.TMP_Text>();
+                if (placeholder == null)
+                    placeholder = transform.Find("Placeholder").GetComponent<TMPro.TMP_Text>();
+
+                _placeHolderText = (TMPro.TMP_Text)placeholder;
             }
             catch
             {

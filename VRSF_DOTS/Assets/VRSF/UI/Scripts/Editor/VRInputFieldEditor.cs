@@ -9,13 +9,8 @@ namespace VRSF.UI.Editor
     /// </summary>
     [CustomEditor(typeof(VRInputField), true)]
     [CanEditMultipleObjects]
-    public class VRInputFieldEditor : UnityEditor.UI.InputFieldEditor
+    public class VRInputFieldEditor : TMPro.EditorUtilities.TMP_InputFieldEditor
     {
-        // EMPTY
-        #region PUBLIC_VARIABLES
-        #endregion PUBLIC_VARIABLES
-
-
         #region PRIVATE_VARIABLES
         static GameObject vrInputFieldPrefab;
 
@@ -35,6 +30,8 @@ namespace VRSF.UI.Editor
         #region PUBLIC_METHODS
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
+
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("VRSF Parameters", EditorStyles.boldLabel);
@@ -73,16 +70,7 @@ namespace VRSF.UI.Editor
             vrInputField.UseVRKeyboard = EditorGUILayout.ToggleLeft("Use VRKeyboard", vrInputField.UseVRKeyboard);
             vrInputField.VRKeyboard = EditorGUILayout.ObjectField("VRKeyboard in scene", vrInputField.VRKeyboard, typeof(VRKeyboard), true) as VRKeyboard;
 
-            serializedObject.Update();
-
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
-
-            EditorGUILayout.LabelField("Basic InputField Parameters", EditorStyles.boldLabel);
-
-            EditorGUILayout.Space();
-
-            base.OnInspectorGUI();
+           serializedObject.Update();
             
             serializedObject.ApplyModifiedProperties();
             if (GUI.changed) EditorUtility.SetDirty(target);
