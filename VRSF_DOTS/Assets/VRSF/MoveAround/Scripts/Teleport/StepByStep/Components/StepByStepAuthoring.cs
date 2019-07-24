@@ -1,11 +1,9 @@
 ﻿using Unity.Entities;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
-using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.Teleport
 {

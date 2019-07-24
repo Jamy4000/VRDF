@@ -9,15 +9,9 @@ namespace VRSF.Core.Controllers
     /// </summary>
     public class DominantHandHandlerSystem : ComponentSystem
     {
-        private struct Filter
-        {
-            public GoAndGearVRInputCapture SingleControllerInputCapture;
-        }
-
         protected override void OnCreateManager()
         {
             base.OnCreateManager();
-            ChangeDominantHandEvent.Listeners += ChangeDominantHand;
             OnSetupVRReady.Listeners += Setup;
             this.Enabled = false;
         }
@@ -27,8 +21,10 @@ namespace VRSF.Core.Controllers
         protected override void OnDestroyManager()
         {
             base.OnDestroyManager();
-            ChangeDominantHandEvent.Listeners -= ChangeDominantHand;
             OnSetupVRReady.Listeners -= Setup;
+
+            if (ChangeDominantHandEvent.IsMethodAlreadyRegistered(ChangeDominantHand))
+                ChangeDominantHandEvent.Listeners -= ChangeDominantHand;
         }
 
         private void ChangeDominantHand(ChangeDominantHandEvent info)
@@ -39,11 +35,11 @@ namespace VRSF.Core.Controllers
                 return;
             }
 
-            //foreach (var e in GetEntities<Filter>())
-            //{
-            //    e.SingleControllerInputCapture.IsUserRightHanded = info.NewDominantHand == EHand.RIGHT;
-            //    DisableUnusedHand(e.SingleControllerInputCapture.IsUserRightHanded);
-            //}
+            Entities.ForEach((ref GoAndGearVRInputCapture singleController) =>
+            {
+                singleController.IsUserRightHanded = info.NewDominantHand == EHand.RIGHT;
+                DisableUnusedHand(singleController.IsUserRightHanded);
+            });
         }
 
         private void Setup(OnSetupVRReady info)
@@ -51,10 +47,12 @@ namespace VRSF.Core.Controllers
             if (VRSF_Components.DeviceLoaded != EDevice.GEAR_VR && VRSF_Components.DeviceLoaded != EDevice.OCULUS_GO)
                 return;
 
-            //foreach (var e in GetEntities<Filter>())
-            //{
-            //    DisableUnusedHand(e.SingleControllerInputCapture.IsUserRightHanded);
-            //}
+            ChangeDominantHandEvent.Listeners += ChangeDominantHand;
+
+            Entities.ForEach((ref GoAndGearVRInputCapture singleController) =>
+            {
+                DisableUnusedHand(singleController.IsUserRightHanded);
+            });
         }
 
         private void DisableUnusedHand(bool isUserRightHanded)

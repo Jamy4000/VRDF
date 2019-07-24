@@ -9,8 +9,6 @@ namespace VRSF.Core.LaserPointer
         private LineRenderer _lineRenderer;
         private ERayOrigin _rayOrigin;
 
-        private float _newWidth = -1.0f;
-
         void Awake()
         {
             _lineRenderer = GetComponent<LineRenderer>();

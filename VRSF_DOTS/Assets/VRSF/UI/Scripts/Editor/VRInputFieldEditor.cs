@@ -145,10 +145,9 @@ namespace VRSF.UI.Editor
         /// <summary>
         /// Add a new VR Keyboard to the Scene
         /// </summary>
-        /// <param name="menuCommand"></param>
         [MenuItem("VRSF/UI/Input Field/VR Keyboard", priority = 0)]
         [MenuItem("GameObject/VRSF/UI/Input Field/VR Keyboard", priority = 0)]
-        static void InstantiateVRKeyboard(MenuCommand menuCommand)
+        static void InstantiateVRKeyboard(MenuCommand _)
         {
             // Create a custom game object
             GameObject newKeyboard = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRKeyboard"));

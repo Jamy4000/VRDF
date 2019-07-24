@@ -6,7 +6,6 @@ using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
 using System;
 using VRSF.Core.VRInteractions;
-using VRSF.Core.VRInteractions;
 
 namespace VRSF.Core.CBRA
 {
