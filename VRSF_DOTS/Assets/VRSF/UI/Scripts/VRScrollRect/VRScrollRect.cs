@@ -49,6 +49,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
+                _scrollableSetup = new VRUIScrollableSetup(Direction);
                 OnSetupVRReady.Listeners += Init;
 
                 // We setup the BoxCollider size and center
@@ -197,8 +198,6 @@ namespace VRSF.UI
                     Direction = UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(horizontalScrollbar.direction);
                     horizontalScrollbar.onValueChanged.AddListener(delegate { OnValueChangedCallback(); });
                 }
-
-                _scrollableSetup = new VRUIScrollableSetup(Direction);
 
                 ObjectWasClickedEvent.Listeners += CheckRectClick;
                 _eventWereRegistered = true;
