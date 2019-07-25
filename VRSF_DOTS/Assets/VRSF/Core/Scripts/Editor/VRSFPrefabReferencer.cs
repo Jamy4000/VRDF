@@ -10,10 +10,13 @@ namespace VRSF.Core.Utils
 
         public static GameObject GetPrefab(string name)
         {
-            foreach (var prefab in Instance.PrefabsReferences)
+            if (Instance != null)
             {
-                if (prefab.name == name)
-                    return prefab;
+                foreach (var prefab in Instance.PrefabsReferences)
+                {
+                    if (prefab != null && prefab.name == name)
+                        return prefab;
+                }
             }
             Debug.LogErrorFormat("<b>[VRSF] :</b> An error has occured while loading the prefab {0}. Please add an issue on Github or contact me via email (arnaudbriche1994@gmail.com) so I can fix that ASAP !", name);
             return null;
