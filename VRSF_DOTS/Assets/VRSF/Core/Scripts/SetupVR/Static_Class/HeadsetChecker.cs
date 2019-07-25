@@ -20,22 +20,36 @@ namespace VRSF.Core.SetupVR
                 Debug.LogFormat("<b>[VRSF] :</b> {0} is connected.", detectedHmd);
 
                 if (detectedHmd.ToLower().Contains("htc"))
+                {
+                    XRSettings.LoadDeviceByName("OpenVR");
                     return CheckHtcHeadset(detectedHmd);
+                }
                 else if (detectedHmd.ToLower().Contains("gear"))
+                {
+                    XRSettings.LoadDeviceByName("Oculus");
                     return EDevice.GEAR_VR;
+                }
                 else if (detectedHmd.ToLower().Contains("oculus"))
+                {
+                    XRSettings.LoadDeviceByName("Oculus");
                     return CheckOculusHeadset(detectedHmd);
+                }
                 else if (detectedHmd.ToLower().Contains("windows"))
+                {
+                    XRSettings.LoadDeviceByName("OpenVR");
                     return EDevice.WMR;
+                }
                 else
+                {
                     return LoadSimulatorWithDebugText("<b>[VRSF] :</b> " + detectedHmd + " is not supported yet, loading Simulator Support.", true);
+                }
             }
             else
             {
                 return LoadSimulatorWithDebugText("<b>[VRSF] :</b> No XRDevice present, loading Simulator");
             }
         }
-        
+
         private static EDevice CheckHtcHeadset(string detectedHmd)
         {
             if (detectedHmd.ToLower().Contains("vive"))

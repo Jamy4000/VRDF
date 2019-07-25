@@ -23,11 +23,8 @@ namespace VRSF.Core.FadingEffect
             if (_vrCamera == null)
                 return inputDeps;
 
-            var pos = new NativeArray<float3>(1, Allocator.TempJob);
-            pos[0] = _vrCamera.transform.position + _vrCamera.transform.forward * 0.3f;
-
-            var rot = new NativeArray<quaternion>(1, Allocator.TempJob);
-            rot[0] = Quaternion.LookRotation(_vrCamera.transform.up, _vrCamera.transform.forward);
+            var pos = _vrCamera.transform.position + _vrCamera.transform.forward * 0.3f;
+            var rot = Quaternion.LookRotation(_vrCamera.transform.up, _vrCamera.transform.forward);
 
             return new CameraFollowJob
             {
@@ -46,18 +43,16 @@ namespace VRSF.Core.FadingEffect
         [Unity.Burst.BurstCompile]
         public struct CameraFollowJob : IJobForEach<Translation, Rotation, CameraFadeParameters>
         {
-            [DeallocateOnJobCompletion]
-            public NativeArray<float3> CameraPos;
-            [DeallocateOnJobCompletion]
-            public NativeArray<quaternion> CameraRot;
+            public float3 CameraPos;
+            public quaternion CameraRot;
 
             public void Execute(ref Translation camPosition, ref Rotation camRotation, [ReadOnly] ref CameraFadeParameters c2)
             {
                 // Place the instantiated canvas in front of the camera
-                camPosition.Value = CameraPos[0];
+                camPosition.Value = CameraPos;
 
                 // Rotate the instantiated canvas to face the camera
-                camRotation.Value = CameraRot[0];
+                camRotation.Value = CameraRot;
             }
         }
 

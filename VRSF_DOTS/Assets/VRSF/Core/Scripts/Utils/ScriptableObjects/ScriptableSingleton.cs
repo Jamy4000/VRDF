@@ -35,7 +35,7 @@ namespace VRSF.Core.Utils
         {
             get
             {
-                return "Assets/VRSF/Core/ScriptableSingletons";
+                return "Assets/VRSF/Core/Resources";
             }
         }
 
@@ -48,7 +48,7 @@ namespace VRSF.Core.Utils
             {
                 if (_CachedInstance == null)
                 {
-                    _CachedInstance = AssetDatabase.LoadAssetAtPath<T>(Path.Combine(ScriptableSingletonDirectoryPath, FileName + ".asset")) as T;
+                    _CachedInstance = Resources.Load<T>(FileName + ".asset") as T;
                 }
 #if UNITY_EDITOR
                 if (_CachedInstance == null)

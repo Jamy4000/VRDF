@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VRSF.Core.Events;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -35,7 +34,11 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                OnSetupVRReady.Listeners += Init;
+                if (LaserClickable)
+                    ObjectWasClickedEvent.Listeners += CheckInputFieldClick;
+
+                if (ControllerClickable)
+                    GetComponent<BoxCollider>().isTrigger = true;
 
                 SetInputFieldReferences();
 
@@ -48,9 +51,6 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
-                OnSetupVRReady.Listeners -= Init;
-
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckInputFieldClick))
                 ObjectWasClickedEvent.Listeners -= CheckInputFieldClick;
         }
@@ -139,18 +139,6 @@ namespace VRSF.UI
             yield return new WaitForEndOfFrame();
 
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
-        }
-
-        private void Init(OnSetupVRReady _)
-        {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-            {
-                if (LaserClickable)
-                    ObjectWasClickedEvent.Listeners += CheckInputFieldClick;
-
-                if (ControllerClickable)
-                    GetComponent<BoxCollider>().isTrigger = true;
-            }
         }
         #endregion PRIVATE_METHODS
     }
