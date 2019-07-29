@@ -146,7 +146,7 @@ namespace VRSF.Core.CBRA
         public static void AddCBRAObject(MenuCommand menuCommand)
         {
             var cbraObject = new GameObject("CBRA");
-            Undo.RecordObject(cbraObject, "Adding new CBRA");
+            Undo.RegisterCreatedObjectUndo(cbraObject, "Adding  new CBRA");
             cbraObject.transform.SetParent(Selection.activeTransform);
             cbraObject.AddComponent<ControllersButtonResponseAssigner>();
             Selection.SetActiveObjectWithContext(cbraObject, menuCommand.context);
