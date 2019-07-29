@@ -1,4 +1,5 @@
 ﻿using Unity.Mathematics;
+using UnityEngine;
 
 namespace VRSF.MoveAround.Fly
 {
@@ -9,7 +10,6 @@ namespace VRSF.MoveAround.Fly
         /// </summary>
         public float FlightDirection;
 
-        public float3 NormalizedDir;
-        public float3 FinalDirection;
+        public Vector3 CurrentDirection;
     }
 }

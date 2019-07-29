@@ -10,8 +10,15 @@ namespace VRSF.MoveAround.Fly
     /// </summary>
     [ExecuteInEditMode]
     [RequireComponent(typeof(FlyModeAuthoring))]
-	public class FlyBoundariesDisplayer : MonoBehaviour
+	public class FlyBoundariesAuthoring : MonoBehaviour
     {
+        [Header("Boundaries Parameters")]
+        [Tooltip("The minimun local position at which the user can go. Set values to zero for no minimum boundaries.")]
+        public Vector3 MinAvatarPosition = new Vector3(0.0f, 0.0f, 0.0f);
+
+        [Tooltip("The maximum local position at which the user can go. Set values to zero for no minimum boundaries.")]
+        public Vector3 MaxAvatarPosition = new Vector3(0.0f, 0.0f, 0.0f);
+
         private void Awake()
         {
             if (Application.isPlaying)
@@ -24,7 +31,7 @@ namespace VRSF.MoveAround.Fly
         [Tooltip("Choose the Unlit/Color shader in the Material Settings. You can change the color of the connecting lines through this mat.")]
         public Material LineMat;
 
-        [Tooltip("The color of the Bounding box displayed in the Scene view for this FlyComponent.")]
+        [Tooltip("The color of the Bounding box displayed in the Scene view for this FlyBoundariesAuthoring.")]
         public Color BoundariesLinesColor = Color.green;
 
         private FlyModeAuthoring _flyComp;
@@ -32,9 +39,9 @@ namespace VRSF.MoveAround.Fly
         /// <summary>
         /// To show the lines in the editor
         /// </summary>
-        void OnDrawGizmos()
+        void OnDrawGizmosSelected()
         {
-            if (_flyComp.MinAvatarPosition != Vector3.zero && _flyComp.MaxAvatarPosition != Vector3.zero)
+            if (LineMat != null && (MinAvatarPosition != Vector3.zero || MaxAvatarPosition != Vector3.zero))
                 DrawConnectingLines();
         }
 
@@ -46,14 +53,14 @@ namespace VRSF.MoveAround.Fly
             // List of points/vertices
             Vector3[] vertices = new Vector3[8]
             {
-                new Vector3(_flyComp.MinAvatarPosition.x, _flyComp.MinAvatarPosition.y, _flyComp.MinAvatarPosition.z),
-                new Vector3(_flyComp.MinAvatarPosition.x, _flyComp.MaxAvatarPosition.y, _flyComp.MinAvatarPosition.z),
-                new Vector3(_flyComp.MinAvatarPosition.x, _flyComp.MaxAvatarPosition.y, _flyComp.MaxAvatarPosition.z),
-                new Vector3(_flyComp.MinAvatarPosition.x, _flyComp.MinAvatarPosition.y, _flyComp.MaxAvatarPosition.z),
-                new Vector3(_flyComp.MaxAvatarPosition.x, _flyComp.MinAvatarPosition.y, _flyComp.MinAvatarPosition.z),
-                new Vector3(_flyComp.MaxAvatarPosition.x, _flyComp.MaxAvatarPosition.y, _flyComp.MinAvatarPosition.z),
-                new Vector3(_flyComp.MaxAvatarPosition.x, _flyComp.MaxAvatarPosition.y, _flyComp.MaxAvatarPosition.z),
-                new Vector3(_flyComp.MaxAvatarPosition.x, _flyComp.MinAvatarPosition.y, _flyComp.MaxAvatarPosition.z),
+                new Vector3(MinAvatarPosition.x, MinAvatarPosition.y, MinAvatarPosition.z),
+                new Vector3(MinAvatarPosition.x, MaxAvatarPosition.y, MinAvatarPosition.z),
+                new Vector3(MinAvatarPosition.x, MaxAvatarPosition.y, MaxAvatarPosition.z),
+                new Vector3(MinAvatarPosition.x, MinAvatarPosition.y, MaxAvatarPosition.z),
+                new Vector3(MaxAvatarPosition.x, MinAvatarPosition.y, MinAvatarPosition.z),
+                new Vector3(MaxAvatarPosition.x, MaxAvatarPosition.y, MinAvatarPosition.z),
+                new Vector3(MaxAvatarPosition.x, MaxAvatarPosition.y, MaxAvatarPosition.z),
+                new Vector3(MaxAvatarPosition.x, MinAvatarPosition.y, MaxAvatarPosition.z),
             };
 
             // List of indices/Vector2 between which a line must be made
@@ -87,7 +94,7 @@ namespace VRSF.MoveAround.Fly
                 GL.End();
             }
 
-            Vector3 labelPos = new Vector3(_flyComp.MinAvatarPosition.x, _flyComp.MaxAvatarPosition.y, _flyComp.MinAvatarPosition.z);
+            Vector3 labelPos = new Vector3(MinAvatarPosition.x, MaxAvatarPosition.y, MinAvatarPosition.z);
             GUIStyle style = new GUIStyle();
 
             style.normal.textColor = BoundariesLinesColor;

@@ -6,8 +6,8 @@ namespace VRSF.MoveAround.Fly
     /// <summary>
     /// Just add a message to the user to let him know where the parameters are set.
     /// </summary>
-    [CustomEditor(typeof(FlyModeAuthoring))]
-    public class FlyComponentEditor : Editor
+    [CustomEditor(typeof(FlyBoundariesAuthoring))]
+    public class FlyBoundariesEditor : Editor
     {
         public override void OnInspectorGUI()
         {
@@ -15,8 +15,7 @@ namespace VRSF.MoveAround.Fly
 
             EditorGUILayout.Space();
 
-            EditorGUILayout.HelpBox("To use the Fly System, you only need to set the parameters of the Fly Mode Authoring and the VRInteractions Authoring.\n" +
-                "The response to the buttons you chose are already handled in script.", MessageType.Info);
+            EditorGUILayout.HelpBox("Boundaries are shown in Scene view if the Material is not null AND if MinAvatarPos or MaxAvatarPos are different from a Vector3.zero.", MessageType.Info);
         }
 
         /// <summary>

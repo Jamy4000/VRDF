@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.MoveAround.Fly
 {
@@ -10,40 +9,20 @@ namespace VRSF.MoveAround.Fly
     /// </summary>
     public class FlyAccelerationCalculationsSystem : JobComponentSystem
     {
-        private Transform _cameraRigTrans;
-
-        #region ComponentSystem_Methods
-        protected override void OnCreate()
-        {
-            base.OnCreate();
-            OnSetupVRReady.Listeners += Init;
-        }
-
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             return new AccelerationCalculationJob
             {
-                DeltaTime = Time.deltaTime,
-                CameraRigYScale = _cameraRigTrans.lossyScale.y
+                DeltaTime = Time.deltaTime
             }.Schedule(this, inputDeps);
         }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            OnSetupVRReady.Listeners -= Init;
-        }
-        #endregion ComponentSystem_Methods
-
-
-        #region PRIVATE_METHODS
+        
         [RequireComponentTag(typeof(IsFlying))]
-        private struct AccelerationCalculationJob : IJobForEach<FlySpeed, FlyDirection, FlyAcceleration, FlyDeceleration, FlyBoundaries>
+        private struct AccelerationCalculationJob : IJobForEach<FlySpeed, FlyDirection, FlyAcceleration, FlyDeceleration>
         {
             public float DeltaTime;
-            public float CameraRigYScale;
 
-            public void Execute(ref FlySpeed speed, ref FlyDirection direction, ref FlyAcceleration acceleration, ref FlyDeceleration deceleration, ref FlyBoundaries boundaries)
+            public void Execute(ref FlySpeed speed, ref FlyDirection direction, ref FlyAcceleration acceleration, ref FlyDeceleration deceleration)
             {
                 if (deceleration.SlowDownTimer > 0.0f)
                 {
@@ -56,9 +35,6 @@ namespace VRSF.MoveAround.Fly
 
 
                 speed.CurrentFlightVelocity = speed.GetSpeed() * acceleration.TimeSinceStartFlying;
-
-                // We change the speed depending on the Scale of the User
-                speed.CurrentFlightVelocity /= MapRangeClamp(CameraRigYScale, Mathf.Abs(boundaries.MinAvatarPosition.y), Mathf.Abs(boundaries.MaxAvatarPosition.y), 1.0f, boundaries.MaxAvatarPosition.y / 100);
             }
 
             /// <summary>
@@ -82,11 +58,5 @@ namespace VRSF.MoveAround.Fly
                 return dstMin + (val - srcMin) / denominator;
             }
         }
-
-        private void Init(OnSetupVRReady info)
-        {
-            _cameraRigTrans = VRSF_Components.CameraRig.transform;
-        }
-        #endregion PRIVATE_METHODS
     }
 }

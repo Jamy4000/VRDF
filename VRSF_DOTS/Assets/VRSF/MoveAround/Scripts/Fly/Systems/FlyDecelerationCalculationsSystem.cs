@@ -10,7 +10,7 @@ namespace VRSF.MoveAround.Fly
     {
         protected override void OnUpdate()
         {
-            Entities.WithAll(typeof(IsDecelerating)).ForEach((Entity e, ref FlySpeed speed, ref FlyDirection direction, ref FlyAcceleration acceleration, ref FlyDeceleration deceleration, ref FlyBoundaries boundaries) =>
+            Entities.WithAll(typeof(IsDecelerating)).ForEach((Entity e, ref FlySpeed speed, ref FlyDirection direction, ref FlyAcceleration acceleration, ref FlyDeceleration deceleration) =>
             {
                 if (deceleration.SlowDownTimer > 0.0f)
                     deceleration.SlowDownTimer = deceleration.DecelerationEffectFactor != 0.0f ? deceleration.SlowDownTimer - (UnityEngine.Time.deltaTime / deceleration.DecelerationEffectFactor) : 0.0f;

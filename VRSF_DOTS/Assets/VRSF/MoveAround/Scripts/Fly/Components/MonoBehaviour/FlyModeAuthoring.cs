@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using System;
+using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
@@ -24,13 +25,6 @@ namespace VRSF.MoveAround.Fly
         [Tooltip("Is the user decelerating before stopping ? Set to 0.0f if going stopping on stop interacting.")]
         public float DecelerationFactor = 0.0f;
 
-        [Header("Boundaries Parameters")]
-        [Tooltip("The minimun local position at which the user can go. Set values to zero for no minimum boundaries.")]
-        public Vector3 MinAvatarPosition = new Vector3(0.0f, 0.0f, 0.0f);
-
-        [Tooltip("The maximum local position at which the user can go. Set values to zero for no minimum boundaries.")]
-        public Vector3 MaxAvatarPosition = new Vector3(0.0f, 0.0f, 0.0f);
-
         private void Awake()
         {
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
@@ -38,6 +32,19 @@ namespace VRSF.MoveAround.Fly
             // If the device loaded is included in the device using this CBRA
             if ((interactionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
+                if (interactionParameters.ButtonToUse != EControllersButton.TOUCHPAD)
+                {
+                    Debug.LogError("<b>[VRSF] :</b> The Fly mode can only be use using the touchpad/thumbstick, as we use the up and down value. Entity won't be created.");
+                    Destroy(gameObject);
+                    return;
+                }
+                else if (!InteractionIsUpAndDown(interactionParameters))
+                {
+                    Debug.LogError("<b>[VRSF] :</b> The Fly mode can only be use using an UP/DOWN combination, as we use them to calculate the direction. Entity won't be created.");
+                    Destroy(gameObject);
+                    return;
+                }
+
                 var entityManager = World.Active.EntityManager;
 
                 var archetype = entityManager.CreateArchetype
@@ -49,7 +56,6 @@ namespace VRSF.MoveAround.Fly
                     typeof(VRRaycastParameters),
                     typeof(FlyAcceleration),
                     typeof(FlyDeceleration),
-                    typeof(FlyBoundaries),
                     typeof(FlyDirection),
                     typeof(FlySpeed)
                 );
@@ -94,12 +100,17 @@ namespace VRSF.MoveAround.Fly
                     SlowDownTimer = 0.0f
                 });
 
-                entityManager.SetComponentData(flyModeEntity, new FlyBoundaries
+                // Check for Fly Boundaries
+                var flyBoundaries = GetComponent<FlyBoundariesAuthoring>();
+                if (flyBoundaries != null)
                 {
-                    MaxAvatarPosition = this.MaxAvatarPosition,
-                    MinAvatarPosition = this.MinAvatarPosition,
-                    UseBoundaries = this.MaxAvatarPosition != Vector3.zero && this.MinAvatarPosition != Vector3.zero                
-                });
+                    entityManager.AddComponentData(flyModeEntity, new FlyBoundaries
+                    {
+                        MaxAvatarPosition = flyBoundaries.MaxAvatarPosition,
+                        MinAvatarPosition = flyBoundaries.MinAvatarPosition,
+                        UseBoundaries = flyBoundaries.MaxAvatarPosition != Vector3.zero && flyBoundaries.MinAvatarPosition != Vector3.zero
+                    });
+                }
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window
@@ -108,6 +119,21 @@ namespace VRSF.MoveAround.Fly
             }
 
             Destroy(gameObject);
+        }
+
+        /// <summary>
+        /// Check if the interaction are click + UP and DOWN 
+        /// OR
+        /// if the interaction are touch + UP and DOWN 
+        /// </summary>
+        /// <param name="interactionParameters">the interaction parameters to check</param>
+        /// <returns>true if at least one of the consition is respected</returns>
+        private bool InteractionIsUpAndDown(VRInteractionAuthoring interactionParameters)
+        {
+            return ((interactionParameters.InteractionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK
+                    && ((interactionParameters.ClickThumbPosition & EThumbPosition.DOWN) == EThumbPosition.DOWN && (interactionParameters.ClickThumbPosition & EThumbPosition.UP) == EThumbPosition.UP))
+                || ((interactionParameters.InteractionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH
+                    && ((interactionParameters.TouchThumbPosition & EThumbPosition.DOWN) == EThumbPosition.DOWN && (interactionParameters.TouchThumbPosition & EThumbPosition.UP) == EThumbPosition.UP));
         }
 
         private bool SetupRaycasting(ref EntityManager entityManager, ref Entity entity, VRInteractionAuthoring interactionParameters)
