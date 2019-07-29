@@ -6,6 +6,7 @@ VRSF_DOTS/[Bb]uild/
 VRSF_DOTS/[Bb]uilds/
 VRSF_DOTS/[Ll]og/
 VRSF_DOTS/[Ll]ogs/
+VRSF_DOTS/Assets/EntityCache/
 
 # Added to use a Lab folder
 VRSF_DOTS/Assets/Lab
