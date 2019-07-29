@@ -2,30 +2,12 @@
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Raycast;
-using VRSF.Core.Utils;
 using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.Teleport
 {
     public static class TeleporterSetupHelper
     {
-        public static bool SetupInteractions(ref EntityManager entityManager, ref Entity entity, VRInteractionAuthoring interactionParameters)
-        {
-            // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
-            if (!InteractionSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
-                return false;
-
-            // If the Hand wasn't chose correctly, we destroy this entity and return.
-            if (!InteractionSetupHelper.AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
-                return false;
-
-            // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-            if (!InteractionSetupHelper.AddInteractionType(ref entityManager, ref entity, interactionParameters.InteractionType, interactionParameters.ButtonToUse))
-                return false;
-
-            return true;
-        }
-
         public static bool SetupRaycast(ref EntityManager entityManager, ref Entity entity, VRInteractionAuthoring interactionParameters, float distanceSBS)
         {
             switch (interactionParameters.ButtonHand)

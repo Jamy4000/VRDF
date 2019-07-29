@@ -12,12 +12,13 @@ namespace VRSF.MoveAround.VRRotation
         /// <param name="menuCommand"></param>
         [MenuItem("GameObject/VRSF/Move Around/Rotation/Add Non Linear Rotation", priority = 3)]
         [MenuItem("VRSF/Move Around/Rotation/Add Non Linear Rotation", priority = 3)]
-        public static void AddCBRAObject(MenuCommand menuCommand)
+        public static void AddNonLinearRot(MenuCommand menuCommand)
         {
-            var cbraObject = new GameObject("Non Linear Rotation");
-            cbraObject.transform.SetParent(Selection.activeTransform);
-            cbraObject.AddComponent<NonLinearRotationAuthoring>();
-            Selection.SetActiveObjectWithContext(cbraObject, menuCommand.context);
+            var nonLinearRot = new GameObject("Non Linear Rotation");
+            Undo.RegisterCreatedObjectUndo(nonLinearRot, "Adding linearRotation");
+            nonLinearRot.transform.SetParent(Selection.activeTransform);
+            nonLinearRot.AddComponent<NonLinearRotationAuthoring>();
+            Selection.SetActiveObjectWithContext(nonLinearRot, menuCommand.context);
         }
     }
 }

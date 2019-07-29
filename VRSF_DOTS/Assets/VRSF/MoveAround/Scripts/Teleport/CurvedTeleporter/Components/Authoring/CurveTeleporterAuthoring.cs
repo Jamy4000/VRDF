@@ -39,12 +39,7 @@ namespace VRSF.MoveAround.Teleport
         public GameObject SelectionPad;
         [Tooltip("GameObject to use as the invalid pad when the player is pointing at an invalid teleportable surface. Turned to Entity at runtime.")]
         public GameObject InvalidPad;
-
-#if UNITY_EDITOR
-        // Only used for the OnDrawGizmos method
-        [System.NonSerialized] public List<Vector3> ParabolaPoints_Gizmo;
-#endif
-
+        
         private void Awake()
         {
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
@@ -74,7 +69,7 @@ namespace VRSF.MoveAround.Teleport
                 var teleporterEntity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!TeleporterSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
+                if (!Core.Utils.InteractionSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
                 {
                     entityManager.DestroyEntity(teleporterEntity);
                     Destroy(gameObject);

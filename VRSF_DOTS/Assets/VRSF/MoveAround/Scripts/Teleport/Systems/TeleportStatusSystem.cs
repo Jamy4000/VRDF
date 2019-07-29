@@ -24,11 +24,11 @@ namespace VRSF.MoveAround.Teleport
                     switch (gtp.CurrentTeleportState)
                     {
                         case ETeleportState.None:
-                            if ((cit.HasClickInteraction && bic.IsClicking) || (cit.HasTouchInteraction && bic.IsTouching))
+                            if (InteractionChecker.IsInteracting(bic, cit))
                                 gtp.CurrentTeleportState = ETeleportState.Selecting;
                             break;
                         case ETeleportState.Selecting:
-                            if ((cit.HasClickInteraction && !bic.IsClicking) || (cit.HasTouchInteraction && !bic.IsTouching))
+                            if (InteractionChecker.IsNotInteracting(bic, cit))
                             {
                                 gtp.CurrentTeleportState = ETeleportState.Teleporting;
                                 gtp.HasTeleported = false;
