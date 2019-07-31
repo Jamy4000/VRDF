@@ -127,6 +127,9 @@ namespace VRSF.Core.CBRA
                 entityManager.SetName(entity, string.Format("CBRA Entity from GO {0}", transform.name));
 #endif
             }
+
+
+            Destroy(gameObject);
         }
     }
 }

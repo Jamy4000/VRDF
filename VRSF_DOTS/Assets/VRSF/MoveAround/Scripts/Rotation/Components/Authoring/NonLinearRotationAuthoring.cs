@@ -43,7 +43,7 @@ namespace VRSF.MoveAround.VRRotation
                     return;
             }
 
-            entityManager.AddComponentData(entity, new ControllersInteractionType
+            entityManager.SetComponentData(entity, new ControllersInteractionType
             {
                 InteractionType = _interactionType,
                 HasTouchInteraction = (_interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,

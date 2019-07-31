@@ -68,7 +68,7 @@ namespace VRSF.Core.VRInteractions
 
         private void Setup(OnSetupVRReady info)
         {
-            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0;
+            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateEntityCount() > 0;
         }
         #endregion PRIVATE_METHODS
     }

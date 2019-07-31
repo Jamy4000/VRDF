@@ -45,7 +45,7 @@ namespace VRSF.Core.VRInteractions
 
         private void Setup(OnSetupVRReady info)
         {
-            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0;
+            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateEntityCount() > 0;
             if (VRSF_Components.DeviceLoaded == EDevice.SIMULATOR)
             {
                 Entities.ForEach((ref PointerClick pointerClick) =>

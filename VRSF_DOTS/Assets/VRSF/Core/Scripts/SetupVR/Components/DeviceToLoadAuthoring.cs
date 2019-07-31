@@ -75,7 +75,7 @@ namespace VRSF.Core.SetupVR
         private Vector3 CalculateNewFloorOffset()
         {
             var localPos = VRSF_Components.FloorOffset.transform.localPosition;
-            return new Vector3(localPos.x, localPos.y - (localPos.y * VRSF_Components.FloorOffset.transform.lossyScale.y), localPos.z);
+            return new Vector3(localPos.x, 0.0f, localPos.z);
         }
 
         private void RemoveVRStuffs()

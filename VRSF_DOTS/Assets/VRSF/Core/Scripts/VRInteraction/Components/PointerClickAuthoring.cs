@@ -10,7 +10,6 @@ namespace VRSF.Core.VRInteractions
     /// WARNING : This needs to be place on the same GameObject as where the VRRaycastAuthoring component is placed.
     /// </summary>
     [RequiresEntityConversion]
-    [RequireComponent(typeof(VRInteractionAuthoring), typeof(Raycast.VRRaycastAuthoring))]
     public class PointerClickAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
@@ -26,6 +25,9 @@ namespace VRSF.Core.VRInteractions
                 HandClicking = interactionSet.ButtonHand,
                 CanClick = true
             });
+
+            Destroy(interactionSet);
+            Destroy(this);
         }
     }
 

@@ -37,6 +37,8 @@ namespace VRSF.Core.Raycast
                 RaycastHitVar = new RaycastHitVariable(),
                 RayVar = new Ray()
             });
+
+            Destroy(this);
         }
     }
 }

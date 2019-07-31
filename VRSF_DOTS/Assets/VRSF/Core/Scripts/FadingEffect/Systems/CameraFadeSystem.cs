@@ -29,7 +29,7 @@ namespace VRSF.Core.FadingEffect
 
             if (!_entityArrayHasBeenSet)
             {
-                int cameraFadeEntities = GetEntityQuery(typeof(CameraFadeParameters)).CalculateLength();
+                int cameraFadeEntities = GetEntityQuery(typeof(CameraFadeParameters)).CalculateEntityCount();
                 _entities = new NativeArray<Entity>(cameraFadeEntities, Allocator.Persistent);
                 _entityArrayHasBeenSet = true;
             }
