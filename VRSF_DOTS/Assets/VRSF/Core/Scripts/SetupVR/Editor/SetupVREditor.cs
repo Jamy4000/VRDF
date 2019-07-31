@@ -11,10 +11,36 @@ namespace VRSF.Core.SetupVR
     public class SetupVREditor : Editor
     {
         #region PRIVATE_VARIABLES
-        private static GameObject _setupVRPrefab;
+        private SerializedProperty _forcedSDKProp;
+        private DeviceToLoadAuthoring _deviceToLoadtarget;
         #endregion
 
         #region PRIVATE_METHODS
+        private void OnEnable()
+        {
+            _deviceToLoadtarget = (DeviceToLoadAuthoring)target;
+            _forcedSDKProp = serializedObject.FindProperty("ForcedSDK");
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.DrawDefaultInspector();
+
+            serializedObject.Update();
+
+            if (_deviceToLoadtarget.ForceSDKLoad)
+            {
+                EditorGUI.BeginChangeCheck();
+                Undo.RecordObject(_deviceToLoadtarget, "ForcedSDK");
+                EditorGUILayout.PropertyField(_forcedSDKProp);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(_deviceToLoadtarget);
+                }
+            }
+        }
         /// <summary>
         /// Add the SetupVR Prefab to the scene.
         /// </summary>
@@ -33,10 +59,10 @@ namespace VRSF.Core.SetupVR
                 return;
             }
 
-            _setupVRPrefab = Utils.VRSFPrefabReferencer.GetPrefab("SetupVR");
+            var setupVRPrefab = Utils.VRSFPrefabReferencer.GetPrefab("SetupVR");
 
             // Create a custom game object
-            var setupVR = PrefabUtility.InstantiatePrefab(_setupVRPrefab) as GameObject;
+            var setupVR = PrefabUtility.InstantiatePrefab(setupVRPrefab) as GameObject;
 
             // Ensure it gets reparented if this was a context click (otherwise does nothing)
             GameObjectUtility.SetParentAndAlign(setupVR, menuCommand.context as GameObject);
