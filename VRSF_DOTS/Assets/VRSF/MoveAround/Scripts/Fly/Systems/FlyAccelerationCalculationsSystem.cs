@@ -31,7 +31,7 @@ namespace VRSF.MoveAround.Fly
                 }
 
                 if (acceleration.TimeSinceStartFlying >= 0 && acceleration.TimeSinceStartFlying < 1.0f)
-                    acceleration.TimeSinceStartFlying = acceleration.AccelerationEffectFactor == 0.0f ? acceleration.TimeSinceStartFlying + (DeltaTime / acceleration.AccelerationEffectFactor) : 1.0f;
+                    acceleration.TimeSinceStartFlying = acceleration.AccelerationEffectFactor != 0.0f ? acceleration.TimeSinceStartFlying + (DeltaTime / acceleration.AccelerationEffectFactor) : 1.0f;
 
 
                 speed.CurrentFlightVelocity = speed.GetSpeed() * acceleration.TimeSinceStartFlying;
