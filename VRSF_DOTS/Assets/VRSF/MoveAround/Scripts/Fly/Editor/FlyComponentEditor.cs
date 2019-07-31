@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.Fly
 {
@@ -7,6 +8,7 @@ namespace VRSF.MoveAround.Fly
     /// Just add a message to the user to let him know where the parameters are set.
     /// </summary>
     [CustomEditor(typeof(FlyModeAuthoring))]
+    [CanEditMultipleObjects]
     public class FlyComponentEditor : Editor
     {
         public override void OnInspectorGUI()
@@ -16,7 +18,7 @@ namespace VRSF.MoveAround.Fly
             EditorGUILayout.Space();
 
             EditorGUILayout.HelpBox("To use the Fly System, you only need to set the parameters of the Fly Mode Authoring and the VRInteractions Authoring.\n" +
-                "The response to the buttons you chose are already handled in script.", MessageType.Info);
+                "You have to use the Touchpad as button and UP/DOWN as Touch position. All you need to specify in the VRInteractionAuthoring are the Interaction Type and the Button Hand.", MessageType.Info);
         }
 
         /// <summary>
@@ -27,10 +29,7 @@ namespace VRSF.MoveAround.Fly
         [MenuItem("VRSF/Move Around/Fly Mode/Without Boundaries", priority = 3)]
         public static void AddFlyModeWithoutBoundaries(MenuCommand menuCommand)
         {
-            var flyModeObject = new GameObject("Fly Mode");
-            Undo.RegisterCreatedObjectUndo(flyModeObject, "Adding fly mode");
-            flyModeObject.transform.SetParent(Selection.activeTransform);
-            flyModeObject.AddComponent<FlyModeAuthoring>();
+            var flyModeObject = BasicFlyGoSetup("Fly Mode");
             Selection.SetActiveObjectWithContext(flyModeObject, menuCommand.context);
         }
 
@@ -42,12 +41,44 @@ namespace VRSF.MoveAround.Fly
         [MenuItem("VRSF/Move Around/Fly Mode/With Boundaries", priority = 3)]
         public static void AddFlyModeWithBoundaries(MenuCommand menuCommand)
         {
-            var flyModeObject = new GameObject("Fly Mode");
-            Undo.RegisterCreatedObjectUndo(flyModeObject, "Adding fly mode");
-            flyModeObject.transform.SetParent(Selection.activeTransform);
-            flyModeObject.AddComponent<FlyModeAuthoring>();
+            var flyModeObject = BasicFlyGoSetup("Restricted Fly Mode");
             flyModeObject.AddComponent<FlyBoundariesAuthoring>();
             Selection.SetActiveObjectWithContext(flyModeObject, menuCommand.context);
+        }
+
+        private static GameObject BasicFlyGoSetup(string name)
+        {
+            // Create GO
+            var flyModeObject = new GameObject(name);
+
+            // Add Undo Response
+            Undo.RegisterCreatedObjectUndo(flyModeObject, "Adding fly mode");
+
+            // Reset Transform and set parent to the currently selected transform
+            flyModeObject.transform.SetParent(Selection.activeTransform);
+            flyModeObject.transform.position = Vector3.zero;
+            flyModeObject.transform.rotation = Quaternion.identity;
+
+            // Add FlyModeAuthoring script
+            flyModeObject.AddComponent<FlyModeAuthoring>();
+
+            // Setup the interaction script
+            SetupInteractions(flyModeObject);
+            return flyModeObject;
+        }
+
+        /// <summary>
+        /// Setup the interaction script according to the flying mode requirements
+        /// </summary>
+        /// <param name="flyModeObject">the objects we need to set</param>
+        private static void SetupInteractions(GameObject flyModeObject)
+        {
+            var interactions = flyModeObject.GetComponent<VRInteractionAuthoring>();
+            interactions.ButtonToUse = Core.Inputs.EControllersButton.TOUCHPAD;
+            interactions.ClickThumbPosition = Core.Inputs.EThumbPosition.DOWN | Core.Inputs.EThumbPosition.UP;
+            interactions.TouchThumbPosition = Core.Inputs.EThumbPosition.DOWN | Core.Inputs.EThumbPosition.UP;
+            interactions.IsClickingThreshold = 0.0f;
+            interactions.IsTouchingThreshold = 0.0f;
         }
     }
 }

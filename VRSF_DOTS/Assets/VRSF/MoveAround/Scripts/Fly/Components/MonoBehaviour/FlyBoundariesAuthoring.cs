@@ -39,7 +39,7 @@ namespace VRSF.MoveAround.Fly
         /// <summary>
         /// To show the lines in the editor
         /// </summary>
-        void OnDrawGizmosSelected()
+        void OnDrawGizmos()
         {
             if (LineMat != null && (MinAvatarPosition != Vector3.zero || MaxAvatarPosition != Vector3.zero))
                 DrawConnectingLines();

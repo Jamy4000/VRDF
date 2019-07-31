@@ -12,8 +12,8 @@ namespace VRSF.Core.CBRA
         {
             Entities.WithAll<CBRATag>().WithNone<TouchpadInputCapture>().ForEach((Entity entity, ref BaseInputCapture baseInput) =>
             {
-                if (baseInput.IsClicking)
-                    CBRADelegatesHolder.IsClickingEvents[entity]?.Invoke();
+                if (baseInput.IsClicking && CBRADelegatesHolder.IsClickingEvents.TryGetValue(entity, out System.Action action))
+                    action.Invoke();
             });
         }
     }

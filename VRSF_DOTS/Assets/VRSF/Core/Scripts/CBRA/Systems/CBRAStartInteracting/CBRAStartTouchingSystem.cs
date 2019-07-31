@@ -20,8 +20,8 @@ namespace VRSF.Core.CBRA
         {
             Entities.WithAll<CBRATag>().ForEach((Entity entity, ref StartTouchingEventComp startTouchingEvent) =>
             {
-                if (_entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(startTouchingEvent.ButtonInteracting)))
-                    CBRADelegatesHolder.StartTouchingEvents[entity]?.Invoke();
+                if (_entityManager.HasComponent(entity, CBRAInputTypeGetter.GetTypeFor(startTouchingEvent.ButtonInteracting)) && CBRADelegatesHolder.StartTouchingEvents.TryGetValue(entity, out System.Action action))
+                    action.Invoke();
             });
 
             Entities.ForEach((Entity entity, ref StartTouchingEventComp startTouchingEvent) =>
