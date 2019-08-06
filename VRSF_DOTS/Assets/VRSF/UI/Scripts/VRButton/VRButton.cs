@@ -78,7 +78,10 @@ namespace VRSF.UI
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
 
-            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+            var boxCollider = GetComponent<BoxCollider>();
+            var rectTrans = GetComponent<RectTransform>();
+            if (boxCollider != null && rectTrans != null)
+                VRUIBoxColliderSetup.CheckBoxColliderSize(boxCollider, rectTrans);
         }
 
         private void Init(OnSetupVRReady _)
@@ -88,8 +91,9 @@ namespace VRSF.UI
                 if (LaserClickable)
                     ObjectWasClickedEvent.Listeners += CheckObjectClicked;
 
-                if (ControllerClickable)
-                    GetComponent<BoxCollider>().isTrigger = true;
+                var boxCollider = GetComponent<BoxCollider>();
+                if (ControllerClickable && boxCollider != null)
+                    boxCollider.isTrigger = true;
             }
         }
         #endregion PRIVATE_METHODS
