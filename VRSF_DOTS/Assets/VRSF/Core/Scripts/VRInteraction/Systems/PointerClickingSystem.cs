@@ -23,7 +23,7 @@ namespace VRSF.Core.VRInteractions
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
+            Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
             {
                 if (pointerClick.CanClick)
                 {

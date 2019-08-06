@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Controllers
 {
+    [RequireComponent(typeof(ControllerMeshListing))]
     public class ControllerMeshAuthoring : MonoBehaviour
     {
         [Header("The parenting Hand")]
@@ -15,24 +14,18 @@ namespace VRSF.Core.Controllers
         [Tooltip("Should this gameobject be destroyed when the setup ended, or should only this script be destroyed ?")]
         [SerializeField] private bool _destroyOnSetup = true;
 
-        [Header("The Controller for this hand")]
-        [Tooltip("This component group all controller's mesh for each loadable device. The created Controller will be set as child of the parent from the corresponding hand.")]
-        [SerializeField] private VRControllers[] _vrControllers;
-
-        private Dictionary<EDevice, GameObject> _controllersPerDevice = new Dictionary<EDevice, GameObject>();
-
-        private void Awake()
+        private void Start()
         {
-            OnSetupVRReady.Listeners += SetupControllersMesh;
-            foreach (var vrController in _vrControllers)
-            {
-                _controllersPerDevice.Add(vrController.ControllersDevice, vrController.ControllersMeshPrefabs);
-            }
+            if (VRSF_Components.SetupVRIsReady)
+                SetupControllersMesh(null);
+            else
+                OnSetupVRReady.Listeners += SetupControllersMesh;
         }
 
         private void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= SetupControllersMesh;
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(SetupControllersMesh))
+                OnSetupVRReady.Listeners -= SetupControllersMesh;
         }
 
         private void SetupControllersMesh(OnSetupVRReady info)
@@ -41,8 +34,9 @@ namespace VRSF.Core.Controllers
             {
                 if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
                 {
+                    var controllersList = GetComponent<ControllerMeshListing>().ControllersPerDevice;
                     var parent = _controllersHand == EHand.LEFT ? VRSF_Components.LeftController.transform : VRSF_Components.RightController.transform;
-                    GameObject.Instantiate(_controllersPerDevice[VRSF_Components.DeviceLoaded], parent);
+                    GameObject.Instantiate(controllersList[VRSF_Components.DeviceLoaded], parent);
                 }
 
                 if (_destroyOnSetup)
@@ -55,13 +49,5 @@ namespace VRSF.Core.Controllers
                 Debug.LogErrorFormat("[b]VRSF :[\n] Couldn't setup controller, as no value was given for the device {0}. Returning.", VRSF_Components.DeviceLoaded.ToString());
             }
         }
-    }
-
-
-    [Serializable]
-    public struct VRControllers
-    {
-        public EDevice ControllersDevice;
-        public GameObject ControllersMeshPrefabs;
     }
 }

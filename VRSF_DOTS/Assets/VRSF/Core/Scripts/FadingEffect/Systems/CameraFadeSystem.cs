@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Rendering;
 using Unity.Collections;
 using UnityEngine.SceneManagement;
+using System;
 
 namespace VRSF.Core.FadingEffect
 {
@@ -65,17 +66,12 @@ namespace VRSF.Core.FadingEffect
             }
         }
 
-        protected override void OnStopRunning()
-        {
-            base.OnStopRunning();
-            _entities.Dispose();
-        }
-
         protected override void OnDestroy()
         {
             StartFadingInEvent.Listeners -= OnStartFadingIn;
             StartFadingOutEvent.Listeners -= OnStartFadingOut;
 
+            _entities.Dispose();
             base.OnDestroy();
         }
 

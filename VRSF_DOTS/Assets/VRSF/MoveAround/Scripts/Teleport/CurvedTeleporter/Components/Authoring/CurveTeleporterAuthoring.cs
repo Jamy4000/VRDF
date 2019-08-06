@@ -69,7 +69,7 @@ namespace VRSF.MoveAround.Teleport
                 var teleporterEntity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!Core.Utils.InteractionSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
+                if (!Core.Utils.InteractionsSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
                 {
                     entityManager.DestroyEntity(teleporterEntity);
                     Destroy(gameObject);

@@ -15,8 +15,8 @@ namespace VRSF.Core.VRInteractions
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             var interactionSet = GetComponent<VRInteractionAuthoring>();
-            InteractionSetupHelper.AddInputCaptureComponent(ref dstManager, ref entity, interactionSet);
-            InteractionSetupHelper.AddButtonHand(ref dstManager, ref entity, interactionSet.ButtonHand);
+            InteractionsSetupHelper.AddInputCaptureComponent(ref dstManager, ref entity, interactionSet);
+            InteractionsSetupHelper.AddButtonHand(ref dstManager, ref entity, interactionSet.ButtonHand);
 
             // We add a new pointer click to store
             dstManager.AddComponentData(entity, new PointerClick

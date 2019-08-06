@@ -7,20 +7,20 @@ using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Utils
 {
-    public static class InteractionSetupHelper
+    public static class InteractionsSetupHelper
     {
         public static bool SetupInteractions(ref EntityManager entityManager, ref Entity entity, VRInteractionAuthoring interactionParameters)
         {
             // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
-            if (!InteractionSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
+            if (!InteractionsSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
                 return false;
 
             // If the Hand wasn't chose correctly, we destroy this entity and return.
-            if (!InteractionSetupHelper.AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
+            if (!InteractionsSetupHelper.AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
                 return false;
 
             // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-            if (!InteractionSetupHelper.AddInteractionType(ref entityManager, ref entity, interactionParameters.InteractionType, interactionParameters.ButtonToUse))
+            if (!InteractionsSetupHelper.AddInteractionType(ref entityManager, ref entity, interactionParameters.InteractionType, interactionParameters.ButtonToUse))
                 return false;
 
             return true;

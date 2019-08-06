@@ -4,7 +4,6 @@ using VRSF.Core.Raycast;
 
 namespace VRSF.Core.LaserPointer
 {
-    [RequireComponent(typeof(LaserLengthSetter), typeof(LaserWidthSetter))]
     public class LaserPointerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
         [Header("Laser Renderering Parameters")]

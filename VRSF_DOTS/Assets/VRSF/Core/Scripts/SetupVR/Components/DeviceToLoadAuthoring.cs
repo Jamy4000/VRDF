@@ -4,7 +4,7 @@ using UnityEngine.SpatialTracking;
 using UnityEngine.XR;
 
 namespace VRSF.Core.SetupVR
-{
+{ 
     public class DeviceToLoadAuthoring : MonoBehaviour
     {
         [Header("VR Device Parameters.")]
@@ -38,7 +38,8 @@ namespace VRSF.Core.SetupVR
             VRSF_Components.CameraRig.transform.name = "[VRSF] " + _device.ToString();
 
             // SteamVR Do not use any floor offset, so we reduce it of floorOffsetY meter * scale if this is the loaded SDK
-            VRSF_Components.FloorOffset.transform.localPosition = XRSettings.loadedDeviceName == "OpenVR" ? CalculateNewFloorOffset() : VRSF_Components.FloorOffset.transform.localPosition;
+            if (XRSettings.loadedDeviceName == "OpenVR")
+                VRSF_Components.FloorOffset.transform.localPosition = CalculateNewFloorOffset();
 
             if (ForceSDKLoad)
                 TrySDKForcing();
@@ -75,7 +76,7 @@ namespace VRSF.Core.SetupVR
         private Vector3 CalculateNewFloorOffset()
         {
             var localPos = VRSF_Components.FloorOffset.transform.localPosition;
-            return new Vector3(localPos.x, 0.0f, localPos.z);
+            return new Vector3(localPos.x, localPos.y - (localPos.y * VRSF_Components.FloorOffset.transform.lossyScale.y), localPos.z);
         }
 
         private void RemoveVRStuffs()

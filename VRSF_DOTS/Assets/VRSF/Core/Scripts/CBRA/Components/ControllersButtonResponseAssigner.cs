@@ -56,21 +56,21 @@ namespace VRSF.Core.CBRA
                 entityManager.AddComponentData(entity, new CBRATag());
 
                 // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
+                if (!InteractionsSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
                 }
 
                 // If the Hand wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
+                if (!InteractionsSetupHelper.AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
                 }
 
                 // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddInteractionType(ref entityManager, ref entity, interactionParameters.InteractionType, interactionParameters.ButtonToUse))
+                if (!InteractionsSetupHelper.AddInteractionType(ref entityManager, ref entity, interactionParameters.InteractionType, interactionParameters.ButtonToUse))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
