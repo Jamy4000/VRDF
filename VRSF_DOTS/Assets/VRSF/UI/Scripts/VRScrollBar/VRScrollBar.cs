@@ -6,6 +6,7 @@ using VRSF.Core.VRInteractions;
 using VRSF.Core.Events;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
+using UnityEngine.EventSystems;
 
 namespace VRSF.UI
 {
@@ -30,6 +31,8 @@ namespace VRSF.UI
         private VRUIScrollableSetup _scrollableSetup;
 
         private bool _boxColliderSetup;
+
+        private bool _isSelected;
         #endregion
 
 
@@ -40,10 +43,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                if (VRSF_Components.SetupVRIsReady)
-                    Init(null);
-                else
-                    OnSetupVRReady.Listeners += Init;
+                OnSetupVRReady.RegisterSetupVRResponse(Init);
 
                 // We setup the BoxCollider size and center
                 StartCoroutine(SetupBoxCollider());
@@ -57,7 +57,10 @@ namespace VRSF.UI
                 OnSetupVRReady.Listeners -= Init;
 
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckBarClick))
-                ObjectWasClickedEvent.UnregisterListener(CheckBarClick);
+            {
+                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
+                ObjectWasClickedEvent.Listeners -= CheckBarClick;
+            }
         }
 
         protected override void Update()
@@ -93,8 +96,21 @@ namespace VRSF.UI
         {
             if (interactable && clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
                 _rayHoldingHandle = clickEvent.RayOrigin;
-            else
-                _rayHoldingHandle = ERayOrigin.NONE;
+        }
+
+        private void CheckObjectOvered(ObjectWasHoveredEvent info)
+        {
+            var currentEventSystem = EventSystem.current;
+            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            {
+                _isSelected = true;
+                OnSelect(new BaseEventData(currentEventSystem));
+            }
+            else if (info.ObjectHovered != transform && _isSelected)
+            {
+                _isSelected = false;
+                OnDeselect(new BaseEventData(currentEventSystem));
+            }
         }
 
         /// <summary>
@@ -155,6 +171,7 @@ namespace VRSF.UI
 
                 // We register the Listener
                 ObjectWasClickedEvent.Listeners += CheckBarClick;
+                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
 
                 _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));
                 // Check if the Min and Max object are already created, and set there references

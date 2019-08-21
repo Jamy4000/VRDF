@@ -26,7 +26,7 @@ namespace VRSF.MoveAround.Teleport
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA
-            if ((interactionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
+            if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.Active.EntityManager;
 
@@ -45,7 +45,7 @@ namespace VRSF.MoveAround.Teleport
                 var entity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!Core.Utils.InteractionsSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))
+                if (!Core.Utils.InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))
                 {
                     entityManager.DestroyEntity(entity);
                     Destroy(gameObject);

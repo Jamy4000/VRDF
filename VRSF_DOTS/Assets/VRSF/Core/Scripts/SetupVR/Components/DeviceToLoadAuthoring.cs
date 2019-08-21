@@ -22,6 +22,11 @@ namespace VRSF.Core.SetupVR
 
         [HideInInspector] public EVR_SDK ForcedSDK = EVR_SDK.OPEN_VR;
 
+        private void Awake()
+        {
+            VRSF_Components.SetupVRIsReady = false;
+        }
+
         public void Start()
         {
             if (_checkDeviceAtRuntime)
@@ -38,7 +43,7 @@ namespace VRSF.Core.SetupVR
             VRSF_Components.CameraRig.transform.name = "[VRSF] " + _device.ToString();
 
             // SteamVR Do not use any floor offset, so we reduce it of floorOffsetY meter * scale if this is the loaded SDK
-            if (XRSettings.loadedDeviceName == "OpenVR")
+            if (XRSettings.loadedDeviceName == "OpenVR" && _device != EDevice.SIMULATOR) 
                 VRSF_Components.FloorOffset.transform.localPosition = CalculateNewFloorOffset();
 
             if (ForceSDKLoad)
@@ -66,6 +71,12 @@ namespace VRSF.Core.SetupVR
                         Debug.LogError("<b>[VRSF] :</b> Trying to force OpenVR SDK, but Simulator is the loaded Device. Please check your settings on SetupVR.");
 
                     XRSettings.LoadDeviceByName("OpenVR");
+                    break;
+                case EVR_SDK.WMR:
+                    if (_device != EDevice.WMR)
+                        Debug.LogErrorFormat("<b>[VRSF] :</b> Trying to force WMR SDK, but {0} is the loaded Device. Please check your settings on SetupVR.", _device.ToString());
+
+                    XRSettings.LoadDeviceByName("Windows Mixed Reality");
                     break;
                 default:
                     XRSettings.LoadDeviceByName("None");

@@ -16,7 +16,12 @@ namespace VRSF.Core.FadingEffect
         /// </summary>
         [Tooltip("Duration of the \"blink\" animation (fading in and out upon teleport) in seconds.")]
         public float FadingSpeed = 1;
-        
+        /// <summary>
+        ///  How long, in seconds, the fade-in/fade-out animation should take
+        /// </summary>
+        [Tooltip("Whether a Fade In effect should take place when the OnSetupVRReady is called.")]
+        public bool FadeInOnSetupVRReady = true;
+
         [Header("Required Fading Components")]
         [Tooltip("Plane Mesh used to fade")]
         [SerializeField] private Mesh _mesh;
@@ -25,7 +30,7 @@ namespace VRSF.Core.FadingEffect
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
-            _fadeMaterial.color = new Color(_fadeMaterial.color.r, _fadeMaterial.color.g, _fadeMaterial.color.b, 1.0f);
+            _fadeMaterial.color = new Color(_fadeMaterial.color.r, _fadeMaterial.color.g, _fadeMaterial.color.b, FadeInOnSetupVRReady ? 1.0f : 0.0f);
 
             dstManager.AddSharedComponentData(entity, new RenderMesh()
             {
@@ -39,7 +44,8 @@ namespace VRSF.Core.FadingEffect
                 FadingInProgress = true,
                 IsFadingIn = true,
                 ShouldImmediatlyFadeIn = false,
-                OldFadingSpeedFactor = FadingSpeed
+                OldFadingSpeedFactor = FadingSpeed,
+                FadeInOnSceneLoaded = FadeInOnSetupVRReady
             });
 
 #if UNITY_EDITOR

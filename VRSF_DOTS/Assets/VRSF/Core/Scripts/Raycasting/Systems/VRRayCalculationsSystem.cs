@@ -18,7 +18,8 @@ namespace VRSF.Core.Raycast
 
         protected override void OnUpdate()
         {
-            AssignRay();
+            if (VRSF_Components.SetupVRIsReady)
+                AssignRay();
         }
 
         protected override void OnDestroy()
@@ -53,7 +54,7 @@ namespace VRSF.Core.Raycast
                 }
 
                 raycastOrigin.RayOriginPosition = originTransform.position;
-                raycastOutputs.RayVar = new Ray(originTransform.position, originTransform.TransformDirection(Vector3.forward));
+                raycastOutputs.RayVar = new Ray(originTransform.position, originTransform.TransformDirection(Vector3.forward + ControllersRaycastOffset.RaycastDirectionOffset[VRSF_Components.DeviceLoaded]));
             });
         }
 

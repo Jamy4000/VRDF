@@ -15,26 +15,38 @@ namespace VRSF.Core.SetupVR
         {
             if (XRDevice.isPresent)
             {
-                string detectedHmd = XRDevice.model;
+                string detectedHmd = XRDevice.model.ToLower();
 
-                Debug.LogFormat("<b>[VRSF] :</b> {0} is connected.", detectedHmd);
+                Debug.LogFormat("<b>[VRSF] :</b> {0} is connected.", XRDevice.model);
 
-                if (detectedHmd.ToLower().Contains("htc"))
+                if (detectedHmd.Contains("vive") || detectedHmd.Contains("focus"))
+                {
                     return CheckHtcHeadset(detectedHmd);
-                else if (detectedHmd.ToLower().Contains("gear"))
+                }
+                else if (detectedHmd.Contains("gear"))
+                {
                     return EDevice.GEAR_VR;
-                else if (detectedHmd.ToLower().Contains("oculus"))
+                }
+                else if (detectedHmd.Contains("oculus"))
+                {
                     return CheckOculusHeadset(detectedHmd);
-                else if (detectedHmd.ToLower().Contains("windows"))
+                }
+                else if (detectedHmd.Contains("windows") || detectedHmd.Contains("acer") || detectedHmd.Contains("lenovo") || 
+                    detectedHmd.ToLower().Contains("odyssey") || detectedHmd.Contains("hp") || detectedHmd.Contains("dell"))
+                {
                     return EDevice.WMR;
+                }
                 else
-                    return LoadSimulatorWithDebugText("<b>[VRSF] :</b> " + detectedHmd + " is not supported yet, loading Simulator Support.", true);            }
+                {
+                    return LoadSimulatorWithDebugText("<b>[VRSF] :</b> " + detectedHmd + " is not supported yet, loading Simulator Support.", true);
+                }
+            }
             else
             {
                 return LoadSimulatorWithDebugText("<b>[VRSF] :</b> No XRDevice present, loading Simulator");
             }
         }
-
+        
         private static EDevice CheckHtcHeadset(string detectedHmd)
         {
             if (detectedHmd.ToLower().Contains("vive"))

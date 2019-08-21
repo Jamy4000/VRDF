@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
+using UnityEngine.EventSystems;
+using VRSF.Core.Controllers.Haptic;
+using VRSF.Core.Controllers;
 
 namespace VRSF.UI
 {
@@ -11,7 +14,7 @@ namespace VRSF.UI
     [RequireComponent(typeof(Collider))]
     public class VRButton : UnityEngine.UI.Button
     {
-        #region PUBLIC_VARIABLES
+        #region VARIABLES
         [Tooltip("If you want to set the collider yourself, set this value to false.")]
         [SerializeField] public bool SetColliderAuto = true;
 
@@ -20,7 +23,9 @@ namespace VRSF.UI
 
         [Tooltip("If this button can be click using the meshcollider of your controller.")]
         [SerializeField] public bool ControllerClickable = true;
-        #endregion PUBLIC_VARIABLES
+
+        private bool _isSelected;
+        #endregion VARIABLES
 
 
         #region MONOBEHAVIOUR_METHODS
@@ -30,10 +35,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                if (VRSF_Components.SetupVRIsReady)
-                    Init(null);
-                else
-                    OnSetupVRReady.Listeners += Init;
+                OnSetupVRReady.RegisterSetupVRResponse(Init);
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
@@ -49,13 +51,19 @@ namespace VRSF.UI
                 OnSetupVRReady.Listeners -= Init;
 
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
+            {
+                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
                 ObjectWasClickedEvent.Listeners -= CheckObjectClicked;
+            }
         }
 
         private void OnTriggerEnter(Collider other)
         {
             if (ControllerClickable && interactable && other.gameObject.tag.Contains("ControllerBody"))
+            {
                 onClick.Invoke();
+                new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+            }
         }
         #endregion MONOBEHAVIOUR_METHODS
 
@@ -69,6 +77,21 @@ namespace VRSF.UI
         {
             if (interactable && objectClickEvent.ObjectClicked == transform)
                 onClick.Invoke();
+        }
+
+        private void CheckObjectOvered(ObjectWasHoveredEvent info)
+        {
+            var currentEventSystem = EventSystem.current;
+            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            {
+                _isSelected = true;
+                OnSelect(new BaseEventData(currentEventSystem));
+            }
+            else if (info.ObjectHovered != transform && _isSelected)
+            {
+                _isSelected = false;
+                OnDeselect(new BaseEventData(currentEventSystem));
+            }
         }
 
         /// <summary>
@@ -92,7 +115,10 @@ namespace VRSF.UI
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
                 if (LaserClickable)
+                {
                     ObjectWasClickedEvent.Listeners += CheckObjectClicked;
+                    ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+                }
 
                 var boxCollider = GetComponent<BoxCollider>();
                 if (ControllerClickable && boxCollider != null)

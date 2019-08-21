@@ -39,7 +39,7 @@ namespace VRSF.Core.VRInteractions
             // We set the buttonActionChoser reference
             _interactionSet = (VRInteractionAuthoring)target;
 
-            _deviceToUse = serializedObject.FindProperty("DeviceUsingCBRA");
+            _deviceToUse = serializedObject.FindProperty("DeviceUsingFeature");
             _interactionType = serializedObject.FindProperty("InteractionType");
             _buttonHand = serializedObject.FindProperty("ButtonHand");
             _buttonToUse = serializedObject.FindProperty("ButtonToUse");
@@ -172,17 +172,18 @@ namespace VRSF.Core.VRInteractions
 
         private bool DisplayDeviceToUse()
         {
-            EditorGUILayout.LabelField("Device using this CBRA", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Device using this feature", EditorStyles.boldLabel);
 
             Rect ourRect = EditorGUILayout.BeginHorizontal();
             EditorGUI.BeginProperty(ourRect, GUIContent.none, _deviceToUse);
             EditorGUI.BeginChangeCheck();
 
-            var newVal = (int)(EDevice)EditorGUILayout.EnumFlagsField("Device List", _interactionSet.DeviceUsingCBRA);
+            var oldVal = _deviceToUse.intValue;
+            var newVal = (int)(EDevice)EditorGUILayout.EnumFlagsField("Device List", _interactionSet.DeviceUsingFeature);
 
             EditorGUILayout.EndHorizontal();
             EditorGUI.EndProperty();
-            if (CheckEndChanges())
+            if (CheckEndChanges(oldVal, newVal))
             {
                 Undo.RecordObject(_interactionSet, "Changing DeviceToUse");
                 _deviceToUse.intValue = newVal;
@@ -204,11 +205,12 @@ namespace VRSF.Core.VRInteractions
             EditorGUI.BeginProperty(ourRect, GUIContent.none, _interactionType);
             EditorGUI.BeginChangeCheck();
 
+            var oldVal = _interactionType.intValue;
             var newVal = (int)(EControllerInteractionType)EditorGUILayout.EnumFlagsField("Interaction Type", _interactionSet.InteractionType);
-
             EditorGUI.EndProperty();
             EditorGUILayout.EndHorizontal();
-            if (CheckEndChanges())
+
+            if (CheckEndChanges(oldVal, newVal))
             {
                 Undo.RecordObject(_interactionSet, "Changing DeviceToUse");
                 _interactionType.intValue = newVal;
@@ -394,9 +396,9 @@ namespace VRSF.Core.VRInteractions
             EditorGUILayout.HelpBox("This Button cannot be use for the Click Interaction", MessageType.Error);
         }
 
-        private bool CheckEndChanges()
+        private bool CheckEndChanges(int oldValue = -1, int newValue = -1)
         {
-            if (EditorGUI.EndChangeCheck())
+            if (EditorGUI.EndChangeCheck() || oldValue != newValue)
             {
                 serializedObject.ApplyModifiedProperties();
                 PrefabUtility.RecordPrefabInstancePropertyModifications(_interactionSet);
