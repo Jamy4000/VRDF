@@ -10,7 +10,7 @@ namespace VRSF.Core.VRInteractions
         /// <summary>
         /// The Devices that are using this VR Interaction
         /// </summary>
-        [HideInInspector] [SerializeField] public EDevice DeviceUsingCBRA = EDevice.ALL;
+        [HideInInspector] [SerializeField] public EDevice DeviceUsingFeature = EDevice.ALL;
 
         /// <summary>
         /// The type of Interaction you want to use

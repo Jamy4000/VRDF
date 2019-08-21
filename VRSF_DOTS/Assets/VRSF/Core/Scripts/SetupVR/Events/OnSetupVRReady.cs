@@ -9,5 +9,13 @@
         {
             FireEvent(this);
         }
+
+        public static void RegisterSetupVRResponse(EventListener listener)
+        {
+            if (VRSF_Components.SetupVRIsReady)
+                listener(null);
+            else
+                Listeners += listener;
+        }
     }
 }

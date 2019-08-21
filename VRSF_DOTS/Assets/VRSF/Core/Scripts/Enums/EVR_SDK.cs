@@ -8,5 +8,6 @@
         NONE            = 0, 
         OCULUS          = 1 << 0,
         OPEN_VR         = 1 << 1,
+        WMR             = 1 << 2
     }
 }

@@ -11,12 +11,13 @@ namespace VRSF.Core.Utils
     {
         private void Awake()
         {
-            OnSetupVRReady.Listeners += DestroyThisObject;
+            OnSetupVRReady.RegisterSetupVRResponse(DestroyThisObject);
         }
 
         private void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= DestroyThisObject;
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(DestroyThisObject))
+                OnSetupVRReady.Listeners -= DestroyThisObject;
         }
 
         private void DestroyThisObject(OnSetupVRReady info)

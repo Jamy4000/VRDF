@@ -10,6 +10,8 @@ namespace VRSF.Core.Inputs
     {
         private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
 
+        private string _leftInput;
+
         protected override void OnCreate()
         {
             // Cache the EndSimulationEntityCommandBufferSystem in a field, so we don't have to get it every frame
@@ -20,10 +22,13 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
+            if (!VRSF_Components.SetupVRIsReady)
+                return inputDeps;
+
             var handle = new MenuInputCaptureJob()
             {
-                MenuButtonDown = Input.GetButtonDown("WMRLeftMenuClick"),
-                MenuButtonUp = Input.GetButtonUp("WMRLeftMenuClick"),
+                MenuButtonDown = Input.GetButtonDown(_leftInput),
+                MenuButtonUp = Input.GetButtonUp(_leftInput),
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
 
@@ -69,6 +74,7 @@ namespace VRSF.Core.Inputs
         private void CheckForDevice(OnSetupVRReady info)
         {
             this.Enabled = VRSF_Components.DeviceLoaded == EDevice.WMR;
+            _leftInput = UnityEngine.XR.XRSettings.loadedDeviceName == "OpenVR" ? "HtcLeftMenuClick" : "WMRLeftMenuClick";
         }
         #endregion PRIVATE_METHODS
     }

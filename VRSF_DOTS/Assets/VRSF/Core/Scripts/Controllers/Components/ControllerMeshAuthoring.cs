@@ -16,10 +16,7 @@ namespace VRSF.Core.Controllers
 
         private void Start()
         {
-            if (VRSF_Components.SetupVRIsReady)
-                SetupControllersMesh(null);
-            else
-                OnSetupVRReady.Listeners += SetupControllersMesh;
+            OnSetupVRReady.RegisterSetupVRResponse(SetupControllersMesh);
         }
 
         private void OnDestroy()

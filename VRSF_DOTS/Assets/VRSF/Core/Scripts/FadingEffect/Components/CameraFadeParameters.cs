@@ -22,5 +22,10 @@ namespace VRSF.Core.FadingEffect
         /// Whether the fading effect is currently in progress
         /// </summary>
         public bool FadingInProgress;
+
+        /// <summary>
+        /// Whether the fading effect should take place OnSetupVRReady
+        /// </summary>
+        public bool FadeInOnSceneLoaded;
     }
 }

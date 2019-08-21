@@ -6,6 +6,7 @@ using VRSF.Core.VRInteractions;
 using VRSF.Core.Events;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
+using UnityEngine.EventSystems;
 
 namespace VRSF.UI
 {
@@ -31,6 +32,8 @@ namespace VRSF.UI
         private VRUIScrollableSetup _scrollableSetup;
 
         private bool _boxColliderSetup;
+
+        private bool _isSelected;
         #endregion
 
 
@@ -43,11 +46,7 @@ namespace VRSF.UI
             {
                 _boxColliderSetup = false;
 
-                if (VRSF_Components.SetupVRIsReady)
-                    Init(null);
-                else
-                    OnSetupVRReady.Listeners += Init;
-
+                OnSetupVRReady.RegisterSetupVRResponse(Init);
 
                 // We setup the BoxCollider size and center
                 StartCoroutine(SetupBoxCollider());
@@ -61,7 +60,10 @@ namespace VRSF.UI
                 OnSetupVRReady.Listeners -= Init;
 
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
+            {
+                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
                 ObjectWasClickedEvent.Listeners -= CheckSliderClick;
+            }
         }
 
         protected override void Update()
@@ -104,6 +106,21 @@ namespace VRSF.UI
             }
         }
 
+        private void CheckObjectOvered(ObjectWasHoveredEvent info)
+        {
+            var currentEventSystem = EventSystem.current;
+            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            {
+                _isSelected = true;
+                OnSelect(new BaseEventData(currentEventSystem));
+            }
+            else if (info.ObjectHovered != transform && _isSelected)
+            {
+                _isSelected = false;
+                OnDeselect(new BaseEventData(currentEventSystem));
+            }
+        }
+
 
         /// <summary>
         /// Set the BoxCollider size if SetColliderAuto is at true
@@ -125,6 +142,8 @@ namespace VRSF.UI
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
                 ObjectWasClickedEvent.Listeners += CheckSliderClick;
+                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+            
                 CheckSliderReferences();
 
                 _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), minValue, maxValue, wholeNumbers);

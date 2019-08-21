@@ -1,10 +1,8 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Events;
-using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
-using VRSF.Core.CBRA;
 
 namespace VRSF.Core.VRInteractions
 {
@@ -23,7 +21,7 @@ namespace VRSF.Core.VRInteractions
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
+            Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
             {
                 if (pointerClick.CanClick)
                 {

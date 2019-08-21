@@ -52,7 +52,6 @@ namespace VRSF.Core.LaserPointer
             dstManager.SetName(entity, string.Format("Laser Pointer {0}", raycastAuthoring.RayOrigin.ToString()));
 #endif
 
-            Destroy(raycastAuthoring);
             Destroy(GetComponent<ConvertToEntity>());
             Destroy(this);
         }

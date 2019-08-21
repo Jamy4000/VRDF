@@ -10,52 +10,38 @@ namespace VRSF.UI
     /// </summary>
     public class VRKeyboard : MonoBehaviour
     {
-        #region PUBLIC_VARIABLES 
         [Header("Event fired when the user is clicking the Enter button")]
         public UnityEvent OnEnterClicked;
-        #endregion PUBLIC_VARIABLES
 
-
-        #region PRIVATE_VARIABLES
-        [Tooltip("This can be set via a script by referencing the VRKeyboard")]
-        private TMPro.TMP_InputField inputField;
-        #endregion PRIVATE_VARIABLES
-
-
-        #region MONOBEHAVIOUR_METHODS
-        private void Awake()
+        protected virtual void Awake()
         {
-            VRButton[] buttons = GetComponentsInChildren<VRButton>();
-            foreach (VRButton button in buttons)
+            foreach (VRButton button in GetComponentsInChildren<VRButton>())
             {
                 button.onClick.AddListenerExtend(delegate { ClickKey(button.name); });
             }
         }
-        #endregion MONOBEHAVIOUR_METHODS
 
-
-        #region PRIVATE_METHODS
         /// <summary>
         /// Called when a key on the keyboard is clicked
         /// </summary>
         /// <param name="character">The character that was clicked</param>
-        private void ClickKey(string character)
+        protected virtual void ClickKey(string character)
         {
-            if (!inputField) return;
+            if (!InputField) return;
 
-            switch (character)
+            switch (character.ToLower())
             {
-                case "Backspace":
+                case "backspace":
                     Backspace();
                     break;
-                case "Enter":
+                case "enter":
                     Enter();
                     break;
-                case "Space":
-                    inputField.text += " ";
+                case "space":
+                    InputField.text += " ";
                     break;
                 default:
-                    inputField.text += character;
+                    InputField.text += character;
                     break;
             }
         }
@@ -63,38 +49,21 @@ namespace VRSF.UI
         /// <summary>
         /// Handle the Backspace Key
         /// </summary>
-        private void Backspace()
+        protected virtual void Backspace()
         {
-            if (inputField.text.Length > 0)
-            {
-                inputField.text = inputField.text.Substring(0, inputField.text.Length - 1);
-            }
+            if (InputField.text.Length > 0)
+                InputField.text = InputField.text.Substring(0, InputField.text.Length - 1);
         }
 
         /// <summary>
         /// Handle the Enter Key
         /// </summary>
-        private void Enter()
+        protected virtual void Enter()
         {
             OnEnterClicked.Invoke();
-            Debug.Log("You've typed [" + inputField.text + "]");
         }
-        #endregion PRIVATE_METHODS
 
 
-        #region GETTERS_SETTERS
-        public TMPro.TMP_InputField InputField
-        {
-            get
-            {
-                return inputField;
-            }
-
-            set
-            {
-                inputField = value;
-            }
-        }
-        #endregion GETTERS_SETTERS
+        public TMPro.TMP_InputField InputField { get; set; }
     }
 }

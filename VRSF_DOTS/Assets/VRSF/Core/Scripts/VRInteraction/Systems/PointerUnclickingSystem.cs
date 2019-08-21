@@ -23,7 +23,7 @@ namespace VRSF.Core.VRInteractions
                 if (stopClickingEvent.ButtonInteracting == pointerClick.ControllersButton)
                 {
                     InteractionVariableContainer.IsClickingSomethingLeft = false;
-                    new ObjectWasClickedEvent(Raycast.ERayOrigin.LEFT_HAND, null);
+                    //new ObjectWasClickedEvent(Raycast.ERayOrigin.LEFT_HAND, null);
                 }
             });
 
@@ -32,7 +32,7 @@ namespace VRSF.Core.VRInteractions
                 if (stopClickingEvent.ButtonInteracting == pointerClick.ControllersButton)
                 {
                     InteractionVariableContainer.IsClickingSomethingRight = false;
-                    new ObjectWasClickedEvent(Raycast.ERayOrigin.RIGHT_HAND, null);
+                   // new ObjectWasClickedEvent(Raycast.ERayOrigin.RIGHT_HAND, null);
                 }
             });
         }
