@@ -16,6 +16,7 @@ namespace VRSF.MoveAround.Fly
             EditorGUILayout.Space();
 
             EditorGUILayout.HelpBox("Boundaries are shown in Scene view if the Material is not null AND if MinAvatarPos or MaxAvatarPos are different from a Vector3.zero.", MessageType.Info);
+            EditorGUILayout.HelpBox("WARNING : You need to have Gizmos activated in your Scene View !", MessageType.Warning);
         }
 
         /// <summary>
