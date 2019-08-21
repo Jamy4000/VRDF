@@ -9,6 +9,7 @@ namespace VRSF.MoveAround.Fly
     /// <summary>
     /// System calculating the direction in which the user is going
     /// </summary>
+    
     public class FlyDirectionCalculationSystem : JobComponentSystem
     {
         protected override JobHandle OnUpdate(JobHandle inputDeps)

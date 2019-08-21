@@ -25,6 +25,7 @@ namespace VRSF.MoveAround.Fly
                 }
                 else if (EntityManager.HasComponent(e, typeof(IsFlying)))
                 {
+                    UnityEngine.Debug.Log("Has IS Flying");
                     PostUpdateCommands.RemoveComponent<IsFlying>(e);
                     PostUpdateCommands.AddComponent(e, new IsDecelerating());
                 }
