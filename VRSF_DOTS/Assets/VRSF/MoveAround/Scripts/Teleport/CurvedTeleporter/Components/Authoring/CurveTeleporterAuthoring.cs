@@ -5,6 +5,7 @@ using VRSF.Core.SetupVR;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
 using Unity.Rendering;
+using VRSF.Core.Utils;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -140,6 +141,8 @@ namespace VRSF.MoveAround.Teleport
                     InvalidPadInstance = invalidPad
                 });
 
+                entityManager.AddComponentData(teleporterEntity, new DestroyOnSceneUnloaded());
+
                 Destroy(SelectionPad);
                 Destroy(InvalidPad);
 
@@ -162,12 +165,12 @@ namespace VRSF.MoveAround.Teleport
                 {
                     var parabolPoint = entityManager.CreateEntity(pointArchetype);
                     entityManager.SetSharedComponentData(parabolPoint, new ParabolPointParent { TeleporterEntityIndex = teleporterEntity.Index });
+                    entityManager.AddComponentData(parabolPoint, new DestroyOnSceneUnloaded());
 #if UNITY_EDITOR
                     // Set it's name in Editor Mode for the Entity Debugger Window
                     entityManager.SetName(parabolPoint, "Curve Teleporter Point " + i);
 #endif
                 }
-
             }
 
             Destroy(gameObject);

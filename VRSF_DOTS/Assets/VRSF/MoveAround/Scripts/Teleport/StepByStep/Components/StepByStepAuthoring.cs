@@ -4,6 +4,7 @@ using VRSF.Core.Inputs;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
+using VRSF.Core.Utils;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -69,6 +70,8 @@ namespace VRSF.MoveAround.Teleport
                     DistanceStepByStep = _distanceStepByStep,
                     StepHeight = _stepHeight
                 });
+
+                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

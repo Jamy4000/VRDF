@@ -1,6 +1,7 @@
 ﻿using Unity.Entities;
 using Unity.Rendering;
 using UnityEngine;
+using VRSF.Core.Utils;
 
 namespace VRSF.Core.FadingEffect
 {
@@ -47,6 +48,8 @@ namespace VRSF.Core.FadingEffect
                 OldFadingSpeedFactor = FadingSpeed,
                 FadeInOnSceneLoaded = FadeInOnSetupVRReady
             });
+
+            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window

@@ -1,5 +1,6 @@
 ﻿using Unity.Entities;
 using UnityEngine;
+using VRSF.Core.Utils;
 
 namespace VRSF.Core.Raycast
 {
@@ -45,6 +46,8 @@ namespace VRSF.Core.Raycast
                 RaycastHitVar = new RaycastHitVariable(),
                 RayVar = new Ray()
             });
+
+            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
             Destroy(this);
         }

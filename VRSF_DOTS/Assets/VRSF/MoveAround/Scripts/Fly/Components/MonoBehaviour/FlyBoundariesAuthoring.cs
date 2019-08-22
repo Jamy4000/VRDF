@@ -19,7 +19,7 @@ namespace VRSF.MoveAround.Fly
         [Tooltip("The maximum local position at which the user can go. Set values to zero for no minimum boundaries.")]
         public Vector3 MaxAvatarPosition = new Vector3(0.0f, 0.0f, 0.0f);
 
-        private void Awake()
+        private void Start()
         {
             if (Application.isPlaying)
                 Destroy(this);

@@ -5,6 +5,7 @@ using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
+using VRSF.Core.Utils;
 using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.Fly
@@ -111,6 +112,8 @@ namespace VRSF.MoveAround.Fly
                         UseBoundaries = flyBoundaries.MaxAvatarPosition != Vector3.zero && flyBoundaries.MinAvatarPosition != Vector3.zero
                     });
                 }
+
+                entityManager.AddComponentData(flyModeEntity, new DestroyOnSceneUnloaded());
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

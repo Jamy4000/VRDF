@@ -1,6 +1,7 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Raycast;
+using VRSF.Core.Utils;
 
 namespace VRSF.Core.LaserPointer
 {
@@ -46,6 +47,8 @@ namespace VRSF.Core.LaserPointer
                 ShouldPointTo3DObjectsCenter = _shouldPointTo3DObjectCenter,
                 ShouldPointToUICenter = _shouldPointToUICenter
             });
+
+            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
 #if UNITY_EDITOR
             // Set the name of the entity in Editor Mode for the Entity Debugger Window
