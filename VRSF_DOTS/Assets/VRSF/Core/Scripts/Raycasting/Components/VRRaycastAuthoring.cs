@@ -18,13 +18,21 @@ namespace VRSF.Core.Raycast
         [Header("Layer(s) to exclude from the Raycast System.")]
         public LayerMask ExcludedLayer = new LayerMask();
 
+        [Header("Raycast Position Offset")]
+        [Tooltip("If you want to apply an offset to the start point of the raycast. This will as well be applied to the laser if you use one.")]
+        [SerializeField] private Vector3 _startPointOffset = Vector3.zero;
+        [Tooltip("If you want to apply an offset to the end point of the raycast. This will as well be applied to the laser if you use one.")]
+        [SerializeField] private Vector3 _endPointOffset = Vector3.zero;
+
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             // We add the VRRaycastParameters as a struct to the newly created entity
             dstManager.AddComponentData(entity, new VRRaycastParameters
             {
                 MaxRaycastDistance = MaxRaycastDistance,
-                ExcludedLayer = ExcludedLayer
+                ExcludedLayer = ExcludedLayer,
+                StartPointOffset = _startPointOffset,
+                EndPointOffset = _endPointOffset
             });
 
             dstManager.AddComponentData(entity, new VRRaycastOrigin

@@ -53,8 +53,14 @@ namespace VRSF.Core.Raycast
                         break;
                 }
 
-                raycastOrigin.RayOriginPosition = originTransform.position;
-                raycastOutputs.RayVar = new Ray(originTransform.position, originTransform.TransformDirection(Vector3.forward + ControllersRaycastOffset.RaycastDirectionOffset[VRSF_Components.DeviceLoaded]));
+                // Start Point
+                raycastOrigin.RayOriginPosition = originTransform.position + ControllersRaycastOffset.RaycastPositionOffset[VRSF_Components.DeviceLoaded] + parameters.StartPointOffset;
+                raycastOutputs.RayVar = new Ray
+                (
+                    raycastOrigin.RayOriginPosition,
+                    // End Point
+                    originTransform.TransformDirection(Vector3.forward + ControllersRaycastOffset.RaycastDirectionOffset[VRSF_Components.DeviceLoaded] + parameters.EndPointOffset)
+                );
             });
         }
 
