@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VRSF.Core.Inputs
+namespace VRSF.Core.Utils
 {
     public struct CameraState
     {
