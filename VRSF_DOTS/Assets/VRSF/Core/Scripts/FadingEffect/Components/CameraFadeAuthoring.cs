@@ -42,8 +42,6 @@ namespace VRSF.Core.FadingEffect
             dstManager.AddComponentData(entity, new CameraFadeParameters()
             {
                 FadingSpeed = FadingSpeed,
-                FadingInProgress = true,
-                IsFadingIn = true,
                 ShouldImmediatlyFadeIn = false,
                 OldFadingSpeedFactor = FadingSpeed,
                 FadeInOnSceneLoaded = FadeInOnSetupVRReady
