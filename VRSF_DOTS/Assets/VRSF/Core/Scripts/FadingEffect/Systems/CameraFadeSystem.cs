@@ -1,23 +1,18 @@
 ﻿using UnityEngine;
 using Unity.Entities;
 using Unity.Rendering;
-using Unity.Collections;
-using UnityEngine.SceneManagement;
 
 namespace VRSF.Core.FadingEffect
 {
     public class CameraFadeSystem : ComponentSystem
     {
         private EntityManager _entityManager;
-        private NativeArray<Entity> _entities;
-        private bool _entityArrayHasBeenSet;
         private RenderMesh _renderMesh;
 
         protected override void OnCreate()
         {
             StartFadingInEvent.Listeners += OnStartFadingIn;
             StartFadingOutEvent.Listeners += OnStartFadingOut;
-            SceneManager.sceneLoaded += OnNewSceneLoaded;
 
             base.OnCreate();
             _entityManager = World.Active.EntityManager;
@@ -26,13 +21,6 @@ namespace VRSF.Core.FadingEffect
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
-
-            if (!_entityArrayHasBeenSet)
-            {
-                int cameraFadeEntities = GetEntityQuery(typeof(CameraFadeParameters)).CalculateEntityCount();
-                _entities = new NativeArray<Entity>(cameraFadeEntities, Allocator.Persistent);
-                _entityArrayHasBeenSet = true;
-            }
 
             Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
@@ -63,8 +51,6 @@ namespace VRSF.Core.FadingEffect
         {
             StartFadingInEvent.Listeners -= OnStartFadingIn;
             StartFadingOutEvent.Listeners -= OnStartFadingOut;
-
-            _entities.Dispose();
             base.OnDestroy();
         }
 
@@ -120,11 +106,6 @@ namespace VRSF.Core.FadingEffect
         protected void OnStartFadingOut(StartFadingOutEvent info)
         {
             this.Enabled = true;
-        }
-
-        private void OnNewSceneLoaded(Scene newScene, LoadSceneMode loadMode)
-        {
-            _entityArrayHasBeenSet = !(SceneManager.GetActiveScene() == newScene);
         }
     }
 }
