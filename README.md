@@ -38,8 +38,8 @@ For Unity, you need to download the latest **2019.1 version or later**, as it's 
 ## Main Packages
 To use this Framework, you gonna need the following stuffs :
 - **The XR Legacy Input Helpers** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on All Packages > XR Legacy Input Helpers > Install).
-- **The Entities Package 0.0.12 preview-33** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install). 
-- **The Hybrid Renderer Package 0.0.1 preview-13** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Hybrid Renderer > Install). 
+- **The Entities Package preview - 0.1.1** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install). 
+- **The Hybrid Renderer Package preview - 0.1.1** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Hybrid Renderer > Install). 
 - **TextMesh Pro** : Only if you want to use the VR UI Extension. You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on All Packages > TextMesh Pro > Install).
 
 ## VR Packages
