@@ -52,7 +52,8 @@ namespace VRSF.Core.Simulator
                     typeof(SimulatorMovementSpeed),
                     typeof(SimulatorMovementRotation),
                     typeof(JobAnimationCurve),
-                    typeof(SimulatorCameraState)
+                    typeof(SimulatorCameraState),
+                    typeof(DestroyOnSceneUnloaded)
                 );
 
                 var entity = entityManager.CreateEntity(archetype);
