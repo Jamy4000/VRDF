@@ -1,5 +1,35 @@
 # Change Log
 
+## [v0.3](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.3) (2019-08-23)
+[Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.2.1...v0.3)
+**Summary:**
+The largest part of VRSF Hybrid is now refactored. We tried the framework in another project and fixed some bugs.
+
+### New Features :
+- Simulator Movements refactored
+- Raycast offset per controllers
+- Raycast offset as serialized property
+- Multiplayer package, sample and HOW TO
+- OnSetupVRReady.RegisterSetupVRResponse to make sure that the init methods are called
+
+
+### Debug :
+- No error anymore in Camera Fade
+- Deletion of VRSF Entities when scene is reloaded (just adding a component called DestroyOnSceneUnloaded)
+- VRSF_Components.SetupVRIsReady was never reset, fixed that
+
+**Closed issues:**
+
+- v0.3 Summary [\#32](https://github.com/Jamy4000/VRSF_DOTS/issues/32)
+- Refactor Simulator movements [\#21](https://github.com/Jamy4000/VRSF_DOTS/issues/21)
+- OnSetupVRReady with Additive Scenes [\#30](https://github.com/Jamy4000/VRSF_DOTS/issues/30)
+- CameraFade Bug [\#27](https://github.com/Jamy4000/VRSF_DOTS/issues/27)
+- General Bugs and Improvements [\#31](https://github.com/Jamy4000/VRSF_DOTS/issues/31)
+- Add Prefabs and Editor Scripts [\#16](https://github.com/Jamy4000/VRSF_DOTS/issues/16)
+- Create an HOW-TO Documentation [\#17](https://github.com/Jamy4000/VRSF_DOTS/issues/17)
+- Implement Basic Features [\#15](https://github.com/Jamy4000/VRSF_DOTS/issues/15)
+
+
 ## [v0.2.1](https://github.com/Jamy4000/VRSF_DOTS/tree/v0.2.1) (2019-07-24)
 [Full Changelog](https://github.com/Jamy4000/VRSF_DOTS/compare/v0.2...v0.2.1)
 **Summary:**
