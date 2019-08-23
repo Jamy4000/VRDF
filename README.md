@@ -26,6 +26,11 @@ The supported devices for now are :
 The stable versions are placed in the Releases section of this repository. Multiple packages are available, with extensions depending on your use. The only one you absolutely need is the VRSF_Hybrid_Core package.
 
 
+# Third Party Softwares
+- **Oculus Desktop** : App provided by Oculus to use the Oculus Rift or Rift S. Just download and follow [the setup form here](https://www.oculus.com/rift/setup/).
+- **SteamVR** : Just download [Steam](https://store.steampowered.com/about/), and look for [SteamVR](https://store.steampowered.com/app/250820/SteamVR/) on the Steam Store.
+- **WMR Support for SteamVR** : If you want to use WMR Headset. Just look for [the support on the Steam Store](https://store.steampowered.com/app/719950/Windows_Mixed_Reality_for_SteamVR/).
+
 
 # Requirements
 For Unity, you need to download the latest **2019.1 version or later**, as it's required to be able to use Unity DOTS.
@@ -50,11 +55,8 @@ If you need to build for a mobile platform, you need as well to download the And
 - **VR Support** : In the Player Settings Window (Edit > Project Settings > Player), go to the last tab called XR Settings, set the Virtual Reality Supported toggle to true, and add the Oculus, OpenVR and None SDKs to the list.
 - **Scripting Runtime Version** : This one is normally set by default in the last versions of Unity, but we never know :  still in the Player Settings Window, go to the Other Settings tab and set the Scripting Runtime version to .NET 4.x Equivalent.
 
-## Third Party Softwares
-- **Oculus Desktop** : App provided by Oculus to use the Oculus Rift or Rift S. Just download and follow [the setup form here](https://www.oculus.com/rift/setup/).
-- **SteamVR** : Just download [Steam](https://store.steampowered.com/about/), and look for [SteamVR](https://store.steampowered.com/app/250820/SteamVR/) on the Steam Store.
-- **WMR Support for SteamVR** : If you want to use WMR Headset. Just look for [the support on the Steam Store](https://store.steampowered.com/app/719950/Windows_Mixed_Reality_for_SteamVR/).
-
+## Multiplayer Setup
+To use the multiplayer features, please follow [the HOW TO list](https://github.com/Jamy4000/VRSF_DOTS/blob/master/VRSF_DOTS/Assets/VRSF/Multiplayer/HOW_TO_Multi.md) created for this purpose.
 
 Once all of that is done, **Restart your project so everything can be recompiled !**
 
