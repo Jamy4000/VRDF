@@ -14,7 +14,7 @@ The repository you're currently is a Crossfplatform, Lightweight VR Framework gi
 The supported devices for now are :
 - The HTC Vive
 - The HTC Focus (No 3D Models for the controllers are provided for now)
-- The Microsoft Mixed Reality Headset
+- The Microsoft Mixed Reality Headset (using SteamVR)
 - The Oculus Rift with Touch Controllers
 - The Oculus Quest
 - The Oculus GO
@@ -41,8 +41,7 @@ To use this Framework, you gonna need the following stuffs :
 You still need to import some VR Packages, depending on your needs, to use this framework. Those are found in the Package Manager from Unity :
 - **Oculus (Desktop)** : If you want to use the Rift or Rift S Support
 - **Oculus (Android)** : If you want to use the Oculus Go, Gear VR or Oculus Quest Support
-- **OpenVR (Desktop)** : If you want to use the HTC Vive or HTC Focus (**WARNING :** MODELS FOR FOCUS CONTROLLERS NOT PROVIDED)
-- **Windows Mixed Reality** : If you want to use the WMR Headset
+- **OpenVR (Desktop)** : If you want to use the HTC Vive, HTC Focus or WMR Headsets (**WARNING :** MODELS FOR FOCUS CONTROLLERS NOT PROVIDED)
 
 ### Oculus GO, Oculus Quest, Gear VR and HTC Focus Specifities
 If you need to build for a mobile platform, you need as well to download the Android Building support (File > Build Settings > Android) and to switch the platform to Android.
@@ -51,6 +50,10 @@ If you need to build for a mobile platform, you need as well to download the And
 - **VR Support** : In the Player Settings Window (Edit > Project Settings > Player), go to the last tab called XR Settings, set the Virtual Reality Supported toggle to true, and add the Oculus, OpenVR and None SDKs to the list.
 - **Scripting Runtime Version** : This one is normally set by default in the last versions of Unity, but we never know :  still in the Player Settings Window, go to the Other Settings tab and set the Scripting Runtime version to .NET 4.x Equivalent.
 
+## Third Party Softwares
+- **Oculus Desktop** : App provided by Oculus to use the Oculus Rift or Rift S. Just download and follow [the setup form here](https://www.oculus.com/rift/setup/).
+- **SteamVR** : Just download [Steam](https://store.steampowered.com/about/), and look for [SteamVR](https://store.steampowered.com/app/250820/SteamVR/) on the Steam Store.
+- **WMR Support for SteamVR** : If you want to use WMR Headset. Just look for [the support on the Steam Store](https://store.steampowered.com/app/719950/Windows_Mixed_Reality_for_SteamVR/).
 
 
 Once all of that is done, **Restart your project so everything can be recompiled !**
