@@ -315,19 +315,16 @@ namespace VRSF.UI
 
         private void Init(OnSetupVRReady _)
         {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            GetFillRectReference();
+
+            if (LaserClickable)
             {
-                GetFillRectReference();
-
-                if (LaserClickable)
-                {
-                    ObjectWasClickedEvent.Listeners += CheckSliderClick;
-                    ObjectWasHoveredEvent.Listeners += CheckSliderHovered;
-                }
-
-                if (ControllerClickable)
-                    GetComponent<BoxCollider>().isTrigger = true;
+                ObjectWasClickedEvent.Listeners += CheckSliderClick;
+                ObjectWasHoveredEvent.Listeners += CheckSliderHovered;
             }
+
+            if (ControllerClickable)
+                GetComponent<BoxCollider>().isTrigger = true;
         }
 
         /// <summary>

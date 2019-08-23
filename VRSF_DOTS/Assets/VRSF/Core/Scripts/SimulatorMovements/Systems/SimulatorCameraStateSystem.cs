@@ -4,22 +4,33 @@ using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.Simulator
 {
+    [UpdateBefore(typeof(SimulatorRotationSystem))]
     public class SimulatorCameraStateSystem : ComponentSystem
     {
+        private bool _setupDone = true;
+
         protected override void OnCreateManager()
         {
             OnSetupVRReady.RegisterSetupVRResponse(CheckSystemState);
             base.OnCreateManager();
-            this.Enabled = false;
         }
-        
+
         protected override void OnUpdate()
         {
+            if (!_setupDone)
+            {
+                Entities.ForEach((ref SimulatorCameraState scs) =>
+                {
+                    ResetCameraStateTransform(ref scs);
+                    _setupDone = true;
+                });
+            }
+
             if (Input.GetMouseButtonDown(1))
             {
                 Entities.ForEach((ref SimulatorCameraState scs) =>
                 {
-                    ResetCameraStateTransform(scs);
+                    ResetCameraStateTransform(ref scs);
                 });
             }
         }
@@ -31,7 +42,7 @@ namespace VRSF.Core.Simulator
                 OnSetupVRReady.Listeners -= CheckSystemState;
         }
 
-        public static void ResetCameraStateTransform(SimulatorCameraState scs)
+        public static void ResetCameraStateTransform(ref SimulatorCameraState scs)
         {
             scs.InterpolatingCameraState.SetFromTransform(VRSF_Components.CameraRig.transform);
             scs.TargetCameraState.SetFromTransform(VRSF_Components.CameraRig.transform);
@@ -39,10 +50,7 @@ namespace VRSF.Core.Simulator
         
         private void CheckSystemState(OnSetupVRReady info)
         {
-            Entities.ForEach((ref SimulatorCameraState scs) =>
-            {
-                ResetCameraStateTransform(scs);
-            });
+            _setupDone = false;
         }
     }
 }

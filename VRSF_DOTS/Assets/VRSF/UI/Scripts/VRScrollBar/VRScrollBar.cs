@@ -165,20 +165,17 @@ namespace VRSF.UI
 
         private void Init(OnSetupVRReady _)
         {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-            {
-                GetHandleRectReference();
+            GetHandleRectReference();
 
-                // We register the Listener
-                ObjectWasClickedEvent.Listeners += CheckBarClick;
-                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+            // We register the Listener
+            ObjectWasClickedEvent.Listeners += CheckBarClick;
+            ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
 
-                _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));
-                // Check if the Min and Max object are already created, and set there references
-                _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
+            _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));
+            // Check if the Min and Max object are already created, and set there references
+            _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
 
-                value = 1;
-            }
+            value = 1;
         }
         #endregion
     }

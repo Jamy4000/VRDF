@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using VRSF.Core.Controllers;
 using VRSF.Core.Raycast;
 
 namespace VRSF.Core.Events

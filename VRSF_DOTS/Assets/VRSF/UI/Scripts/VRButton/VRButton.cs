@@ -112,18 +112,15 @@ namespace VRSF.UI
 
         private void Init(OnSetupVRReady _)
         {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            if (LaserClickable)
             {
-                if (LaserClickable)
-                {
-                    ObjectWasClickedEvent.Listeners += CheckObjectClicked;
-                    ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
-                }
-
-                var boxCollider = GetComponent<BoxCollider>();
-                if (ControllerClickable && boxCollider != null)
-                    boxCollider.isTrigger = true;
+                ObjectWasClickedEvent.Listeners += CheckObjectClicked;
+                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
             }
+
+            var boxCollider = GetComponent<BoxCollider>();
+            if (ControllerClickable && boxCollider != null)
+                boxCollider.isTrigger = true;
         }
         #endregion PRIVATE_METHODS
     }

@@ -180,30 +180,27 @@ namespace VRSF.UI
 
         private void Init(OnSetupVRReady _)
         {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            // We setup the references to the ScrollRect elements
+            SetScrollRectReferences();
+
+            // We override the directio selected in the inspector by the scrollbar direction if we use one
+            // The vertical direction will always have top priority on the horizontal direction
+            if (vertical && verticalScrollbar != null)
             {
-                // We setup the references to the ScrollRect elements
-                SetScrollRectReferences();
-
-                // We override the directio selected in the inspector by the scrollbar direction if we use one
-                // The vertical direction will always have top priority on the horizontal direction
-                if (vertical && verticalScrollbar != null)
-                {
-                    Direction = UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(verticalScrollbar.direction);
-                    verticalScrollbar.onValueChanged.AddListener(delegate { OnValueChangedCallback(); });
-                }
-                else if (horizontal && horizontalScrollbar != null)
-                {
-                    Direction = UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(horizontalScrollbar.direction);
-                    horizontalScrollbar.onValueChanged.AddListener(delegate { OnValueChangedCallback(); });
-                }
-
-                ObjectWasClickedEvent.Listeners += CheckRectClick;
-                _eventWereRegistered = true;
-
-                // We setup the Min and Max pos transform
-                _scrollableSetup.CheckMinMaxGameObjects(transform, Direction, ref _minPosBar, ref _maxPosBar);
+                Direction = UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(verticalScrollbar.direction);
+                verticalScrollbar.onValueChanged.AddListener(delegate { OnValueChangedCallback(); });
             }
+            else if (horizontal && horizontalScrollbar != null)
+            {
+                Direction = UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(horizontalScrollbar.direction);
+                horizontalScrollbar.onValueChanged.AddListener(delegate { OnValueChangedCallback(); });
+            }
+
+            ObjectWasClickedEvent.Listeners += CheckRectClick;
+            _eventWereRegistered = true;
+
+            // We setup the Min and Max pos transform
+            _scrollableSetup.CheckMinMaxGameObjects(transform, Direction, ref _minPosBar, ref _maxPosBar);
         }
 
         /// <summary>

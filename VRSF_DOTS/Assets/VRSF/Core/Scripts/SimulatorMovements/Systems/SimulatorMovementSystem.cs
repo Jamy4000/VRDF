@@ -2,6 +2,7 @@
 using Unity.Entities;
 using VRSF.Core.SetupVR;
 using E7.DataStructure;
+using VRSF.Core.VRInteractions;
 
 namespace VRSF.Core.Simulator
 {
@@ -47,7 +48,7 @@ namespace VRSF.Core.Simulator
             var translation = GetInputTranslationDirection() * sms.BaseSpeed * deltaTime;
             if (translation != Vector3.zero)
             {
-                SimulatorCameraStateSystem.ResetCameraStateTransform(scs);
+                SimulatorCameraStateSystem.ResetCameraStateTransform(ref scs);
 
                 // Speed up movement when shift key held
                 if (Input.GetKey(KeyCode.LeftShift))
@@ -66,6 +67,10 @@ namespace VRSF.Core.Simulator
         /// <returns>The direction vector based on the user's inputs</returns>
         private Vector3 GetInputTranslationDirection()
         {
+            // If the mouse is hovering a UI Element
+            if (InteractionVariableContainer.CurrentGazeHit != null && InteractionVariableContainer.CurrentGazeHit.GetComponent<UnityEngine.UI.Selectable>() != null)
+                return Vector3.zero;
+
             Vector3 direction = Vector3.zero;
             if (Input.GetKey(KeyCode.W))
             {

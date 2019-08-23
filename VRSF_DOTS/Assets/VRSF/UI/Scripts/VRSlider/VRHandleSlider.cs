@@ -139,16 +139,13 @@ namespace VRSF.UI
 
         private void Init(OnSetupVRReady _)
         {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-            {
-                ObjectWasClickedEvent.Listeners += CheckSliderClick;
-                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+            ObjectWasClickedEvent.Listeners += CheckSliderClick;
+            ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
             
-                CheckSliderReferences();
+            CheckSliderReferences();
 
-                _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), minValue, maxValue, wholeNumbers);
-                _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
-            }
+            _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), minValue, maxValue, wholeNumbers);
+            _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
         }
 
         private void CheckSliderReferences()
