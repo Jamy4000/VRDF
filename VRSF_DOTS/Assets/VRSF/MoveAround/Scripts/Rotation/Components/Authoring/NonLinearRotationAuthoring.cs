@@ -2,6 +2,7 @@
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
+using VRSF.Core.Utils;
 using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.VRRotation
@@ -43,7 +44,7 @@ namespace VRSF.MoveAround.VRRotation
                     return;
             }
 
-            entityManager.AddComponentData(entity, new ControllersInteractionType
+            entityManager.SetComponentData(entity, new ControllersInteractionType
             {
                 InteractionType = _interactionType,
                 HasTouchInteraction = (_interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,
@@ -54,6 +55,7 @@ namespace VRSF.MoveAround.VRRotation
 
             entityManager.SetComponentData(entity, new BaseInputCapture());
             entityManager.SetComponentData(entity, new TouchpadInputCapture());
+            entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window

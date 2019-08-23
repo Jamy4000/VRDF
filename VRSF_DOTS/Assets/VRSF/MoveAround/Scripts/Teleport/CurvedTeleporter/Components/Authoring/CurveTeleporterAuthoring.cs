@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using VRSF.Core.VRInteractions;
 using Unity.Entities;
-using System.Collections.Generic;
 using VRSF.Core.SetupVR;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
 using Unity.Rendering;
+using VRSF.Core.Utils;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -39,18 +39,13 @@ namespace VRSF.MoveAround.Teleport
         public GameObject SelectionPad;
         [Tooltip("GameObject to use as the invalid pad when the player is pointing at an invalid teleportable surface. Turned to Entity at runtime.")]
         public GameObject InvalidPad;
-
-#if UNITY_EDITOR
-        // Only used for the OnDrawGizmos method
-        [System.NonSerialized] public List<Vector3> ParabolaPoints_Gizmo;
-#endif
-
+        
         private void Awake()
         {
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA
-            if ((interactionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
+            if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.Active.EntityManager;
 
@@ -74,7 +69,7 @@ namespace VRSF.MoveAround.Teleport
                 var teleporterEntity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!TeleporterSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
+                if (!Core.Utils.InteractionSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
                 {
                     entityManager.DestroyEntity(teleporterEntity);
                     Destroy(gameObject);
@@ -146,6 +141,8 @@ namespace VRSF.MoveAround.Teleport
                     InvalidPadInstance = invalidPad
                 });
 
+                entityManager.AddComponentData(teleporterEntity, new DestroyOnSceneUnloaded());
+
                 Destroy(SelectionPad);
                 Destroy(InvalidPad);
 
@@ -168,12 +165,12 @@ namespace VRSF.MoveAround.Teleport
                 {
                     var parabolPoint = entityManager.CreateEntity(pointArchetype);
                     entityManager.SetSharedComponentData(parabolPoint, new ParabolPointParent { TeleporterEntityIndex = teleporterEntity.Index });
+                    entityManager.AddComponentData(parabolPoint, new DestroyOnSceneUnloaded());
 #if UNITY_EDITOR
                     // Set it's name in Editor Mode for the Entity Debugger Window
                     entityManager.SetName(parabolPoint, "Curve Teleporter Point " + i);
 #endif
                 }
-
             }
 
             Destroy(gameObject);

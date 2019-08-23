@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using VRSF.Core.Raycast;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.LaserPointer
 {
@@ -15,11 +17,15 @@ namespace VRSF.Core.LaserPointer
             // VRRaycastAuthoring is necessaraly on this GameObject; as the LaserPointerStateAuthoring needs it.
             _rayOrigin = GetComponent<VRRaycastAuthoring>().RayOrigin;
             OnLaserLengthChanged.Listeners += UpdateLineRender;
+            OnSetupVRReady.RegisterSetupVRResponse(InitPositionOffset);
         }
 
         void OnDestroy()
         {
             OnLaserLengthChanged.Listeners -= UpdateLineRender;
+
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(InitPositionOffset))
+                OnSetupVRReady.Listeners -= InitPositionOffset;
         }
 
         private void UpdateLineRender(OnLaserLengthChanged info)
@@ -32,6 +38,11 @@ namespace VRSF.Core.LaserPointer
                     info.NewEndPos
                 });
             }
+        }
+
+        private void InitPositionOffset(OnSetupVRReady info)
+        {
+            transform.localPosition += ControllersRaycastOffset.RaycastPositionOffset[VRSF_Components.DeviceLoaded];
         }
     }
 }

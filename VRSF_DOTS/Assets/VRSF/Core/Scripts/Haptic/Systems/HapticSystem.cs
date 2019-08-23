@@ -33,6 +33,10 @@ namespace VRSF.Core.Controllers.Haptic
             if (InputDevices.GetDeviceAtXRNode(hand).isValid)
                 SendImpulseToNode(hand, onHapticRequested.HapticAmplitude, onHapticRequested.HapticDuration);
 
+            // If Oculus Go or GearVR, we send it to the two hands, just in case
+            if (SetupVR.VRSF_Components.DeviceLoaded == SetupVR.EDevice.GEAR_VR || SetupVR.VRSF_Components.DeviceLoaded == SetupVR.EDevice.OCULUS_GO)
+                SendImpulseToNode(hand == XRNode.LeftHand ? XRNode.RightHand : XRNode.LeftHand, onHapticRequested.HapticAmplitude, onHapticRequested.HapticDuration);
+
 
             void SendImpulseToNode(XRNode node, float amplitude, float duration)
             {

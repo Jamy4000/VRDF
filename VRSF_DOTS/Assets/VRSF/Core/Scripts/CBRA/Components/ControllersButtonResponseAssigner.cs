@@ -28,12 +28,13 @@ namespace VRSF.Core.CBRA
 
         private void Awake()
         {
-            OnSetupVRReady.Listeners += CreateEntity;
+            OnSetupVRReady.RegisterSetupVRResponse(CreateEntity);
         }
 
         private void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= CreateEntity;
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(CreateEntity))
+                OnSetupVRReady.Listeners -= CreateEntity;
         }
 
         private void CreateEntity(OnSetupVRReady info)
@@ -41,7 +42,7 @@ namespace VRSF.Core.CBRA
             var interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA
-            if ((interactionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
+            if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.Active.EntityManager;
 
@@ -55,22 +56,8 @@ namespace VRSF.Core.CBRA
                 var entity = entityManager.CreateEntity(archetype);
                 entityManager.AddComponentData(entity, new CBRATag());
 
-                // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
-                {
-                    entityManager.DestroyEntity(entity);
-                    return;
-                }
-
-                // If the Hand wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
-                {
-                    entityManager.DestroyEntity(entity);
-                    return;
-                }
-
-                // Add the corresponding interaction type component for the selected button. If the interaction type wasn't chose correctly, we destroy this entity and return.
-                if (!InteractionSetupHelper.AddInteractionType(ref entityManager, ref entity, interactionParameters.InteractionType, interactionParameters.ButtonToUse))
+                // Add the corresponding input, Hand and Interaction type component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
+                if (!InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
@@ -117,7 +104,7 @@ namespace VRSF.Core.CBRA
                 // Check if at least one event response was setup
                 if (!cbraHasEvents)
                 {
-                    Debug.LogErrorFormat("<b>[VRSF] :</b> Please give at least one response to one of the Unity Events for the CBRA on Object {0}.", transform.name);
+                    Debug.LogError("<b>[VRSF] :</b> Please give at least one response to one of the Unity Events for the CBRA on the GameObject " + transform.name, gameObject);
                     entityManager.DestroyEntity(entity);
                     return;
                 }
@@ -127,6 +114,9 @@ namespace VRSF.Core.CBRA
                 entityManager.SetName(entity, string.Format("CBRA Entity from GO {0}", transform.name));
 #endif
             }
+
+
+            Destroy(gameObject);
         }
     }
 }

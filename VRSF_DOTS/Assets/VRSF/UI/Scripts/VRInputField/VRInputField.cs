@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using VRSF.Core.Events;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -11,7 +11,7 @@ namespace VRSF.UI
     [RequireComponent(typeof(Collider))]
     public class VRInputField : TMPro.TMP_InputField
     {
-        #region PUBLIC_VARIABLES
+        #region VARIABLES
         [Header("The VRKeyboard parameters and references")]
         public bool UseVRKeyboard = true;
         public VRKeyboard VRKeyboard;
@@ -24,7 +24,9 @@ namespace VRSF.UI
 
         [Tooltip("If this button can be click using the meshcollider of your controller.")]
         [SerializeField] public bool ControllerClickable = true;
-        #endregion PUBLIC_VARIABLES
+
+        private bool _isSelected;
+        #endregion VARIABLES
 
         private TMPro.TMP_Text _placeHolderText;
 
@@ -35,7 +37,14 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                OnSetupVRReady.Listeners += Init;
+                if (LaserClickable)
+                {
+                    ObjectWasClickedEvent.Listeners += CheckInputFieldClick;
+                    ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+                }
+
+                if (ControllerClickable)
+                    GetComponent<BoxCollider>().isTrigger = true;
 
                 SetInputFieldReferences();
 
@@ -48,11 +57,11 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
-                OnSetupVRReady.Listeners -= Init;
-
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckInputFieldClick))
+            {
+                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
                 ObjectWasClickedEvent.Listeners -= CheckInputFieldClick;
+            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -74,9 +83,26 @@ namespace VRSF.UI
                 StartTyping();
         }
 
-        private void StartTyping()
+        private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            _placeHolderText.text = "";
+            var currentEventSystem = EventSystem.current;
+            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            {
+                _isSelected = true;
+                OnSelect(new BaseEventData(currentEventSystem));
+            }
+            else if (info.ObjectHovered != transform && _isSelected)
+            {
+                _isSelected = false;
+                OnDeselect(new BaseEventData(currentEventSystem));
+            }
+        }
+
+        public void StartTyping(bool deletePlaceHoldText = true)
+        {
+            if (deletePlaceHoldText)
+                _placeHolderText.text = "";
+
             ActivateInputField();
             CheckForVRKeyboard();
         }
@@ -139,18 +165,6 @@ namespace VRSF.UI
             yield return new WaitForEndOfFrame();
 
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
-        }
-
-        private void Init(OnSetupVRReady _)
-        {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-            {
-                if (LaserClickable)
-                    ObjectWasClickedEvent.Listeners += CheckInputFieldClick;
-
-                if (ControllerClickable)
-                    GetComponent<BoxCollider>().isTrigger = true;
-            }
         }
         #endregion PRIVATE_METHODS
     }

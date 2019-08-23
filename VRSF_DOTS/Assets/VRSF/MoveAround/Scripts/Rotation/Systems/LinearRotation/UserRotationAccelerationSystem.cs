@@ -50,7 +50,7 @@ namespace VRSF.MoveAround.VRRotation
 
             public void Execute(ref LinearUserRotation lur, [ReadOnly] ref ControllersInteractionType cit, [ReadOnly] ref BaseInputCapture bic, [ReadOnly] ref TouchpadInputCapture tic)
             {
-                if ((cit.HasClickInteraction && bic.IsClicking) || (cit.HasTouchInteraction && bic.IsTouching))
+                if (InteractionChecker.IsInteracting(bic, cit))
                 {
                     // maxSpeedTimeDeltaTime : To calculate the current speed according to deltaTime, Max Speed and acceleration factor
                     float maxSpeedTimeDeltaTime = DeltaTime * lur.AccelerationFactor * (lur.MaxRotationSpeed / 50);

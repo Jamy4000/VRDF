@@ -92,7 +92,9 @@ namespace VRSF.UI
             if (Application.isPlaying)
             {
                 _boxColliderSetup = false;
-                OnSetupVRReady.Listeners += Init;
+
+                OnSetupVRReady.RegisterSetupVRResponse(Init);
+
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)

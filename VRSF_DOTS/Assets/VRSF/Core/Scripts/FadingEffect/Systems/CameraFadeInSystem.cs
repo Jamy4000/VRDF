@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using Unity.Entities;
+﻿using Unity.Entities;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.FadingEffect
@@ -28,28 +27,36 @@ namespace VRSF.Core.FadingEffect
 
         private void StartFadeIn(StartFadingInEvent info)
         {
-            Entities.ForEach((ref CameraFadeParameters cameraFade) =>
+            Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
-                cameraFade.FadingInProgress = true;
-                cameraFade.IsFadingIn = true;
                 cameraFade.OldFadingSpeedFactor = cameraFade.FadingSpeed;
 
                 if (info.SpeedOverride != -1.0f)
                     cameraFade.FadingSpeed = info.SpeedOverride;
+
+                EntityManager.AddComponentData(e, new CameraFadeIn());
             });
         }
 
         private void OnFadeInEnded(OnFadingInEndedEvent info)
         {
-            Entities.ForEach((ref CameraFadeParameters cameraFade) =>
+            Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
+                EntityManager.RemoveComponent<CameraFadeIn>(e);
                 CameraFadeSystem.ResetParameters(ref cameraFade);
             });
         }
         
         private void StartFadingIn(OnSetupVRReady info)
         {
-            new StartFadingInEvent(0.5f);
+            Entities.ForEach((ref CameraFadeParameters cameraFade) =>
+            {
+                if (cameraFade.FadeInOnSceneLoaded)
+                {
+                    new StartFadingInEvent(0.5f);
+                    return;
+                }
+            });
         }
     }
 }

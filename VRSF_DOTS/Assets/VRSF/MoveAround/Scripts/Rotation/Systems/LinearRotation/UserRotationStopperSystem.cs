@@ -40,7 +40,7 @@ namespace VRSF.MoveAround.VRRotation
         {
             public void Execute(ref LinearUserRotation lur, [ReadOnly] ref ControllersInteractionType cit, [ReadOnly] ref BaseInputCapture bic)
             {
-                if (lur.CurrentRotationSpeed > 0.0f && ((cit.HasClickInteraction && !bic.IsClicking) || (cit.HasTouchInteraction && !bic.IsTouching)))
+                if (lur.CurrentRotationSpeed > 0.0f && InteractionChecker.IsNotInteracting(bic, cit))
                 {
                     // Setting the current speed of the user to 0
                     lur.CurrentRotationSpeed = 0.0f;

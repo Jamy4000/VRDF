@@ -31,11 +31,11 @@ namespace VRSF.Core.Utils
         /// <summary>
         /// The path of the Asset
         /// </summary>
-        private static string ScriptableSingletonDirectoryPath
+        private static string VRSFResources
         {
             get
             {
-                return "Assets/VRSF/Core/ScriptableSingletons";
+                return "Assets/VRSF/Core/Resources";
             }
         }
 
@@ -48,7 +48,7 @@ namespace VRSF.Core.Utils
             {
                 if (_CachedInstance == null)
                 {
-                    _CachedInstance = AssetDatabase.LoadAssetAtPath<T>(Path.Combine(ScriptableSingletonDirectoryPath, FileName + ".asset")) as T;
+                    _CachedInstance = Resources.Load<T>(FileName) as T;
                 }
 #if UNITY_EDITOR
                 if (_CachedInstance == null)
@@ -93,10 +93,10 @@ namespace VRSF.Core.Utils
         /// <param name="obj">The type of Scriptable Object to save</param>
         private static void SaveAsset(T obj)
         {
-            if (!Directory.Exists(ScriptableSingletonDirectoryPath))
-                Directory.CreateDirectory(ScriptableSingletonDirectoryPath);
+            if (!Directory.Exists(VRSFResources))
+                Directory.CreateDirectory(VRSFResources);
 
-            string filePath = Path.GetDirectoryName(Path.Combine(ScriptableSingletonDirectoryPath, FileName + ".asset"));
+            string filePath = Path.Combine(VRSFResources, FileName + ".asset");
             AssetDatabase.CreateAsset(obj, filePath);
             AssetDatabase.SaveAssets();
         }

@@ -4,6 +4,7 @@ using VRSF.Core.Inputs;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
+using VRSF.Core.Utils;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -26,7 +27,7 @@ namespace VRSF.MoveAround.Teleport
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA
-            if ((interactionParameters.DeviceUsingCBRA & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
+            if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.Active.EntityManager;
 
@@ -45,7 +46,7 @@ namespace VRSF.MoveAround.Teleport
                 var entity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!TeleporterSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))
+                if (!Core.Utils.InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))
                 {
                     entityManager.DestroyEntity(entity);
                     Destroy(gameObject);
@@ -69,6 +70,8 @@ namespace VRSF.MoveAround.Teleport
                     DistanceStepByStep = _distanceStepByStep,
                     StepHeight = _stepHeight
                 });
+
+                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

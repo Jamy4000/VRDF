@@ -23,7 +23,7 @@ namespace VRSF.Core.VRInteractions
                 if (stopClickingEvent.ButtonInteracting == pointerClick.ControllersButton)
                 {
                     InteractionVariableContainer.IsClickingSomethingLeft = false;
-                    new ObjectWasClickedEvent(Raycast.ERayOrigin.LEFT_HAND, null);
+                    //new ObjectWasClickedEvent(Raycast.ERayOrigin.LEFT_HAND, null);
                 }
             });
 
@@ -32,7 +32,7 @@ namespace VRSF.Core.VRInteractions
                 if (stopClickingEvent.ButtonInteracting == pointerClick.ControllersButton)
                 {
                     InteractionVariableContainer.IsClickingSomethingRight = false;
-                    new ObjectWasClickedEvent(Raycast.ERayOrigin.RIGHT_HAND, null);
+                   // new ObjectWasClickedEvent(Raycast.ERayOrigin.RIGHT_HAND, null);
                 }
             });
         }
@@ -45,7 +45,7 @@ namespace VRSF.Core.VRInteractions
 
         private void Setup(OnSetupVRReady info)
         {
-            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0;
+            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateEntityCount() > 0;
             if (VRSF_Components.DeviceLoaded == EDevice.SIMULATOR)
             {
                 Entities.ForEach((ref PointerClick pointerClick) =>

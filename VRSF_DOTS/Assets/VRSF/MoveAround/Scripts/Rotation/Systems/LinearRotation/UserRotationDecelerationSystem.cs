@@ -48,9 +48,9 @@ namespace VRSF.MoveAround.VRRotation
             public NativeArray<float3> RotationAxis;
             public NativeArray<float> CurrentSpeed;
 
-            public void Execute(ref LinearUserRotation lur, [ReadOnly] ref ControllersInteractionType urit, [ReadOnly] ref BaseInputCapture bic, [ReadOnly] ref LinearRotationDeceleration lrd)
+            public void Execute(ref LinearUserRotation lur, [ReadOnly] ref ControllersInteractionType cit, [ReadOnly] ref BaseInputCapture bic, [ReadOnly] ref LinearRotationDeceleration lrd)
             {
-                if (lur.CurrentRotationSpeed > 0.0f && ((urit.HasClickInteraction && !bic.IsClicking) || (urit.HasTouchInteraction && !bic.IsTouching)))
+                if (lur.CurrentRotationSpeed > 0.0f && InteractionChecker.IsNotInteracting(bic, cit))
                 {
                     // maxSpeedTimeDeltaTime : To calculate the current speed according to deltaTime, Max Speed and acceleration factor
                     float maxSpeedTimeDeltaTime = DeltaTime * lrd.DecelerationFactor * (lur.MaxRotationSpeed / 50);

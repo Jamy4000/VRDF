@@ -1,10 +1,10 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Raycast;
+using VRSF.Core.Utils;
 
 namespace VRSF.Core.LaserPointer
 {
-    [RequireComponent(typeof(LaserLengthSetter), typeof(LaserWidthSetter))]
     public class LaserPointerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
         [Header("Laser Renderering Parameters")]
@@ -48,10 +48,15 @@ namespace VRSF.Core.LaserPointer
                 ShouldPointToUICenter = _shouldPointToUICenter
             });
 
+            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
+
 #if UNITY_EDITOR
             // Set the name of the entity in Editor Mode for the Entity Debugger Window
             dstManager.SetName(entity, string.Format("Laser Pointer {0}", raycastAuthoring.RayOrigin.ToString()));
 #endif
+
+            Destroy(GetComponent<ConvertToEntity>());
+            Destroy(this);
         }
     }
 }

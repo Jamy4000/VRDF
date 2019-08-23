@@ -1,10 +1,8 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Events;
-using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
-using VRSF.Core.CBRA;
 
 namespace VRSF.Core.VRInteractions
 {
@@ -68,7 +66,7 @@ namespace VRSF.Core.VRInteractions
 
         private void Setup(OnSetupVRReady info)
         {
-            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateLength() > 0;
+            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateEntityCount() > 0;
         }
         #endregion PRIVATE_METHODS
     }

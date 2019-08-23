@@ -1,24 +1,18 @@
 ﻿using UnityEngine;
 using Unity.Entities;
 using Unity.Rendering;
-using Unity.Collections;
-using UnityEngine.SceneManagement;
-using System;
 
 namespace VRSF.Core.FadingEffect
 {
     public class CameraFadeSystem : ComponentSystem
     {
         private EntityManager _entityManager;
-        private NativeArray<Entity> _entities;
-        private bool _entityArrayHasBeenSet;
         private RenderMesh _renderMesh;
 
         protected override void OnCreate()
         {
             StartFadingInEvent.Listeners += OnStartFadingIn;
             StartFadingOutEvent.Listeners += OnStartFadingOut;
-            SceneManager.sceneLoaded += OnNewSceneLoaded;
 
             base.OnCreate();
             _entityManager = World.Active.EntityManager;
@@ -27,13 +21,6 @@ namespace VRSF.Core.FadingEffect
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
-
-            if (!_entityArrayHasBeenSet)
-            {
-                int cameraFadeEntities = GetEntityQuery(typeof(CameraFadeParameters)).CalculateLength();
-                _entities = new NativeArray<Entity>(cameraFadeEntities, Allocator.Persistent);
-                _entityArrayHasBeenSet = true;
-            }
 
             Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
@@ -44,47 +31,39 @@ namespace VRSF.Core.FadingEffect
 
         protected override void OnUpdate()
         {
-            int index = 0;
             bool materialWasSet = false;
 
-            Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
+            Entities.WithAny(typeof(CameraFadeOut), typeof(CameraFadeIn)).ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
-                _entities[index] = e;
-                if (!materialWasSet && cameraFade.FadingInProgress)
+                if (!materialWasSet)
                 {
                     RenderMesh newRend = _renderMesh;
-                    newRend.material = HandlePlaneAlpha(ref cameraFade, newRend);
+                    newRend.material = HandlePlaneAlpha(ref cameraFade, newRend, EntityManager.HasComponent<CameraFadeIn>(e));
                     _renderMesh = newRend;
                     materialWasSet = true;
                 }
-                index++;
-            });
 
-            for (int i = 0; i < _entities.Length; i++)
-            {
-                _entityManager.SetSharedComponentData(_entities[i], _renderMesh);
-            }
+                _entityManager.SetSharedComponentData(e, _renderMesh);
+            });
         }
 
         protected override void OnDestroy()
         {
             StartFadingInEvent.Listeners -= OnStartFadingIn;
             StartFadingOutEvent.Listeners -= OnStartFadingOut;
-
-            _entities.Dispose();
             base.OnDestroy();
         }
 
         /// <summary>
         /// Change the alpha of the fading canvas and set the current teleporting state if the fade in/out is done
         /// </summary>
-        private Material HandlePlaneAlpha(ref CameraFadeParameters cameraFade, RenderMesh renderMesh)
+        private Material HandlePlaneAlpha(ref CameraFadeParameters cameraFade, RenderMesh renderMesh, bool isFadingIn)
         {
             Material newMat = renderMesh.material;
             Color color = newMat.color;
 
             // If we are currently Fading In
-            if (cameraFade.IsFadingIn)
+            if (isFadingIn)
             {
                 color.a -= Time.deltaTime * cameraFade.FadingSpeed;
 
@@ -92,8 +71,8 @@ namespace VRSF.Core.FadingEffect
                 if (color.a < 0)
                 {
                     color.a = 0.0f;
-                    new OnFadingInEndedEvent();
                     this.Enabled = false;
+                    new OnFadingInEndedEvent();
                 }
             }
             // If we are currently Fading Out
@@ -105,8 +84,8 @@ namespace VRSF.Core.FadingEffect
                 if (color.a > 1)
                 {
                     color.a = 1.0f;
+                    this.Enabled = cameraFade.ShouldImmediatlyFadeIn;
                     new OnFadingOutEndedEvent();
-                    this.Enabled = !cameraFade.ShouldImmediatlyFadeIn;
                 }
             }
 
@@ -116,7 +95,6 @@ namespace VRSF.Core.FadingEffect
 
         public static void ResetParameters(ref CameraFadeParameters cameraFade)
         {
-            cameraFade.FadingInProgress = false;
             cameraFade.FadingSpeed = cameraFade.OldFadingSpeedFactor;
         }
 
@@ -128,11 +106,6 @@ namespace VRSF.Core.FadingEffect
         protected void OnStartFadingOut(StartFadingOutEvent info)
         {
             this.Enabled = true;
-        }
-
-        private void OnNewSceneLoaded(Scene newScene, LoadSceneMode loadMode)
-        {
-            _entityArrayHasBeenSet = !(SceneManager.GetActiveScene() == newScene);
         }
     }
 }

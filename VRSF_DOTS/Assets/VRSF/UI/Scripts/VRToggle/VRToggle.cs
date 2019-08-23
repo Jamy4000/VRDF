@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
 
@@ -11,7 +12,7 @@ namespace VRSF.UI
     [RequireComponent(typeof(Collider))]
     public class VRToggle : UnityEngine.UI.Toggle
     {
-        #region PUBLIC_VARIABLES
+        #region VARIABLES
         [Tooltip("If you want to set the collider yourself, set this value to false.")]
         [SerializeField] public bool SetColliderAuto = true;
 
@@ -20,7 +21,9 @@ namespace VRSF.UI
 
         [Tooltip("If this button can be click using the meshcollider of your controller.")]
         [SerializeField] public bool ControllerClickable = true;
-        #endregion PUBLIC_VARIABLES
+
+        private bool _isSelected;
+        #endregion VARIABLES
 
 
         #region MONOBEHAVIOUR_METHODS
@@ -30,7 +33,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                OnSetupVRReady.Listeners += Init;
+                OnSetupVRReady.RegisterSetupVRResponse(Init);
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
@@ -45,7 +48,10 @@ namespace VRSF.UI
                 OnSetupVRReady.Listeners -= Init;
 
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckToggleClick))
+            {
+                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
                 ObjectWasClickedEvent.Listeners -= CheckToggleClick;
+            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -67,6 +73,21 @@ namespace VRSF.UI
                 isOn = !isOn;
         }
 
+        private void CheckObjectOvered(ObjectWasHoveredEvent info)
+        {
+            var currentEventSystem = EventSystem.current;
+            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            {
+                _isSelected = true;
+                OnSelect(new BaseEventData(currentEventSystem));
+            }
+            else if (info.ObjectHovered != transform && _isSelected)
+            {
+                _isSelected = false;
+                OnDeselect(new BaseEventData(currentEventSystem));
+            }
+        }
+
         /// <summary>
         /// Setup the BoxCOllider size and center by colling the NotScrollableSetup method CheckBoxColliderSize.
         /// We use a coroutine and wait for the end of the first frame as the element cannot be correctly setup on the first frame
@@ -85,9 +106,12 @@ namespace VRSF.UI
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
                 if (LaserClickable)
+                {
                     ObjectWasClickedEvent.Listeners += CheckToggleClick;
+                    ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+                }
 
-                if (ControllerClickable)
+            if (ControllerClickable)
                     GetComponent<BoxCollider>().isTrigger = true;
             }
         }

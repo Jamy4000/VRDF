@@ -24,22 +24,24 @@ namespace VRSF.Core.FadingEffect
 
         private void StartFadeOut(StartFadingOutEvent info)
         {
-            Entities.ForEach((ref CameraFadeParameters cameraFade) =>
+            Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
-                cameraFade.FadingInProgress = true;
-                cameraFade.IsFadingIn = false;
                 cameraFade.ShouldImmediatlyFadeIn = info.ShouldFadeInWhenDone;
                 cameraFade.OldFadingSpeedFactor = cameraFade.FadingSpeed;
 
                 if (info.SpeedOverride != -1.0f)
                     cameraFade.FadingSpeed = info.SpeedOverride;
+
+                EntityManager.AddComponentData(e, new CameraFadeOut());
             });
         }
         
         private void OnFadeOutEnded(OnFadingOutEndedEvent info)
         {
-            Entities.ForEach((ref CameraFadeParameters cameraFade) =>
+            Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
+                EntityManager.RemoveComponent<CameraFadeOut>(e);
+
                 var overrideSpeed = cameraFade.FadingSpeed;
 
                 CameraFadeSystem.ResetParameters(ref cameraFade);

@@ -50,7 +50,8 @@ namespace VRSF.UI
             if (Application.isPlaying)
             {
                 _scrollableSetup = new VRUIScrollableSetup(Direction);
-                OnSetupVRReady.Listeners += Init;
+
+                OnSetupVRReady.RegisterSetupVRResponse(Init);
 
                 // We setup the BoxCollider size and center
                 StartCoroutine(SetupBoxCollider());
@@ -120,8 +121,6 @@ namespace VRSF.UI
         {
             if (clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
                 _rayHoldingHandle = clickEvent.RayOrigin;
-            else
-                _rayHoldingHandle = ERayOrigin.NONE;
         }
 
         /// <summary>

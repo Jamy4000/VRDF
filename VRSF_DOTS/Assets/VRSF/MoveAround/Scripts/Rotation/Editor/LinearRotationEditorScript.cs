@@ -40,12 +40,13 @@ namespace VRSF.MoveAround.VRRotation
         /// <param name="menuCommand"></param>
         [MenuItem("GameObject/VRSF/Move Around/Rotation/Add Linear Rotation", priority = 3)]
         [MenuItem("VRSF/Move Around/Rotation/Add Linear Rotation", priority = 3)]
-        public static void AddCBRAObject(MenuCommand menuCommand)
+        public static void AddLinearRotationObject(MenuCommand menuCommand)
         {
-            var cbraObject = new GameObject("Linear Rotation");
-            cbraObject.transform.SetParent(Selection.activeTransform);
-            cbraObject.AddComponent<LinearRotationAuthoring>();
-            Selection.SetActiveObjectWithContext(cbraObject, menuCommand.context);
+            var linearRot = new GameObject("Linear Rotation");
+            Undo.RegisterCreatedObjectUndo(linearRot, "Adding linearRotation");
+            linearRot.transform.SetParent(Selection.activeTransform);
+            linearRot.AddComponent<LinearRotationAuthoring>();
+            Selection.SetActiveObjectWithContext(linearRot, menuCommand.context);
         }
     }
 }
