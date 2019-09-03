@@ -61,57 +61,64 @@ namespace VRSF.MoveAround.Teleport
         /// <param name="graphicThickness">The thickness of the parabole to dispaly</param>
         private void GenerateMesh(ref Mesh m, NativeArray<Translation> points, int lastPointIndex, Vector3 fwd, float uvoffset, float graphicThickness)
         {
-            Vector3[] verts = new Vector3[lastPointIndex * 2];
-            Vector2[] uv = new Vector2[lastPointIndex * 2];
-
-            float3 right = Vector3.Cross(fwd, Vector3.up).normalized;
-
-            for (int x = 0; x < lastPointIndex; x++)
+            try
             {
-                verts[2 * x] = points[x].Value - right * graphicThickness / 2;
-                verts[2 * x + 1] = points[x].Value + right * graphicThickness / 2;
+                Vector3[] verts = new Vector3[lastPointIndex * 2];
+                Vector2[] uv = new Vector2[lastPointIndex * 2];
 
-                float uvoffset_mod = uvoffset;
-                if (x == lastPointIndex - 1 && x > 1)
+                float3 right = Vector3.Cross(fwd, Vector3.up).normalized;
+
+                for (int x = 0; x < lastPointIndex; x++)
                 {
-                    float dist_last = ((Vector3)points[x - 2].Value - (Vector3)points[x - 1].Value).magnitude;
-                    float dist_cur = ((Vector3)points[x].Value - (Vector3)points[x - 1].Value).magnitude;
-                    uvoffset_mod += 1 - dist_cur / dist_last;
+                    verts[2 * x] = points[x].Value - right * graphicThickness / 2;
+                    verts[2 * x + 1] = points[x].Value + right * graphicThickness / 2;
+
+                    float uvoffset_mod = uvoffset;
+                    if (x == lastPointIndex - 1 && x > 1)
+                    {
+                        float dist_last = ((Vector3)points[x - 2].Value - (Vector3)points[x - 1].Value).magnitude;
+                        float dist_cur = ((Vector3)points[x].Value - (Vector3)points[x - 1].Value).magnitude;
+                        uvoffset_mod += 1 - dist_cur / dist_last;
+                    }
+
+                    uv[2 * x] = new Vector2(0, x - uvoffset_mod);
+                    uv[2 * x + 1] = new Vector2(1, x - uvoffset_mod);
                 }
 
-                uv[2 * x] = new Vector2(0, x - uvoffset_mod);
-                uv[2 * x + 1] = new Vector2(1, x - uvoffset_mod);
-            }
+                int[] indices = new int[2 * 3 * (verts.Length - 2)];
+                for (int x = 0; x < verts.Length / 2 - 1; x++)
+                {
+                    int p1 = 2 * x;
+                    int p2 = 2 * x + 1;
+                    int p3 = 2 * x + 2;
+                    int p4 = 2 * x + 3;
 
-            int[] indices = new int[2 * 3 * (verts.Length - 2)];
-            for (int x = 0; x < verts.Length / 2 - 1; x++)
+                    indices[12 * x] = p1;
+                    indices[12 * x + 1] = p2;
+                    indices[12 * x + 2] = p3;
+                    indices[12 * x + 3] = p3;
+                    indices[12 * x + 4] = p2;
+                    indices[12 * x + 5] = p4;
+
+                    indices[12 * x + 6] = p3;
+                    indices[12 * x + 7] = p2;
+                    indices[12 * x + 8] = p1;
+                    indices[12 * x + 9] = p4;
+                    indices[12 * x + 10] = p2;
+                    indices[12 * x + 11] = p3;
+                }
+
+                m.Clear();
+                m.vertices = verts;
+                m.uv = uv;
+                m.triangles = indices;
+                m.RecalculateBounds();
+                m.RecalculateNormals();
+            }
+            catch (System.Exception e)
             {
-                int p1 = 2 * x;
-                int p2 = 2 * x + 1;
-                int p3 = 2 * x + 2;
-                int p4 = 2 * x + 3;
-
-                indices[12 * x] = p1;
-                indices[12 * x + 1] = p2;
-                indices[12 * x + 2] = p3;
-                indices[12 * x + 3] = p3;
-                indices[12 * x + 4] = p2;
-                indices[12 * x + 5] = p4;
-
-                indices[12 * x + 6] = p3;
-                indices[12 * x + 7] = p2;
-                indices[12 * x + 8] = p1;
-                indices[12 * x + 9] = p4;
-                indices[12 * x + 10] = p2;
-                indices[12 * x + 11] = p3;
+                Debug.LogError("<b>[VRSF] :</b> An error has occured while rendering the Curve Parabole :\n" + e.ToString());
             }
-
-            m.Clear();
-            m.vertices = verts;
-            m.uv = uv;
-            m.triangles = indices;
-            m.RecalculateBounds();
-            m.RecalculateNormals();
         }
     }
 }

@@ -72,7 +72,9 @@ namespace VRSF.UI
                 if (horizontalScrollbar != null)
                     horizontalScrollbar.onValueChanged.RemoveAllListeners();
 
-                ObjectWasClickedEvent.Listeners -= CheckRectClick;
+                if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                    ObjectWasClickedEvent.Listeners -= CheckObjectClick;
+
                 _eventWereRegistered = false;
             }
         }
@@ -117,7 +119,7 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when something is clicked</param>
-        void CheckRectClick(ObjectWasClickedEvent clickEvent)
+        void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
             if (clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
                 _rayHoldingHandle = clickEvent.RayOrigin;
@@ -196,7 +198,9 @@ namespace VRSF.UI
                 horizontalScrollbar.onValueChanged.AddListener(delegate { OnValueChangedCallback(); });
             }
 
-            ObjectWasClickedEvent.Listeners += CheckRectClick;
+            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+                ObjectWasClickedEvent.Listeners += CheckObjectClick;
+
             _eventWereRegistered = true;
 
             // We setup the Min and Max pos transform

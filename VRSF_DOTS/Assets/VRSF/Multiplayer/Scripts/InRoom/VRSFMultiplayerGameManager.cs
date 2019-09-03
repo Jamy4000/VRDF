@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using Photon.Realtime;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 namespace VRSF.Multiplayer
 {
@@ -16,10 +17,6 @@ namespace VRSF.Multiplayer
         [Header("The name of the Lobby Scene")]
         [SerializeField]
         private string _lobbySceneName = "BasicVRMultiLobby";
-
-        [Header("The name of the Multiplayer Scene")]
-        [SerializeField]
-        private string _multiPlayerScene = "BasicVRMultiScene";
 
         /// <summary>
         /// MonoBehaviour method called on GameObject by Unity during initialization phase.
@@ -40,7 +37,7 @@ namespace VRSF.Multiplayer
             Debug.Log("<b>[VRSF] :</b> OnPlayerEnteredRoom() " + other.NickName); // not seen if you're the player connecting
             
             if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.LoadLevel(_multiPlayerScene);
+                PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
         }
 
         /// <summary>
@@ -52,7 +49,7 @@ namespace VRSF.Multiplayer
             Debug.Log("<b>[VRSF] :</b> OnPlayerLeftRoom() " + other.NickName); // seen when other disconnects
 
             if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.LoadLevel(_multiPlayerScene);
+                PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
         }
 
         /// <summary>

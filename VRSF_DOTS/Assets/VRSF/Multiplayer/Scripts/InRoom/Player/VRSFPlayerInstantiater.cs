@@ -6,12 +6,12 @@ using VRSF.Core.SetupVR;
 namespace VRSF.Multiplayer
 {
     /// <summary>
-    /// Instantiate the player gameObject that was placed in the Resources/PhotonPrefabs folder
+    /// Instantiate the player gameObject that was placed in the VRSF/Resources/PhotonPrefabs folder
     /// </summary>
     public class VRSFPlayerInstantiater : MonoBehaviourPunCallbacks
     {
         [Header("The prefab representing the players")]
-        [Tooltip("WARNING : Need to be placed in the Resources/PhotonPrefabs folder")]
+        [Tooltip("WARNING : Need to be placed in the VRSF/Resources/PhotonPrefabs folder")]
         [SerializeField]
         private GameObject _playersPrefab;
 
@@ -24,6 +24,8 @@ namespace VRSF.Multiplayer
         /// Keep track of the localPlayer rotation whenever a user leave/enter the room
         /// </summary>
         private static Quaternion _localPlayerRotCache = Quaternion.identity;
+
+        private static int _currentSceneIndex = -1;
 
         public void Awake()
         {
@@ -94,9 +96,15 @@ namespace VRSF.Multiplayer
                 if (VRSFBasicPlayersManager.LocalPlayerInstance != null)
                     PhotonNetwork.Destroy(VRSFBasicPlayersManager.LocalPlayerInstance);
 
-                // Set the CameraRig pos and rot based on the previous check
-                VRSF_Components.CameraRig.transform.position = _localPlayerPosCache;
-                VRSF_Components.CameraRig.transform.rotation = _localPlayerRotCache;
+                // If the stored position isn't a vector3 zero AND the active scene loaded is the same as the previous one
+                if (_localPlayerPosCache != Vector3.zero && _currentSceneIndex == UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex)
+                {
+                    // Set the CameraRig pos and rot based on the previous check
+                    VRSF_Components.CameraRig.transform.position = _localPlayerPosCache;
+                    VRSF_Components.CameraRig.transform.rotation = _localPlayerRotCache;
+                }
+
+                _currentSceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
 
                 // Instantiate the loacalPlayer Instance
                 VRSFBasicPlayersManager.LocalPlayerInstance = PhotonNetwork.Instantiate(PlayerPrefabName, _localPlayerPosCache, _localPlayerRotCache);

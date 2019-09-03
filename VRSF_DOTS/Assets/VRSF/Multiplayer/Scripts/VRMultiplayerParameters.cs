@@ -1,5 +1,4 @@
 ﻿using Photon.Realtime;
-using UnityEditor;
 using UnityEngine;
 
 namespace VRSF.Multiplayer
@@ -8,7 +7,7 @@ namespace VRSF.Multiplayer
     /// Contains all parameters for the Multiplayer part of VRSF
     /// </summary>
     //[CreateAssetMenu]
-    public class VRMultiplayerParameters : ScriptableSingleton<VRMultiplayerParameters>
+    public class VRMultiplayerParameters : Core.Utils.ScriptableSingleton<VRMultiplayerParameters>
     {
         [Header("Room Parameters")]
         /// <summary>

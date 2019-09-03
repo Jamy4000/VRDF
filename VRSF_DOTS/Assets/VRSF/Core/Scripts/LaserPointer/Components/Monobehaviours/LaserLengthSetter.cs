@@ -10,22 +10,23 @@ namespace VRSF.Core.LaserPointer
     {
         private LineRenderer _lineRenderer;
         private ERayOrigin _rayOrigin;
+        private Vector3 _raycastStartPosOffset;
 
         void Awake()
         {
+            _raycastStartPosOffset = GetComponent<VRRaycastAuthoring>().StartPointOffset;
             _lineRenderer = GetComponent<LineRenderer>();
             // VRRaycastAuthoring is necessaraly on this GameObject; as the LaserPointerStateAuthoring needs it.
             _rayOrigin = GetComponent<VRRaycastAuthoring>().RayOrigin;
             OnLaserLengthChanged.Listeners += UpdateLineRender;
-            OnSetupVRReady.RegisterSetupVRResponse(InitPositionOffset);
+            OnSetupVRReady.RegisterSetupVRResponse(InitPos);
         }
 
         void OnDestroy()
         {
             OnLaserLengthChanged.Listeners -= UpdateLineRender;
-
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(InitPositionOffset))
-                OnSetupVRReady.Listeners -= InitPositionOffset;
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(InitPos))
+                OnSetupVRReady.Listeners -= InitPos;
         }
 
         private void UpdateLineRender(OnLaserLengthChanged info)
@@ -34,15 +35,15 @@ namespace VRSF.Core.LaserPointer
             {
                 _lineRenderer.SetPositions(new Vector3[]
                 {
-                    transform.position,
+                    Vector3.zero,
                     info.NewEndPos
                 });
             }
         }
 
-        private void InitPositionOffset(OnSetupVRReady info)
+        private void InitPos(OnSetupVRReady info)
         {
-            transform.localPosition += ControllersRaycastOffset.RaycastPositionOffset[VRSF_Components.DeviceLoaded];
+            transform.localPosition = _raycastStartPosOffset + ControllersRaycastOffset.RaycastPositionOffset[VRSF_Components.DeviceLoaded];
         }
     }
 }

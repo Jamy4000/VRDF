@@ -28,14 +28,13 @@ namespace VRSF.Core.Raycast
             base.OnDestroy();
         }
 
-        [Unity.Burst.BurstCompile]
         private void AssignRay()
         {
             Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
             {
                 Transform originTransform = VRSF_Components.VRCamera.transform;
 
-                // Depending on the RayOring, we provide references to different ray and raycastHit variables
+                // Depending on the RayOrigin, we provide references to different ray and raycastHit variables
                 switch (raycastOrigin.RayOrigin)
                 {
                     case ERayOrigin.LEFT_HAND:
@@ -45,7 +44,8 @@ namespace VRSF.Core.Raycast
                         originTransform = VRSF_Components.RightController.transform;
                         break;
                     case ERayOrigin.CAMERA:
-                        originTransform = VRSF_Components.VRCamera.transform;
+                        // No need to set it, already done before
+                        // originTransform = VRSF_Components.VRCamera.transform;
                         break;
                     default:
                         Debug.LogError("<b>[VRSF] :</b> An error has occured in the RayCalculationsSystems. " +
@@ -53,14 +53,8 @@ namespace VRSF.Core.Raycast
                         break;
                 }
 
-                // Start Point
-                raycastOrigin.RayOriginPosition = originTransform.position + ControllersRaycastOffset.RaycastPositionOffset[VRSF_Components.DeviceLoaded] + parameters.StartPointOffset;
-                raycastOutputs.RayVar = new Ray
-                (
-                    raycastOrigin.RayOriginPosition,
-                    // End Point
-                    originTransform.TransformDirection(Vector3.forward + ControllersRaycastOffset.RaycastDirectionOffset[VRSF_Components.DeviceLoaded] + parameters.EndPointOffset)
-                );
+                raycastOutputs.RayVar.origin = originTransform.position + ControllersRaycastOffset.RaycastPositionOffset[VRSF_Components.DeviceLoaded] + parameters.StartPointOffset;
+                raycastOutputs.RayVar.direction = originTransform.TransformDirection(Vector3.forward + ControllersRaycastOffset.RaycastDirectionOffset[VRSF_Components.DeviceLoaded] + parameters.EndPointOffset);
             });
         }
 

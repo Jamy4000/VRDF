@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -16,14 +17,12 @@ namespace VRSF.MoveAround.Teleport
     public class PadsRenderingSystem : ComponentSystem
     {
         private EntityQuery _parabolQuery;
-        private EntityQuery _pointsQuery;
         private EntityManager _entityManager;
 
         protected override void OnCreate()
         {
             base.OnCreate();
             _entityManager = World.Active.EntityManager;
-            _pointsQuery = GetEntityQuery(typeof(Translation), typeof(ParabolPointParent));
             _parabolQuery = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]

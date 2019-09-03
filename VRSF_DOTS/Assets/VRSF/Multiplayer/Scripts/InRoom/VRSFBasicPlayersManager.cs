@@ -49,18 +49,22 @@ namespace VRSF.Multiplayer
         /// </summary>
         /// <param name="other">The player to look for</param>
         /// <returns>The player if it was found</returns>
-        public static VRSFPlayer FindPlayer(Player other, bool showErrorLog = true)
+        public static bool FindPlayer(Player other, out VRSFPlayer vrsfPlayer, bool showErrorLog = true)
         {
             foreach (var player in PlayersInstances)
             {
                 if (player.NickName == other.NickName)
-                    return player;
+                {
+                    vrsfPlayer = player;
+                    return true;
+                }
             }
 
             if (showErrorLog)
                 Debug.LogErrorFormat("<b>[VRSF] :</b> Couldn't find player with userID {0}. Nickname of user should have been {1}.", other.UserId, other.NickName);
 
-            return null;
+            vrsfPlayer = null;
+            return false;
         }
 
         /// <summary>

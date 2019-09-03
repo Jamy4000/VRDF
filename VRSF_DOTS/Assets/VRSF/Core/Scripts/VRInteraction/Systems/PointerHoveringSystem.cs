@@ -10,7 +10,7 @@ namespace VRSF.Core.VRInteractions
     {
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs) =>
+            Entities.WithAll(typeof(VRHovering)).ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs) =>
             {
                 switch (raycastOrigin.RayOrigin)
                 {

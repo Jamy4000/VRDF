@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using VRSF.Core.Utils;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -7,7 +6,7 @@ namespace VRSF.MoveAround.Teleport
     /// Contains all variable necessary for the Teleport Systems to work.
     /// It implements the ITeleportComponent to be able to display the boundaries limits with TeleportBoundaries.
     /// </summary>
-    [RequireComponent(typeof(TeleportNavMeshAuthoring), typeof(SetupVRDestroyer))]
+    [RequireComponent(typeof(TeleportNavMeshAuthoring))]
     public class GeneralTeleportAuthoring : MonoBehaviour
     {
         [Header("Is this teleport feature using fade out/in")]

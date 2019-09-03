@@ -12,13 +12,6 @@ namespace VRSF.Core.VRInteractions
     /// </summary>
     public class PointerClickingSystem : ComponentSystem
     {
-        #region ComponentSystem_Methods
-        protected override void OnCreate()
-        {
-            OnSetupVRReady.Listeners += Setup;
-            base.OnCreate();
-        }
-
         protected override void OnUpdate()
         {
             Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
@@ -41,15 +34,7 @@ namespace VRSF.Core.VRInteractions
             });
         }
 
-        protected override void OnDestroy()
-        {
-            OnSetupVRReady.Listeners -= Setup;
-            base.OnDestroy();
-        }
-        #endregion
 
-
-        #region PRIVATE_METHODS
         private void CheckHit(RaycastHitVariable hitVar, out bool hasClickSomething, ERayOrigin origin)
         {
             //If nothing is hit, we set the hasClickSomething value to false
@@ -63,11 +48,5 @@ namespace VRSF.Core.VRInteractions
                 new ObjectWasClickedEvent(origin, hitVar.Value.collider.transform);
             }
         }
-
-        private void Setup(OnSetupVRReady info)
-        {
-            this.Enabled = GetEntityQuery(typeof(PointerClick)).CalculateEntityCount() > 0;
-        }
-        #endregion PRIVATE_METHODS
     }
 }

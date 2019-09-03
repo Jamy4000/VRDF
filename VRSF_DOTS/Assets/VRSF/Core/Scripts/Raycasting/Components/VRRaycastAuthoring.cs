@@ -19,6 +19,10 @@ namespace VRSF.Core.Raycast
         [Header("Layer(s) to exclude from the Raycast System.")]
         public LayerMask ExcludedLayer = new LayerMask();
 
+        [Header("Raycast Hover Feature")]
+        [Tooltip("If you want to raise an event when the pointer is hovering something.")]
+        [SerializeField] private bool _useHoverFeature = true;
+
         [Header("Raycast Position Offset")]
         [Tooltip("If you want to apply an offset to the start point of the raycast. This will as well be applied to the laser if you use one.")]
         [SerializeField] private Vector3 _startPointOffset = Vector3.zero;
@@ -47,9 +51,15 @@ namespace VRSF.Core.Raycast
                 RayVar = new Ray()
             });
 
+            if (_useHoverFeature)
+                dstManager.AddComponentData(entity, new VRHovering());
+
             dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
             Destroy(this);
         }
+
+        public Vector3 StartPointOffset { get => _startPointOffset; }
+        public Vector3 EndPointOffset { get => _endPointOffset; }
     }
 }

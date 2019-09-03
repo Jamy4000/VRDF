@@ -69,7 +69,7 @@ namespace VRSF.MoveAround.Teleport
                 var teleporterEntity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!Core.Utils.InteractionSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
+                if (!InteractionSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
                 {
                     entityManager.DestroyEntity(teleporterEntity);
                     Destroy(gameObject);
@@ -132,8 +132,17 @@ namespace VRSF.MoveAround.Teleport
                 var selectionPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(SelectionPad, World.Active);
                 var invalidPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(InvalidPad, World.Active);
 
+                entityManager.AddComponentData(selectionPad, new DestroyOnSceneUnloaded());
+                entityManager.AddComponentData(invalidPad, new DestroyOnSceneUnloaded());
+
                 entityManager.SetEnabled(selectionPad, false);
                 entityManager.SetEnabled(invalidPad, false);
+
+#if UNITY_EDITOR
+                // Set it's name in Editor Mode for the Entity Debugger Window
+                entityManager.SetName(selectionPad, "Curve Teleporter Selection Pad");
+                entityManager.SetName(invalidPad, "Curve Teleporter Invalid Pad");
+#endif
 
                 entityManager.SetComponentData(teleporterEntity, new ParabolPadsEntities
                 {

@@ -109,10 +109,9 @@ namespace VRSF.UI
                 OnSetupVRReady.Listeners -= Init;
 
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
-            {
                 ObjectWasClickedEvent.Listeners -= CheckSliderClick;
+            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckSliderHovered))
                 ObjectWasHoveredEvent.Listeners -= CheckSliderHovered;
-            }
         }
 
         protected override void Update()
@@ -162,19 +161,7 @@ namespace VRSF.UI
         /// <param name="clickEvent">The event raised when an object is clicked</param>
         private void CheckSliderClick(ObjectWasClickedEvent clickEvent)
         {
-            if (IsInteractable() && FillWithClick)
-            {
-                // if the object clicked correspond to this transform and the coroutine to fill the bar didn't started yet
-                if (clickEvent.ObjectClicked == transform && _fillBarRoutine == null)
-                {
-                    HandleHandInteracting(clickEvent.RayOrigin);
-                }
-                // If the user was clicking the bar but stopped
-                else if (_fillBarRoutine != null)
-                {
-                    HandleUp();
-                }
-            }
+            CheckTransform(clickEvent.ObjectClicked, clickEvent.RayOrigin);
         }
 
         /// <summary>
@@ -183,15 +170,20 @@ namespace VRSF.UI
         /// <param name="hoverEvent">The event raised when an object is hovered</param>
         private void CheckSliderHovered(ObjectWasHoveredEvent hoverEvent)
         {
-            if (IsInteractable() && !FillWithClick)
+            CheckTransform(hoverEvent.ObjectHovered, hoverEvent.RaycastOrigin);
+        }
+
+        private void CheckTransform(Transform toCheck, ERayOrigin raycastOrigin)
+        {
+            if (IsInteractable())
             {
                 // if the object hovered correspond to this transform and the coroutine to fill the bar didn't started yet
-                if (hoverEvent.ObjectHovered == transform && _fillBarRoutine == null)
+                if (toCheck == transform && _fillBarRoutine == null)
                 {
-                    HandleHandInteracting(hoverEvent.RaycastOrigin);
+                    HandleHandInteracting(raycastOrigin);
                 }
                 // If the user was hovering the bar but stopped
-                else if (_fillBarRoutine != null && hoverEvent.RaycastOrigin == _handFilling && hoverEvent.ObjectHovered != transform)
+                else if (_fillBarRoutine != null && raycastOrigin == _handFilling && toCheck != transform)
                 {
                     HandleUp();
                 }
@@ -319,8 +311,10 @@ namespace VRSF.UI
 
             if (LaserClickable)
             {
-                ObjectWasClickedEvent.Listeners += CheckSliderClick;
-                ObjectWasHoveredEvent.Listeners += CheckSliderHovered;
+                if (FillWithClick)
+                    ObjectWasClickedEvent.Listeners += CheckSliderClick;
+                else
+                    ObjectWasHoveredEvent.Listeners += CheckSliderHovered;
             }
 
             if (ControllerClickable)

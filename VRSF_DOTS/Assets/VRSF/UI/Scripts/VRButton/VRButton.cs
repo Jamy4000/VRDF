@@ -50,11 +50,11 @@ namespace VRSF.UI
             if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
                 OnSetupVRReady.Listeners -= Init;
 
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
-            {
+            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
                 ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
+
+            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
                 ObjectWasClickedEvent.Listeners -= CheckObjectClicked;
-            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -81,16 +81,15 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            var currentEventSystem = EventSystem.current;
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(new BaseEventData(currentEventSystem));
+                OnSelect(null);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
-                OnDeselect(new BaseEventData(currentEventSystem));
+                OnDeselect(null);
             }
         }
 
@@ -112,10 +111,10 @@ namespace VRSF.UI
 
         private void Init(OnSetupVRReady _)
         {
-            if (LaserClickable)
+            if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
-                ObjectWasClickedEvent.Listeners += CheckObjectClicked;
                 ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+                ObjectWasClickedEvent.Listeners += CheckObjectClicked;
             }
 
             var boxCollider = GetComponent<BoxCollider>();

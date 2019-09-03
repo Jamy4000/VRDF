@@ -1,4 +1,4 @@
-﻿using Unity.Mathematics;
+﻿using UnityEngine;
 using VRSF.Core.Raycast;
 
 namespace VRSF.Core.LaserPointer
@@ -10,9 +10,9 @@ namespace VRSF.Core.LaserPointer
     {
         public readonly ERayOrigin LaserOrigin;
 
-        public readonly float3 NewEndPos;
+        public readonly Vector3 NewEndPos;
 
-        public OnLaserLengthChanged(ERayOrigin lasersOrigin, float3 newEndPos) : base("The base event to raise when one of the laserPointer changed its length.")
+        public OnLaserLengthChanged(ERayOrigin lasersOrigin, Vector3 newEndPos) : base("The base event to raise when one of the laserPointer changed its length.")
         {
             LaserOrigin = lasersOrigin;
             NewEndPos = newEndPos;

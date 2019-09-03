@@ -42,21 +42,12 @@ namespace VRSF.Multiplayer
         }
 
         /// <summary>
-        /// Callback for when the user could connect to the server.
-        /// </summary>
-        public override void OnConnectedToMaster()
-        {
-            // When the user is connected to the server, we make him load a basic lobby so he can get the rooms info.
-            PhotonNetwork.JoinLobby(new TypedLobby("BaseVRLobby", LobbyType.Default));
-        }
-
-        /// <summary>
         /// Callback for when the user could connect to a room.
         /// </summary>
         private void ConnectToRoom(OnConnectionToRoomRequested info)
         {
             // we check if we are connected, and join if we are
-            if (PhotonNetwork.IsConnected)
+            if (PhotonNetwork.IsConnectedAndReady)
             {
                 if (info.NeedCreation)
                 {
@@ -100,6 +91,24 @@ namespace VRSF.Multiplayer
                 }
                 return reallyNeedCreation;
             }
+        }
+
+        /// <summary>
+        /// Callback for when the user could connect to the server.
+        /// </summary>
+        public override void OnConnectedToMaster()
+        {
+            Debug.Log("<b>[VRSF] :</b> Connection with Master established, joining Lobby ...");
+            // When the user is connected to the server, we make him load a basic lobby so he can get the rooms info.
+            PhotonNetwork.JoinLobby(new TypedLobby("BaseVRLobby", LobbyType.Default));
+        }
+
+        /// <summary>
+        /// Callback for when the user could connect to the server.
+        /// </summary>
+        public override void OnJoinedLobby()
+        {
+            Debug.Log("<b>[VRSF] :</b> Lobby was successfully joined !");
         }
 
         /// <summary>

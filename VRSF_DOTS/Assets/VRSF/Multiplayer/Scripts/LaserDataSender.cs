@@ -9,36 +9,51 @@ namespace VRSF.Multiplayer
     /// Send the Laser data to the other user's when requested
     /// This component replace the LaserWidthSetter and the LaserLengthSetter component when in multiplayer
     /// </summary>
-    [RequireComponent(typeof(LineRenderer), typeof(PhotonView))]
+    [RequireComponent(typeof(PhotonView))]
     public class LaserDataSender : MonoBehaviour, IPunObservable
     {
+        [SerializeField] private ERayOrigin _rayOrigin;
+
         private bool _isSendingData;
         private LineRenderer _lineRenderer;
-        private ERayOrigin _rayOrigin;
         private PhotonView _punComp;
+
+        private float _startWidthToSend;
+        private float _endWidthToSend;
+        private Vector3 _startPosToSend;
+        private Vector3 _endPosToSend;
 
         private void Awake()
         {
             _punComp = GetComponent<PhotonView>();
             _lineRenderer = GetComponent<LineRenderer>();
-            // VRRaycastAuthoring is necessaraly on this GameObject; as the LaserPointerStateAuthoring needs it.
-            _rayOrigin = GetComponent<VRRaycastAuthoring>().RayOrigin;
-            OnLaserWidthChanged.Listeners += UpdateLineRenderWidth;
-            OnLaserLengthChanged.Listeners += UpdateLineRenderLength;
+        }
+
+        private void Start()
+        {
+            if (_punComp.IsMine)
+            {
+                OnLaserWidthChanged.Listeners += UpdateLineRenderWidth;
+                OnLaserLengthChanged.Listeners += UpdateLineRenderLength;
+                Destroy(_lineRenderer);
+            }
         }
 
         private void OnDestroy()
         {
-            OnLaserWidthChanged.Listeners -= UpdateLineRenderWidth;
-            OnLaserLengthChanged.Listeners -= UpdateLineRenderLength;
+            if (_punComp.IsMine)
+            {
+                OnLaserWidthChanged.Listeners -= UpdateLineRenderWidth;
+                OnLaserLengthChanged.Listeners -= UpdateLineRenderLength;
+            }
         }
 
         private void UpdateLineRenderWidth(OnLaserWidthChanged info)
         {
-            if (info.LaserOrigin == _rayOrigin && _punComp.IsMine)
+            if (info.LaserOrigin == _rayOrigin)
             {
-                _lineRenderer.startWidth = info.NewWidth;
-                _lineRenderer.endWidth = info.NewWidth;
+                _startWidthToSend = info.NewWidth;
+                _endWidthToSend = info.NewWidth;
 
                 _isSendingData = true;
             }
@@ -46,13 +61,10 @@ namespace VRSF.Multiplayer
 
         private void UpdateLineRenderLength(OnLaserLengthChanged info)
         {
-            if (info.LaserOrigin == _rayOrigin && _punComp.IsMine)
+            if (info.LaserOrigin == _rayOrigin)
             {
-                _lineRenderer.SetPositions(new Vector3[]
-                {
-                    transform.position,
-                    info.NewEndPos
-                });
+                _startPosToSend = Vector3.zero;
+                _endPosToSend = info.NewEndPos;
 
                 _isSendingData = true;
             }
@@ -62,25 +74,22 @@ namespace VRSF.Multiplayer
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            if (stream.IsWriting)
-            {
-                if (_isSendingData)
-                {
-                    // We own this player: send the others our data
-                    stream.SendNext(this._lineRenderer.startWidth);
-                    stream.SendNext(this._lineRenderer.endWidth);
-                    stream.SendNext(this._lineRenderer.GetPosition(0));
-                    stream.SendNext(this._lineRenderer.GetPosition(1));
-                    _isSendingData = false;
-                }
-            }
-            else
+            if (!stream.IsWriting)
             {
                 // Network player, receive data
                 this._lineRenderer.startWidth = (float)stream.ReceiveNext();
                 this._lineRenderer.endWidth = (float)stream.ReceiveNext();
                 this._lineRenderer.SetPosition(0, (Vector3)stream.ReceiveNext());
                 this._lineRenderer.SetPosition(1, (Vector3)stream.ReceiveNext());
+            }
+            else if (_isSendingData)
+            {
+                // We own this player: send the others our data
+                stream.SendNext(_startWidthToSend);
+                stream.SendNext(_endWidthToSend);
+                stream.SendNext(_startPosToSend);
+                stream.SendNext(_endPosToSend);
+                _isSendingData = false;
             }
         }
 

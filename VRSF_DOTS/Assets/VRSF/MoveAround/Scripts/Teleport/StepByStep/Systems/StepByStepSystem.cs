@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using System;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using VRSF.Core.FadingEffect;
@@ -14,6 +15,15 @@ namespace VRSF.MoveAround.Teleport
     {
         private float3 _tempPointToGoTo;
 
+        private Transform _vrCamTransform;
+        private Transform _cameraRigTransform;
+
+        protected override void OnCreate()
+        {
+            base.OnCreate();
+            OnSetupVRReady.Listeners += InitRef;
+        }
+
         protected override void OnUpdate()
         {
             Entities.ForEach((ref StepByStepComponent sbs, ref VRRaycastParameters raycastParam, ref GeneralTeleportParameters gtp, ref TeleportNavMesh tnm, ref VRRaycastOutputs raycastOutputs) =>
@@ -21,7 +31,6 @@ namespace VRSF.MoveAround.Teleport
                 if (gtp.CurrentTeleportState == ETeleportState.Teleporting)
                 {
                     // We teleport the user as soon as we go out of the job
-                    gtp.HasTeleported = true;
                     if (UserIsOnNavMesh(sbs, tnm, raycastOutputs, raycastParam.ExcludedLayer, out float3 newUsersPos))
                     {
                         if (gtp.IsUsingFadingEffect)
@@ -32,24 +41,29 @@ namespace VRSF.MoveAround.Teleport
                         }
                         else
                         {
-                            VRSF_Components.SetCameraRigPosition(newUsersPos);
+                            _cameraRigTransform.position = newUsersPos;
                         }
                     }
+
+                    gtp.HasTeleported = true;
                 }
             });
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            OnSetupVRReady.Listeners -= InitRef;
+        }
+
         private bool UserIsOnNavMesh(StepByStepComponent sbs, TeleportNavMesh tnm, VRRaycastOutputs raycastOutputs, LayerMask excludedLayers, out float3 newCameraRigPos)
         {
-            Transform vrCamTransform = VRSF_Components.VRCamera.transform;
-            Transform cameraRigTransform = VRSF_Components.CameraRig.transform;
-
             // We calculate the direction and the distance Vectors
             var directionVector = raycastOutputs.RayVar.direction;
-            float distanceVector = cameraRigTransform.localScale.y * sbs.DistanceStepByStep;
+            float distanceVector = _cameraRigTransform.localScale.y * sbs.DistanceStepByStep;
 
             // Check if we hit a collider on the way. If it's the case, we reduce the distance.
-            if (Physics.Raycast(vrCamTransform.position, directionVector, out RaycastHit hit, distanceVector, ~excludedLayers))
+            if (Physics.Raycast(_vrCamTransform.position, directionVector, out RaycastHit hit, distanceVector, ~excludedLayers))
                 distanceVector = hit.distance - 0.1f;
 
             // We multiply the direction vector by the distance to which the user should be going
@@ -61,7 +75,7 @@ namespace VRSF.MoveAround.Teleport
             float3 newCameraPos = GetNewTheoriticPos(directionVector, false);
 
             // We calculate a vector down based on the new Camera Pos. 
-            var downVectorDistance = Mathf.Abs(vrCamTransform.localPosition.y + VRSF_Components.FloorOffset.transform.localPosition.y) + sbs.StepHeight;
+            var downVectorDistance = Mathf.Abs(_vrCamTransform.localPosition.y + VRSF_Components.FloorOffset.transform.localPosition.y) + sbs.StepHeight;
             var downVector = newCameraPos + (new float3(0.0f, -1.0f, 0.0f) * downVectorDistance);
 
             // We calculate the linecast between the newUserPos and the downVector and check if it hits the NavMesh
@@ -90,7 +104,7 @@ namespace VRSF.MoveAround.Teleport
             /// <returns>The new Theoritic position</returns>
             float3 GetNewTheoriticPos(Vector3 scaledDirection, bool isCheckingCameraRig)
             {
-                float3 origin = isCheckingCameraRig ? cameraRigTransform.position : vrCamTransform.position;
+                float3 origin = isCheckingCameraRig ? _cameraRigTransform.position : _vrCamTransform.position;
                 return origin + new float3(scaledDirection.x, 0.0f, scaledDirection.z);
             }
         }
@@ -98,7 +112,13 @@ namespace VRSF.MoveAround.Teleport
         private void TeleportUser(OnFadingOutEndedEvent info)
         {
             OnFadingOutEndedEvent.Listeners -= TeleportUser;
-            VRSF_Components.SetCameraRigPosition(_tempPointToGoTo);
+            _cameraRigTransform.position = _tempPointToGoTo;
+        }
+
+        private void InitRef(OnSetupVRReady info)
+        {
+            _vrCamTransform = VRSF_Components.VRCamera.transform;
+            _cameraRigTransform = VRSF_Components.CameraRig.transform;
         }
     }
 }

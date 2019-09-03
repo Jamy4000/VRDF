@@ -56,11 +56,11 @@ namespace VRSF.UI
             if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
                 OnSetupVRReady.Listeners -= Init;
 
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckBarClick))
-            {
+            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                ObjectWasClickedEvent.Listeners -= CheckObjectClick;
+
+            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
                 ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
-                ObjectWasClickedEvent.Listeners -= CheckBarClick;
-            }
         }
 
         protected override void Update()
@@ -92,7 +92,7 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckBarClick(ObjectWasClickedEvent clickEvent)
+        private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
                 _rayHoldingHandle = clickEvent.RayOrigin;
@@ -100,16 +100,14 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            var currentEventSystem = EventSystem.current;
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(new BaseEventData(currentEventSystem));
+                OnSelect(null);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
-                OnDeselect(new BaseEventData(currentEventSystem));
             }
         }
 
@@ -168,8 +166,11 @@ namespace VRSF.UI
             GetHandleRectReference();
 
             // We register the Listener
-            ObjectWasClickedEvent.Listeners += CheckBarClick;
-            ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            {
+                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+                ObjectWasClickedEvent.Listeners += CheckObjectClick;
+            }
 
             _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));
             // Check if the Min and Max object are already created, and set there references

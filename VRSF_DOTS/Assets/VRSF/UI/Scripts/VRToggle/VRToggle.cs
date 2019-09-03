@@ -47,11 +47,11 @@ namespace VRSF.UI
             if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
                 OnSetupVRReady.Listeners -= Init;
 
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckToggleClick))
-            {
+            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
                 ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
-                ObjectWasClickedEvent.Listeners -= CheckToggleClick;
-            }
+
+            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                ObjectWasClickedEvent.Listeners -= CheckObjectClick;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -67,7 +67,7 @@ namespace VRSF.UI
         /// Event called when the button is clicked
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckToggleClick(ObjectWasClickedEvent clickEvent)
+        private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform)
                 isOn = !isOn;
@@ -75,16 +75,14 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            var currentEventSystem = EventSystem.current;
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(new BaseEventData(currentEventSystem));
+                OnSelect(null);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
-                OnDeselect(new BaseEventData(currentEventSystem));
             }
         }
 
@@ -103,10 +101,10 @@ namespace VRSF.UI
 
         private void Init(OnSetupVRReady _)
         {
-            if (LaserClickable)
+            if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
-                ObjectWasClickedEvent.Listeners += CheckToggleClick;
                 ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+                ObjectWasClickedEvent.Listeners += CheckObjectClick;
             }
 
             if (ControllerClickable)

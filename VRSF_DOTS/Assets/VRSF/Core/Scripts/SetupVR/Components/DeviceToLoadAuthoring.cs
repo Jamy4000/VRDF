@@ -50,6 +50,8 @@ namespace VRSF.Core.SetupVR
 
             if (_device == EDevice.SIMULATOR)
                 RemoveVRStuffs();
+            else
+                XRSettings.enabled = true;
 
             VRSF_Components.SetupVRIsReady = true;
             new OnSetupVRReady();
@@ -70,12 +72,6 @@ namespace VRSF.Core.SetupVR
                         Debug.LogError("<b>[VRSF] :</b> Trying to force OpenVR SDK, but Simulator is the loaded Device. Please check your settings on SetupVR.");
 
                     XRSettings.LoadDeviceByName("OpenVR");
-                    break;
-                case EVR_SDK.WMR:
-                    if (_device != EDevice.WMR)
-                        Debug.LogErrorFormat("<b>[VRSF] :</b> Trying to force WMR SDK, but {0} is the loaded Device. Please check your settings on SetupVR.", _device.ToString());
-
-                    XRSettings.LoadDeviceByName("Windows Mixed Reality");
                     break;
                 default:
                     XRSettings.LoadDeviceByName("None");

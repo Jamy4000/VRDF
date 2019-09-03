@@ -42,9 +42,16 @@ namespace VRSF.MoveAround.Teleport
 
         public static void SetupTeleportStuffs(ref EntityManager entityManager, ref Entity entity, GeneralTeleportAuthoring generalTeleportParam)
         {
+            var queryCount = entityManager.CreateEntityQuery(typeof(Core.FadingEffect.CameraFadeParameters)).CalculateEntityCount();
+            bool hasFadingCanvas = GameObject.FindObjectOfType<Core.FadingEffect.CameraFadeAuthoring>() != null || queryCount > 0;
+
+            if (generalTeleportParam.IsUsingFadingEffect && !hasFadingCanvas)
+                Debug.LogError("<b>[VRSF] :</b> You requested to use a fading effect for the teleport feature on GameObject " + generalTeleportParam.gameObject.name + ", but no CameraFadeAuthoring is placed under your Camera." +
+                    "Try to do in your hierarchy RightClick > VRSF > Utils > Add Camera Fade.");
+
             entityManager.SetComponentData(entity, new GeneralTeleportParameters
             {
-                IsUsingFadingEffect = generalTeleportParam.IsUsingFadingEffect
+                IsUsingFadingEffect = generalTeleportParam.IsUsingFadingEffect && hasFadingCanvas
             });
 
             var tnm = generalTeleportParam.GetComponent<TeleportNavMeshAuthoring>();

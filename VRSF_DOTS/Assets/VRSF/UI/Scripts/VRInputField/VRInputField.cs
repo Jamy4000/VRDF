@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VRSF.Core.Events;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -37,10 +38,10 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                if (LaserClickable)
+                if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
                 {
-                    ObjectWasClickedEvent.Listeners += CheckInputFieldClick;
                     ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+                    ObjectWasClickedEvent.Listeners += CheckObjectClick;
                 }
 
                 if (ControllerClickable)
@@ -57,11 +58,10 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckInputFieldClick))
-            {
+            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                ObjectWasClickedEvent.Listeners -= CheckObjectClick;
+            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
                 ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
-                ObjectWasClickedEvent.Listeners -= CheckInputFieldClick;
-            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -77,7 +77,7 @@ namespace VRSF.UI
         /// Method called when the user is clicking
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        void CheckInputFieldClick(ObjectWasClickedEvent clickEvent)
+        void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform)
                 StartTyping();
@@ -85,16 +85,14 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            var currentEventSystem = EventSystem.current;
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(new BaseEventData(currentEventSystem));
+                OnSelect(null);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
-                OnDeselect(new BaseEventData(currentEventSystem));
             }
         }
 

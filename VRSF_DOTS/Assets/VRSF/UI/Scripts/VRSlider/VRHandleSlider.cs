@@ -59,11 +59,11 @@ namespace VRSF.UI
             if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
                 OnSetupVRReady.Listeners -= Init;
 
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
-            {
+            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                ObjectWasClickedEvent.Listeners -= CheckObjectClick;
+
+            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
                 ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
-                ObjectWasClickedEvent.Listeners -= CheckSliderClick;
-            }
         }
 
         protected override void Update()
@@ -75,15 +75,15 @@ namespace VRSF.UI
                 {
                     case ERayOrigin.LEFT_HAND:
                         _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingLeft);
-                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
+                        value = InteractionVariableContainer.CurrentLeftHit != transform ? value : _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
                         break;
                     case ERayOrigin.RIGHT_HAND:
                         _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingRight);
-                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
+                        value = InteractionVariableContainer.CurrentRightHit != transform ? value : _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
                         break;
                     case ERayOrigin.CAMERA:
                         _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingGaze);
-                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
+                        value = InteractionVariableContainer.CurrentGazeHit != transform ? value : _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
                         break;
                 }
             }
@@ -96,7 +96,7 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckSliderClick(ObjectWasClickedEvent clickEvent)
+        private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
             _rayHoldingHandle = interactable && ObjectClickedIsThis() ? clickEvent.RayOrigin : ERayOrigin.NONE;
 
@@ -108,16 +108,14 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            var currentEventSystem = EventSystem.current;
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(new BaseEventData(currentEventSystem));
+                OnSelect(null);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
-                OnDeselect(new BaseEventData(currentEventSystem));
             }
         }
 
@@ -139,9 +137,13 @@ namespace VRSF.UI
 
         private void Init(OnSetupVRReady _)
         {
-            ObjectWasClickedEvent.Listeners += CheckSliderClick;
-            ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
-            
+            Debug.Log("Init");
+            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            {
+                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
+                ObjectWasClickedEvent.Listeners += CheckObjectClick;
+            }
+
             CheckSliderReferences();
 
             _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), minValue, maxValue, wholeNumbers);

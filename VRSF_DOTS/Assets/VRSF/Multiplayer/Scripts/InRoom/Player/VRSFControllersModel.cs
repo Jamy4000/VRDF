@@ -10,7 +10,7 @@ namespace VRSF.Multiplayer
     /// Need to be placed under the COntrollers Transform object from the PlayerPrefab
     /// </summary>
     [RequireComponent(typeof(PhotonView), typeof(ControllerMeshListing))]
-    public class VRSFControllersModel : MonoBehaviourPun
+    public class VRSFControllersModel : MonoBehaviour
     {
         /// <summary>
         /// Attached to this object, contains a list of meshes based on a type of Device
@@ -22,33 +22,21 @@ namespace VRSF.Multiplayer
         /// </summary>
         private GameObject _controllerInstance;
 
-        private bool _waitForAuthoringAndDestroy;
+        private PhotonView _punView;
 
-        private void Awake()
+        private void Start()
         {
-            var controllerAuth = GetComponent<ControllerMeshAuthoring>();
+            _punView = GetComponent<PhotonView>();
 
-            // We don't need a controller authoring if this player isn't the local player
-            if (controllerAuth != null && !photonView.IsMine)
+            // If this for the local player, the controller are set directly in SetupVR
+            if (_punView.IsMine)
             {
-                Destroy(controllerAuth);
-            }
-            else if (photonView.IsMine)
-            {
-                // This gameobject is not needed if the photonView is mine, so we destroy it once the authoring phase is done
-                _waitForAuthoringAndDestroy = true;
+                Destroy(gameObject);
                 return;
             }
 
-            _controllersMesh = GetComponent<ControllerMeshListing>();
             VRDeviceWasSet.Listeners += CallInstantiation;
-        }
-
-        private void Update()
-        {
-            // This gameobject is not needed if the photonView is mine, so we destroy it once the authoring phase is done
-            if (_waitForAuthoringAndDestroy && GetComponent<ControllerMeshAuthoring>() == null)
-                Destroy(gameObject);
+            _controllersMesh = GetComponent<ControllerMeshListing>();
         }
 
         private void OnDestroy()
@@ -56,8 +44,10 @@ namespace VRSF.Multiplayer
             if (VRDeviceWasSet.IsMethodAlreadyRegistered(CallInstantiation))
             {
                 VRDeviceWasSet.Listeners -= CallInstantiation;
+
                 // Destroy the remote controller
-                Destroy(_controllerInstance);
+                if (_controllerInstance != null)
+                    Destroy(_controllerInstance);
             }
         }
 
@@ -69,13 +59,22 @@ namespace VRSF.Multiplayer
         private void CallInstantiation(VRDeviceWasSet info)
         {
             // If the player that has send his info is the one corresponding to this player and the remoteControllers dictionary doesn't contains this player yet
-            if (info.Player.NickName == photonView.Owner.NickName)
+            if (info.Player.NickName == _punView.Owner.NickName)
             {
                 if (_controllerInstance != null)
                     Destroy(_controllerInstance);
 
                 // If the other user use the simulator, we do not need to generate a controller
                 _controllerInstance = info.Player.DeviceUsed == EDevice.SIMULATOR ? null : GameObject.Instantiate(_controllersMesh.ControllersPerDevice[info.Player.DeviceUsed], transform.parent);
+            }
+            else if (_controllerInstance == null)
+            {
+                foreach (var player in VRSFBasicPlayersManager.PlayersInstances)
+                {
+                    // If the other user use the simulator, we do not need to generate a controller
+                    if (player.UserId == _punView.Owner.UserId && player.DeviceUsed != EDevice.NONE)
+                        _controllerInstance = info.Player.DeviceUsed == EDevice.SIMULATOR ? null : GameObject.Instantiate(_controllersMesh.ControllersPerDevice[info.Player.DeviceUsed], transform.parent);
+                }
             }
         }
     }

@@ -22,7 +22,6 @@ namespace VRSF.Core.FadingEffect
             OnSetupVRReady.Listeners -= StartFadingIn;
             StartFadingInEvent.Listeners -= StartFadeIn;
             OnFadingInEndedEvent.Listeners -= OnFadeInEnded;
-            this.Enabled = false;
         }
 
         private void StartFadeIn(StartFadingInEvent info)

@@ -1,7 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
-using UnityEngine;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.Multiplayer
@@ -30,17 +29,11 @@ namespace VRSF.Multiplayer
                 List<Player> toRemove = new List<Player>(); 
                 foreach (var kvp in _playersToSet)
                 {
-                    try
+                    if (VRSFBasicPlayersManager.FindPlayer(kvp.Key, out VRSFPlayer player, false))
                     {
-                        var player = VRSFBasicPlayersManager.FindPlayer(kvp.Key, false);
                         player.DeviceUsed = kvp.Value;
                         toRemove.Add(kvp.Key);
-
                         new VRDeviceWasSet(player);
-                    }
-                    catch
-                    {
-                        Debug.LogFormat("<b>[VRSF] :</b> Player {0} is still not set in the VRSFPlayersManager.PlayersInstances. Waiting for next Frame.", kvp.Key.NickName);
                     }
                 }
 
@@ -63,7 +56,6 @@ namespace VRSF.Multiplayer
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             photonView.RPC("SendDeviceInfo", RpcTarget.Others, PhotonNetwork.LocalPlayer, VRSF_Components.DeviceLoaded);
-            base.OnPlayerEnteredRoom(newPlayer);
         }
 
         /// <summary>

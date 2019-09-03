@@ -58,7 +58,10 @@ namespace VRSF.UI
             if (_eventWereRegistered)
             {
                 onValueChanged.RemoveListener(_onValueChangedAction);
-                ObjectWasClickedEvent.UnregisterListener(CheckObjectClicked);
+
+                if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
+                    ObjectWasClickedEvent.Listeners -= CheckObjectClicked;
+
                 _eventWereRegistered = false;
             }
         }
@@ -151,6 +154,7 @@ namespace VRSF.UI
         {
             _onValueChangedAction = delegate { SetDropDownNewState(); };
             onValueChanged.AddListener(_onValueChangedAction);
+
             ObjectWasClickedEvent.Listeners += CheckObjectClicked;
 
             _eventWereRegistered = true;

@@ -19,7 +19,6 @@ namespace VRSF.Core.FadingEffect
             base.OnDestroy();
             StartFadingOutEvent.Listeners -= StartFadeOut;
             OnFadingOutEndedEvent.Listeners -= OnFadeOutEnded;
-            this.Enabled = false;
         }
 
         private void StartFadeOut(StartFadingOutEvent info)
