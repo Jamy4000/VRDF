@@ -15,12 +15,12 @@ namespace VRSF.Core.Utils
     /// <typeparam name="T">The type of ScriptableObject to set as Singleton</typeparam>
     public class ScriptableSingleton<T> : ScriptableObject where T : ScriptableSingleton<T>
     {
-        private static T _CachedInstance;
+        private static T _cachedInstance;
         
         /// <summary>
         /// The name of the scriptable file
         /// </summary>
-        private static string FileName
+        private static string _fileName
         {
             get
             {
@@ -31,7 +31,7 @@ namespace VRSF.Core.Utils
         /// <summary>
         /// The path of the Asset
         /// </summary>
-        private static string VRSFResources
+        private static string _vrsfResources
         {
             get
             {
@@ -46,23 +46,23 @@ namespace VRSF.Core.Utils
         {
             get
             {
-                if (_CachedInstance == null)
+                if (_cachedInstance == null)
                 {
-                    _CachedInstance = Resources.Load<T>(FileName) as T;
+                    _cachedInstance = Resources.Load<T>(_fileName) as T;
                 }
 #if UNITY_EDITOR
-                if (_CachedInstance == null)
+                if (_cachedInstance == null)
                 {
-                    _CachedInstance = CreateAndSave();
+                    _cachedInstance = CreateAndSave();
                 }
 #endif
-                if (_CachedInstance == null)
+                if (_cachedInstance == null)
                 {
-                    Debug.LogWarning("No instance of " + FileName + " found, using default values");
-                    _CachedInstance = ScriptableObject.CreateInstance<T>();
+                    Debug.LogWarning("No instance of " + _fileName + " found, using default values");
+                    _cachedInstance = ScriptableObject.CreateInstance<T>();
                 }
 
-                return _CachedInstance;
+                return _cachedInstance;
             }
         }
 
@@ -93,10 +93,10 @@ namespace VRSF.Core.Utils
         /// <param name="obj">The type of Scriptable Object to save</param>
         private static void SaveAsset(T obj)
         {
-            if (!Directory.Exists(VRSFResources))
-                Directory.CreateDirectory(VRSFResources);
+            if (!Directory.Exists(_vrsfResources))
+                Directory.CreateDirectory(_vrsfResources);
 
-            string filePath = Path.Combine(VRSFResources, FileName + ".asset");
+            string filePath = Path.Combine(_vrsfResources, _fileName + ".asset");
             AssetDatabase.CreateAsset(obj, filePath);
             AssetDatabase.SaveAssets();
         }

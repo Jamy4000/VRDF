@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.absolutehh.DLRMultiplayer" xmlns:tools="http://schemas.android.com/tools" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="TODO" xmlns:tools="http://schemas.android.com/tools" android:installLocation="auto">
   <uses-feature android:name="android.hardware.vr.headtracking" android:version="1" android:required="true" />
   <!-- Request the headset DoF mode -->
   <application android:theme="@style/UnityThemeSelector" android:icon="@mipmap/app_icon" android:label="@string/app_name">

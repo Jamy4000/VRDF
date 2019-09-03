@@ -10,7 +10,22 @@ namespace VRSF.Multiplayer
     /// </summary>
     public class BasicVRLobbyConnectionManager : MonoBehaviourPunCallbacks
     {
-        [Header("Rooms Parameters")]
+        #region Variables
+        [Header("Critical Room Parameters")]
+        /// <summary>
+        /// The Maximal amount of player that can enter a room
+        /// </summary>
+        [Tooltip("The Maximal amount of player that can enter a room")]
+        public int MaxPlayerPerRoom = 5;
+
+        /// <summary>
+        /// The Minimal amount of player that can enter a room
+        /// </summary>
+        [Tooltip("The Minimal amount of player that can enter a room")]
+        public int MinPlayerPerRoom = 0;
+
+
+        [Header("Overridable Rooms Parameters")]
         [Tooltip("The name or index of the scene you want to load as a multiplayer scene. One is enough.")]
         [SerializeField]
         private string _multiplayerSceneName;
@@ -22,6 +37,14 @@ namespace VRSF.Multiplayer
 
         private List<RoomInfo> _onlineRooms = new List<RoomInfo>();
 
+        /// <summary>
+        /// The current room the user want to join/ has joined
+        /// </summary>
+        public static RoomInfo CurrentRoom;
+        #endregion Variables
+
+
+        #region Monobehaviours_Methods
         /// <summary>
         /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
         /// </summary>
@@ -40,7 +63,10 @@ namespace VRSF.Multiplayer
         {
             OnConnectionToRoomRequested.Listeners -= ConnectToRoom;
         }
+        #endregion Monobehaviours_Methods
 
+
+        #region EventCallbacks
         /// <summary>
         /// Callback for when the user could connect to a room.
         /// </summary>
@@ -92,7 +118,10 @@ namespace VRSF.Multiplayer
                 return reallyNeedCreation;
             }
         }
+        #endregion EventCallbacks
 
+
+        #region PunCallbacks
         /// <summary>
         /// Callback for when the user could connect to the server.
         /// </summary>
@@ -160,7 +189,9 @@ namespace VRSF.Multiplayer
         {
             _onlineRooms = roomList;
         }
+        #endregion PunCallbacks
 
+        #region Private_Methods
         /// <summary>
         /// Try to load a scene based on its build index or its name
         /// </summary>
@@ -195,5 +226,6 @@ namespace VRSF.Multiplayer
                 return false;
             }
         }
+        #endregion Private_Methods
     }
 }
