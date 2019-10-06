@@ -25,7 +25,7 @@ And you're done with Photon ! You may need to redo the step 3 to 6 when you clon
 
 
 ## Second part : VRSF Setup
-1. [Follow the Basic Steps to setup VRSF in your project until the Step 9](https://github.com/Jamy4000/VRSF_DOTS#basic-setup)
+1. [Follow the Basic Steps to setup VRSF in your project UNTIL STEP 9](https://github.com/Jamy4000/VRSF_DOTS#basic-setup)
 
 2. Import the VRSF_DOTS_Multiplayer_vX.x.unitypackage in your project
 
