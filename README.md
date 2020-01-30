@@ -8,12 +8,12 @@ If you have any in question on how to use this tool, I'll be glad to answer you,
 
 
 ## Description
-The repository you're currently is a Crossfplatform, Lightweight VR Framework giving you access to some basic features often used in VR (UI, Teleportation, Flying mode, Gaze, Inputs Management, ...). It's an alternative to Libraries like VRTK, that was way too big for me when I first used it.
+This repo is a Crossfplatform, Lightweight VR Framework giving you access to some basic features often used in VR (UI, Teleportation, Flying mode, Gaze, Inputs Management, ...). It's an alternative to Libraries like VRTK, that was way too big for me when I first used it.
 
 
-The supported devices for now are :
+The supported devices as for now are :
 - The HTC Vive
-- The HTC Focus (No 3D Models for the controllers are provided for now)
+- The HTC Focus **(No 3D Models for the controllers are provided for now)**
 - The Microsoft Mixed Reality Headset (using SteamVR)
 - The Oculus Rift with Touch Controllers
 - The Oculus Quest
@@ -33,13 +33,13 @@ The stable versions are placed in the Releases section of this repository. Multi
 
 
 # Requirements
-For Unity, you need to download the latest **2019.1 version or later**, as it's required to be able to use Unity DOTS.
+For Unity, you need to download the latest **2019.3 version or later**, as it's required to be able to use the new Unity DOTS.
 
 ## Main Packages
 To use this Framework, you gonna need the following stuffs :
 - **The XR Legacy Input Helpers** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on All Packages > XR Legacy Input Helpers > Install).
-- **The Entities Package preview - 0.1.1** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install). 
-- **The Hybrid Renderer Package preview - 0.1.1** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Hybrid Renderer > Install). 
+- **The Entities Package preview.11 - 0.5.1** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Entities > Install). I'm trying to update the code as soon as Unity update this package, as it's still in preview.
+- **The Hybrid Renderer Package preview.11 - 0.3.3** : You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on Advanced > Show Preview Packages, and then : All Packages > Hybrid Renderer > Install). I'm trying to update the code as soon as Unity update this package, as it's still in preview.
 - **TextMesh Pro** : Only if you want to use the VR UI Extension. You can find it in the Package Manager from Unity (in Unity, Tab Window > Package Manager, in the Packages Window click on All Packages > TextMesh Pro > Install).
 
 ## VR Packages
@@ -52,25 +52,24 @@ You still need to import some VR Packages, depending on your needs, to use this 
 If you need to build for a mobile platform, you need as well to download the Android Building support (File > Build Settings > Android) and to switch the platform to Android.
 
 ## Other Settings
-- **VR Support** : In the Player Settings Window (Edit > Project Settings > Player), go to the last tab called XR Settings, set the Virtual Reality Supported toggle to true, and add the Oculus, OpenVR and None SDKs to the list.
+- **VR Support** : In the Player Settings Window (Edit > Project Settings > Player), go to the last tab called XR Settings, set the Virtual Reality Supported toggle to true, and add the Oculus, OpenVR and None SDKs to the list. Set the Stereo Rendering Mode to Single Pass or, if possible, Single Pass Instanced.
 - **Scripting Runtime Version** : This one is normally set by default in the last versions of Unity, but we never know :  still in the Player Settings Window, go to the Other Settings tab and set the Scripting Runtime version to .NET 4.x Equivalent.
 
 ## Multiplayer Setup
 To use the multiplayer features, please follow [the HOW TO list](https://github.com/Jamy4000/VRSF_DOTS/blob/master/VRSF_DOTS/Assets/VRSF/Multiplayer/HOW_TO_Multi.md) created for this purpose.
 
-Once all of that is done, **Restart your project so everything can be recompiled !**
+Once all of that is done, **Restart your project to be sure that everything is compiled correctly !**
 
 
 
 # Basic Setup
 
 ## Manual Setup
-1. Create a new Empty project using Unity 2019.x
-2. Import the different packages and setup the settings listed above
-3. Relaunch the Editor to be sure that everything is correctly recompiled
+1. Create a new Empty project using Unity 2019.3.x
+2. Import the different packages and setup the stuffs listed above
 4. Import the VRSF_DOTS_Core package
-5. Import the other VRSF_DOTS extension packages you need (Samples, Move Around, UI or Gaze)
-6. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs to the preset included in the Core Package from VRSF
+5. Import the other VRSF_DOTS extension packages you need (Move Around -for Teleport, Flying Mode, or Rotation features-, UI -for a full Unity UI Elements usable in VR- or Gaze)
+6. Go to Edit > ProjectSettings > Input and use the Preset button on the top right corner to set the Inputs Keys using the preset included in the Core Package from VRSF
 7. Go to Edit > Player > Project Settings > XR Settings and tick the Virtual Reality Supported checkbox
 8. Add, in this order, the Oculus SDK, OpenVR SDK, and None (For the Simulator)
 9. Add SetupVR in your scene (Right click in Scene View > VRSF > Add SetupVR in Scene)
@@ -78,7 +77,7 @@ Once all of that is done, **Restart your project so everything can be recompiled
 11. You should be good to go !
 
 ## Extension Packages
-If you want to add anything more in your scene (Movements, UI, Gaze, ...), just check the prefabs in the different Extension Packages, or check the different scenes in the VRSF.Samples folder of this repository :)
+If you want to add anything more in your scene (Movements, UI, Gaze, ...), just check the prefabs in the different Extension Packages :)
 
 
 # Credits
