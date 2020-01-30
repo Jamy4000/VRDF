@@ -10,7 +10,7 @@ namespace VRSF.Multiplayer
     /// Need to be placed under the COntrollers Transform object from the PlayerPrefab
     /// </summary>
     [RequireComponent(typeof(PhotonView), typeof(ControllerMeshListing))]
-    public class VRSFControllersModel : MonoBehaviour
+    public class VRSFControllersModel : MonoBehaviourPun
     {
         /// <summary>
         /// Attached to this object, contains a list of meshes based on a type of Device
@@ -22,33 +22,24 @@ namespace VRSF.Multiplayer
         /// </summary>
         private GameObject _controllerInstance;
 
-        private PhotonView _punView;
-
         private void Start()
         {
-            _punView = GetComponent<PhotonView>();
-
             // If this for the local player, the controller are set directly in SetupVR
-            if (_punView.IsMine)
+            if (photonView.IsMine)
             {
                 Destroy(gameObject);
                 return;
             }
 
-            VRDeviceWasSet.Listeners += CallInstantiation;
             _controllersMesh = GetComponent<ControllerMeshListing>();
+            InstantiateRemoteControllers();
         }
 
         private void OnDestroy()
         {
-            if (VRDeviceWasSet.IsMethodAlreadyRegistered(CallInstantiation))
-            {
-                VRDeviceWasSet.Listeners -= CallInstantiation;
-
-                // Destroy the remote controller
-                if (_controllerInstance != null)
-                    Destroy(_controllerInstance);
-            }
+            // Destroy the remote controller
+            if (_controllerInstance != null)
+                Destroy(_controllerInstance);
         }
 
         /// <summary>
@@ -56,25 +47,15 @@ namespace VRSF.Multiplayer
         /// Generate the corresponding mesh for the used controllers
         /// </summary>
         /// <param name="info"></param>
-        private void CallInstantiation(VRDeviceWasSet info)
+        private void InstantiateRemoteControllers()
         {
-            // If the player that has send his info is the one corresponding to this player and the remoteControllers dictionary doesn't contains this player yet
-            if (info.Player.NickName == _punView.Owner.NickName)
-            {
-                if (_controllerInstance != null)
-                    Destroy(_controllerInstance);
+            EDevice deviceUsed = (EDevice)photonView.Owner.CustomProperties[VRSFPlayer.DEVICE_USED];
+            // If the other user use the simulator, we do not need to generate a controller
+            _controllerInstance = HasControllers() ? GameObject.Instantiate(_controllersMesh.ControllersPerDevice[deviceUsed], transform.parent) : null;
 
-                // If the other user use the simulator, we do not need to generate a controller
-                _controllerInstance = info.Player.DeviceUsed == EDevice.SIMULATOR ? null : GameObject.Instantiate(_controllersMesh.ControllersPerDevice[info.Player.DeviceUsed], transform.parent);
-            }
-            else if (_controllerInstance == null)
+            bool HasControllers()
             {
-                foreach (var player in VRSFBasicPlayersManager.PlayersInstances)
-                {
-                    // If the other user use the simulator, we do not need to generate a controller
-                    if (player.UserId == _punView.Owner.UserId && player.DeviceUsed != EDevice.NONE)
-                        _controllerInstance = info.Player.DeviceUsed == EDevice.SIMULATOR ? null : GameObject.Instantiate(_controllersMesh.ControllersPerDevice[info.Player.DeviceUsed], transform.parent);
-                }
+                return deviceUsed != EDevice.SIMULATOR && deviceUsed != EDevice.NONE;
             }
         }
     }

@@ -31,7 +31,7 @@ namespace VRSF.MoveAround.Teleport
                 if (gtp.CurrentTeleportState == ETeleportState.Teleporting)
                 {
                     // We teleport the user as soon as we go out of the job
-                    if (UserIsOnNavMesh(sbs, tnm, raycastOutputs, raycastParam.ExcludedLayer, out float3 newUsersPos))
+                    if ((UserIsOnNavMesh(sbs, tnm, raycastOutputs, raycastParam.ExcludedLayer, out float3 newUsersPos, out bool endOnTeleportableLayer) || endOnTeleportableLayer) && RaycastedObjectIsntUI(raycastOutputs))
                     {
                         if (gtp.IsUsingFadingEffect)
                         {
@@ -50,13 +50,18 @@ namespace VRSF.MoveAround.Teleport
             });
         }
 
+        private bool RaycastedObjectIsntUI(VRRaycastOutputs raycastOutputs)
+        {
+            return raycastOutputs.RaycastHitVar.IsNull || raycastOutputs.RaycastHitVar.Value.collider.gameObject.layer != LayerMask.NameToLayer("UI");
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
             OnSetupVRReady.Listeners -= InitRef;
         }
 
-        private bool UserIsOnNavMesh(StepByStepComponent sbs, TeleportNavMesh tnm, VRRaycastOutputs raycastOutputs, LayerMask excludedLayers, out float3 newCameraRigPos)
+        private bool UserIsOnNavMesh(StepByStepComponent sbs, TeleportNavMesh tnm, VRRaycastOutputs raycastOutputs, LayerMask excludedLayers, out float3 newCameraRigPos, out bool endOnTeleportableLayer)
         {
             // We calculate the direction and the distance Vectors
             var directionVector = raycastOutputs.RayVar.direction;
@@ -78,12 +83,20 @@ namespace VRSF.MoveAround.Teleport
             var downVectorDistance = Mathf.Abs(_vrCamTransform.localPosition.y + VRSF_Components.FloorOffset.transform.localPosition.y) + sbs.StepHeight;
             var downVector = newCameraPos + (new float3(0.0f, -1.0f, 0.0f) * downVectorDistance);
 
+            if (sbs.DebugCalculationsRay)
+            {
+                var direction = new float3(directionVector.x, 0.0f, directionVector.z);
+                Debug.DrawRay(_vrCamTransform.position, direction, Color.red, 5.0f);
+                Debug.DrawRay(new float3(_vrCamTransform.position) + direction, downVectorDistance * new float3(0.0f, -1.0f, 0.0f), Color.blue, 5.0f);
+            }
+
             // We calculate the linecast between the newUserPos and the downVector and check if it hits the NavMesh
             TeleportNavMeshHelper.Linecast
             (
                 newCameraPos,
                 downVector,
                 out bool endOnNavmesh,
+                out endOnTeleportableLayer,
                 excludedLayers,
                 out newCameraPos,
                 out _,

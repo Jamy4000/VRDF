@@ -39,7 +39,11 @@ namespace VRSF.MoveAround.Teleport
         public GameObject SelectionPad;
         [Tooltip("GameObject to use as the invalid pad when the player is pointing at an invalid teleportable surface. Turned to Entity at runtime.")]
         public GameObject InvalidPad;
-        
+
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+
         private void Awake()
         {
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
@@ -47,7 +51,7 @@ namespace VRSF.MoveAround.Teleport
             // If the device loaded is included in the device using this CBRA
             if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
-                var entityManager = World.Active.EntityManager;
+                var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
                 var archetype = entityManager.CreateArchetype
                 (
@@ -77,7 +81,7 @@ namespace VRSF.MoveAround.Teleport
                 }
 
                 // Setting up Raycasting
-                if (!TeleporterSetupHelper.SetupRaycast(ref entityManager, ref teleporterEntity, interactionParameters, PointCount))
+                if (!TeleporterSetupHelper.SetupRaycast(ref entityManager, ref teleporterEntity, interactionParameters, 10))
                 {
                     entityManager.DestroyEntity(teleporterEntity);
                     Destroy(gameObject);
@@ -109,6 +113,7 @@ namespace VRSF.MoveAround.Teleport
                     vertices = new Vector3[0],
                     triangles = new int[0]
                 };
+
                 parabolMesh.MarkDynamic();
 
                 // This rendermesh is only here to store the mesh, material and layer of the curve teleporter and draw it later in a system
@@ -129,11 +134,8 @@ namespace VRSF.MoveAround.Teleport
                 });
 
                 // Create the valid and Invalid Pads
-                var selectionPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(SelectionPad, World.Active);
-                var invalidPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(InvalidPad, World.Active);
-
-                entityManager.AddComponentData(selectionPad, new DestroyOnSceneUnloaded());
-                entityManager.AddComponentData(invalidPad, new DestroyOnSceneUnloaded());
+                var selectionPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(SelectionPad, World.DefaultGameObjectInjectionWorld);
+                var invalidPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(InvalidPad, World.DefaultGameObjectInjectionWorld);
 
                 entityManager.SetEnabled(selectionPad, false);
                 entityManager.SetEnabled(invalidPad, false);
@@ -150,7 +152,12 @@ namespace VRSF.MoveAround.Teleport
                     InvalidPadInstance = invalidPad
                 });
 
-                entityManager.AddComponentData(teleporterEntity, new DestroyOnSceneUnloaded());
+                if (_destroyOnSceneUnloaded)
+                {
+                    entityManager.AddComponentData(selectionPad, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+                    entityManager.AddComponentData(invalidPad, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+                    entityManager.AddComponentData(teleporterEntity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+                }
 
                 Destroy(SelectionPad);
                 Destroy(InvalidPad);
@@ -174,7 +181,8 @@ namespace VRSF.MoveAround.Teleport
                 {
                     var parabolPoint = entityManager.CreateEntity(pointArchetype);
                     entityManager.SetSharedComponentData(parabolPoint, new ParabolPointParent { TeleporterEntityIndex = teleporterEntity.Index });
-                    entityManager.AddComponentData(parabolPoint, new DestroyOnSceneUnloaded());
+                    if (_destroyOnSceneUnloaded)
+                        entityManager.AddComponentData(parabolPoint, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
 #if UNITY_EDITOR
                     // Set it's name in Editor Mode for the Entity Debugger Window
                     entityManager.SetName(parabolPoint, "Curve Teleporter Point " + i);

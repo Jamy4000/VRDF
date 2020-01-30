@@ -81,8 +81,14 @@ namespace VRSF.Core.Utils
                     if (((interactionSet.InteractionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH && interactionSet.TouchThumbPosition != EThumbPosition.NONE) || 
                         ((interactionSet.InteractionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK && interactionSet.ClickThumbPosition != EThumbPosition.NONE)) 
                     {
-                        entityManager.AddComponentData(entity, new TouchpadInputCapture(interactionSet.ButtonHand));
-                        entityManager.AddComponentData(entity, new InteractionThumbPosition { TouchThumbPosition = interactionSet.TouchThumbPosition, IsTouchingThreshold = interactionSet.IsTouchingThreshold, ClickThumbPosition = interactionSet.ClickThumbPosition, IsClickingThreshold = interactionSet.IsClickingThreshold });
+                        entityManager.AddComponentData(entity, new TouchpadInputCapture(interactionSet.UseThumbPositionForTouch));
+                        entityManager.AddComponentData(entity, new InteractionThumbPosition 
+                        { 
+                            TouchThumbPosition = interactionSet.TouchThumbPosition, 
+                            IsTouchingThreshold = interactionSet.IsTouchingThreshold, 
+                            ClickThumbPosition = interactionSet.ClickThumbPosition, 
+                            IsClickingThreshold = interactionSet.IsClickingThreshold
+                        });
                         return true;
                     }
 
@@ -203,6 +209,11 @@ namespace VRSF.Core.Utils
         private static bool IsOneHandPortableDevice()
         {
             return VRSF_Components.DeviceLoaded == EDevice.GEAR_VR || VRSF_Components.DeviceLoaded == EDevice.OCULUS_GO;
+        }
+
+        public static bool FlagHasOculusDevice(EDevice flagToTest)
+        {
+            return flagToTest.HasFlag(EDevice.OCULUS_GO) || flagToTest.HasFlag(EDevice.OCULUS_QUEST) || flagToTest.HasFlag(EDevice.OCULUS_RIFT) || flagToTest.HasFlag(EDevice.OCULUS_RIFT_S);
         }
     }
 }

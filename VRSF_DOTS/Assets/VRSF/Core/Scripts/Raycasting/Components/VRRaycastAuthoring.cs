@@ -54,7 +54,7 @@ namespace VRSF.Core.Raycast
             if (_useHoverFeature)
                 dstManager.AddComponentData(entity, new VRHovering());
 
-            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
+            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
 
             Destroy(this);
         }

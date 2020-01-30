@@ -7,6 +7,7 @@ namespace VRSF.MoveAround.Teleport
         public int QueryTriggerInteraction;
         public bool IgnoreSlopedSurfaces;
         public float SampleRadius;
+        public float SphereCastRadius;
         public int NavAreaMask;
     }
 }

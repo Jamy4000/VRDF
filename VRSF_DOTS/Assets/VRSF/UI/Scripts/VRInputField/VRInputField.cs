@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using VRSF.Core.Controllers;
+using VRSF.Core.Controllers.Haptic;
 using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
 
@@ -66,8 +68,16 @@ namespace VRSF.UI
 
         private void OnTriggerEnter(Collider other)
         {
-            if (ControllerClickable && interactable && other.gameObject.tag.Contains("ControllerBody"))
-                StartTyping();
+            // if the user is in VR
+            if (UnityEngine.XR.XRSettings.enabled && VRSF_Components.SetupVRIsReady)
+            {
+                var objectTag = other.gameObject.tag;
+                if (ControllerClickable && interactable && (objectTag.Contains("ControllerBody") || objectTag.Contains("UIClicker")))
+                {
+                    StartTyping();
+                    new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+                }
+            }
         }
         #endregion MONOBEHAVIOUR_METHODS
 

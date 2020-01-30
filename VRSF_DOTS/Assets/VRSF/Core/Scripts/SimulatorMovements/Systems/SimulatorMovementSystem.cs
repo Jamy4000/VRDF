@@ -17,7 +17,7 @@ namespace VRSF.Core.Simulator
         
         protected override void OnUpdate()
         {
-            var deltaTime = Time.deltaTime;
+            var deltaTime = Time.DeltaTime;
 
             Entities.ForEach((ref SimulatorMovementSpeed sms, ref SimulatorMovementRotation smr, ref SimulatorCameraState scs, ref JobAnimationCurve jac) =>
             {
@@ -72,30 +72,23 @@ namespace VRSF.Core.Simulator
                 return Vector3.zero;
 
             Vector3 direction = Vector3.zero;
-            if (Input.GetKey(KeyCode.W))
-            {
-                direction += Vector3.forward;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                direction += Vector3.back;
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                direction += Vector3.left;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                direction += Vector3.right;
-            }
+            float vertical = Input.GetAxis("Vertical");
+            float horizontal = Input.GetAxis("Horizontal");
+
+            // Forward or backward
+            if (vertical != 0.0f)
+                direction.z += vertical;
+
+            // left or right
+            if (horizontal != 0.0f)
+                direction.x += horizontal;
+
+            // up or down
             if (Input.GetKey(KeyCode.Q))
-            {
                 direction += Vector3.down;
-            }
             if (Input.GetKey(KeyCode.E))
-            {
                 direction += Vector3.up;
-            }
+
             return direction;
         }
 

@@ -16,14 +16,14 @@ namespace VRSF.MoveAround.VRRotation
             if (!VRSF_Components.SetupVRIsReady)
                 return;
 
-            Entities.ForEach((ref NonLinearUserRotation nlur, ref ControllersInteractionType cit, ref BaseInputCapture bic, ref TouchpadInputCapture tic) =>
+            Entities.ForEach((ref NonLinearUserRotation nlur, ref ControllersInteractionType cit, ref BaseInputCapture bic, ref TouchpadInputCapture tic, ref InteractionThumbPosition itp) =>
             {
-                if (!nlur.HasAlreadyRotated && InteractionChecker.IsInteracting(bic, cit) && math.abs(tic.ThumbPosition.x) > 0.5f)
+                if (!nlur.HasAlreadyRotated && InteractionChecker.IsInteractingTouchpad(bic, cit, itp, tic))
                 {
                     VRSF_Components.RotateVRCameraAround(new float3(0.0f, tic.ThumbPosition.x, 0.0f), nlur.DegreesToRotate);
                     nlur.HasAlreadyRotated = true;
                 }
-                else if (nlur.HasAlreadyRotated && math.abs(tic.ThumbPosition.x) < 0.5f)
+                else if (nlur.HasAlreadyRotated && InteractionChecker.IsNotInteractingTouchpad(bic, cit, itp, tic))
                 {
                     nlur.HasAlreadyRotated = false;
                 }

@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using UnityEditor;
 using UnityEngine;
 using VRSF.Core.Controllers;
@@ -21,6 +22,7 @@ namespace VRSF.Core.VRInteractions
         // The References for the UnityEvents
         private SerializedProperty _deviceToUse;
         private SerializedProperty _interactionType;
+        private SerializedProperty _usePositionForTouch;
         private SerializedProperty _buttonHand;
         private SerializedProperty _buttonToUse;
 
@@ -41,6 +43,7 @@ namespace VRSF.Core.VRInteractions
 
             _deviceToUse = serializedObject.FindProperty("DeviceUsingFeature");
             _interactionType = serializedObject.FindProperty("InteractionType");
+            _usePositionForTouch = serializedObject.FindProperty("UseThumbPositionForTouch");
             _buttonHand = serializedObject.FindProperty("ButtonHand");
             _buttonToUse = serializedObject.FindProperty("ButtonToUse");
 
@@ -76,6 +79,13 @@ namespace VRSF.Core.VRInteractions
 
             EditorGUILayout.Space();
 
+            // We add the boolean for touch using thumb position if relevant
+            if (Utils.InteractionSetupHelper.FlagHasOculusDevice(_interactionSet.DeviceUsingFeature) && _interactionSet.InteractionType.HasFlag(EControllerInteractionType.TOUCH))
+            {
+                DisplayUseThumbPosBool();
+                EditorGUILayout.Space();
+            }
+
             // We check that the user has set a good value for the Interaction Type. if not, we don't display the rest of the parameters.
             if (!DisplayHandParameters()) return;
 
@@ -91,6 +101,16 @@ namespace VRSF.Core.VRInteractions
             EditorGUILayout.Space();
 
             CheckThumbPos();
+        }
+
+        private void DisplayUseThumbPosBool()
+        {
+            EditorGUILayout.LabelField("OCULUS ONLY : Should we use the thumb position for the touch feature", EditorStyles.boldLabel);
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_interactionSet, "Use Thumb position for Touch");
+            EditorGUILayout.PropertyField(_usePositionForTouch);
+            CheckEndChanges();
         }
 
         private bool DisplayButtonToUseParameter()

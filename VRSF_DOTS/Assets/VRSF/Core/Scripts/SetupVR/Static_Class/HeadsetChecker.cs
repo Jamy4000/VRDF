@@ -61,7 +61,12 @@ namespace VRSF.Core.SetupVR
 
         private static EDevice CheckOculusHeadset(string detectedHmd)
         {
-#if UNITY_ANDROID
+#if UNITY_EDITOR
+            if (detectedHmd.ToLower().Contains("rift s"))
+                return EDevice.OCULUS_RIFT_S;
+            else if (detectedHmd.ToLower().Contains("rift"))
+                return EDevice.OCULUS_RIFT;
+#elif UNITY_ANDROID
             if (detectedHmd.ToLower().Contains("quest"))
                 return EDevice.OCULUS_QUEST;
             else if (detectedHmd.ToLower().Contains("go"))

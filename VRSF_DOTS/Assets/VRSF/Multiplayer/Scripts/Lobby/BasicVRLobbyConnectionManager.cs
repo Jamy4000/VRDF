@@ -13,34 +13,22 @@ namespace VRSF.Multiplayer
         #region Variables
         [Header("Critical Room Parameters")]
         /// <summary>
+        /// SHould we synchronize scenes between players or do you handle it yourself ?
+        /// </summary>
+        [Tooltip("Should we synchronize scenes between players or do you handle it yourself ")]
+        public bool ShouldSynchronizeScene = true;
+        /// <summary>
         /// The Maximal amount of player that can enter a room
         /// </summary>
         [Tooltip("The Maximal amount of player that can enter a room")]
-        public int MaxPlayerPerRoom = 5;
+        public int MaxPlayerPerRoom = 10;
 
         /// <summary>
-        /// The Minimal amount of player that can enter a room
+        /// The name or index of the scene you want to load as a multiplayer scene. 
         /// </summary>
-        [Tooltip("The Minimal amount of player that can enter a room")]
-        public int MinPlayerPerRoom = 0;
-
-
-        [Header("Overridable Rooms Parameters")]
-        [Tooltip("The name or index of the scene you want to load as a multiplayer scene. One is enough.")]
+        [Tooltip("The name or index of the scene you want to load as a multiplayer scene.")]
         [SerializeField]
-        private string _multiplayerSceneName;
-
-        [Tooltip("The name or index of the scene you want to load as a multiplayer scene. One is enough.")]
-        [SerializeField]
-        [Range(0, 100)]
-        private int _multiplayerSceneIndex;
-
-        private List<RoomInfo> _onlineRooms = new List<RoomInfo>();
-
-        /// <summary>
-        /// The current room the user want to join/ has joined
-        /// </summary>
-        public static RoomInfo CurrentRoom;
+        public string MultiplayerSceneName;
         #endregion Variables
 
 
@@ -48,10 +36,10 @@ namespace VRSF.Multiplayer
         /// <summary>
         /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
         /// </summary>
-        void Awake()
+        protected virtual void Awake()
         {
             // #Critical, this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
-            PhotonNetwork.AutomaticallySyncScene = true;
+            PhotonNetwork.AutomaticallySyncScene = ShouldSynchronizeScene;
 
             // #Critical, we must first and foremost connect to Photon Online Server.
             PhotonNetwork.ConnectUsingSettings();
@@ -59,7 +47,7 @@ namespace VRSF.Multiplayer
             OnConnectionToRoomRequested.Listeners += ConnectToRoom;
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             OnConnectionToRoomRequested.Listeners -= ConnectToRoom;
         }
@@ -68,54 +56,27 @@ namespace VRSF.Multiplayer
 
         #region EventCallbacks
         /// <summary>
-        /// Callback for when the user could connect to a room.
+        /// Callback for when the user want to connect to a room.
         /// </summary>
-        private void ConnectToRoom(OnConnectionToRoomRequested info)
+        protected virtual void ConnectToRoom(OnConnectionToRoomRequested info)
         {
             // we check if we are connected, and join if we are
             if (PhotonNetwork.IsConnectedAndReady)
             {
                 if (info.NeedCreation)
                 {
-                    // if the room doesn't exist yet
-                    if (ReallyNeedsCreation())
-                    {
-                        Debug.Log("<b>[VRSF] :</b> Creating Room " + info.RoomName);
-                        // #Critical we need at this point to create a Room.
-                        PhotonNetwork.CreateRoom(info.RoomName, info.Options);
-                    }
-                    else
-                    {
-                        JoinRoom();
-                    }
+                    Debug.Log("<b>[VRSF] :</b> Creating Room " + info.RoomName);
+                    // #Critical we need at this point to create a Room.
+                    PhotonNetwork.CreateRoom(info.RoomName, info.Options);
                 }
                 else
                 {
-                    JoinRoom();
+                    JoinRoom(info.RoomName);
                 }
             }
             else
             {
                 Debug.LogError("<Color=Red><b>[VRSF] :</b> You're not connected to the Photon network. Please check that one of the PhotonNetwork.Connect method was called.</Color>");
-            }
-
-            void JoinRoom()
-            {
-                Debug.Log("<b>[VRSF] :</b> Joining Room " + info.RoomName);
-                // #Critical we need at this point to attempt joining a Room.
-                PhotonNetwork.JoinRoom(info.RoomName);
-            }
-
-            bool ReallyNeedsCreation()
-            {
-                // We check if the room doesn't exist yet
-                bool reallyNeedCreation = true;
-                foreach (var room in _onlineRooms)
-                {
-                    if (room.Name == info.RoomName)
-                        reallyNeedCreation = false;
-                }
-                return reallyNeedCreation;
             }
         }
         #endregion EventCallbacks
@@ -138,6 +99,7 @@ namespace VRSF.Multiplayer
         public override void OnJoinedLobby()
         {
             Debug.Log("<b>[VRSF] :</b> Lobby was successfully joined !");
+            Debug.LogFormat("<b>[VRSF]:</b> {0} players, including this instance of the game, are currently online in your app.", PhotonNetwork.CountOfPlayers);
         }
 
         /// <summary>
@@ -149,11 +111,12 @@ namespace VRSF.Multiplayer
 
             if (!TryLoadScene())
             {
-                if (!TryLoadScene(_multiplayerSceneIndex))
-                {
-                    Debug.LogError("<Color=Red><b>[VRSF] :</b> Can't load the Multiplayer's Scene. Check the name and index of your multiplayer scene, and be sure that this scene was added in the Build Settings. Stopping app.</Color>", gameObject);
-                    Application.Quit();
-                }
+                Debug.LogError("<Color=Red><b>[VRSF] :</b> Can't load the Multiplayer's Scene. Check the name and index of your multiplayer scene, and be sure that this scene was added in the Build Settings. Stopping app.</Color>", gameObject);
+                Application.Quit();
+            }
+            else
+            {
+                PhotonNetwork.LeaveLobby();
             }
         }
 
@@ -173,6 +136,7 @@ namespace VRSF.Multiplayer
         public override void OnJoinedRoom()
         {
             Debug.Log("<Color=Green><b>[VRSF] :</b> The room was successfully JOINED, loading the scene ...</Color>");
+            PhotonNetwork.LeaveLobby();
         }
 
         /// <summary>
@@ -185,47 +149,41 @@ namespace VRSF.Multiplayer
             Debug.LogErrorFormat("<Color=Red><b>[VRSF] :</b> The room couldn't be JOINED. Here's the return code :\n{0}.\nAnd here's the message :\n{1}.</Color>", returnCode, message);
         }
 
-        public override void OnRoomListUpdate(List<RoomInfo> roomList)
+        public override void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics)
         {
-            _onlineRooms = roomList;
+            Debug.LogFormat("<b>[VRSF]:</b> {0} players are currently online in your app.", PhotonNetwork.CountOfPlayers);
         }
         #endregion PunCallbacks
 
+
         #region Private_Methods
         /// <summary>
-        /// Try to load a scene based on its build index or its name
+        /// Try to load a scene based on its name
         /// </summary>
-        /// <param name="index">The index of the scene we wanna load</param>
         /// <returns>true if the scene was correctly loaded</returns>
-        private bool TryLoadScene(int index = -1)
+        private bool TryLoadScene()
         {
             try
             {
-                // Check if we provided a correct index for the room to load
-                if (index != -1 && UnityEngine.SceneManagement.SceneManager.sceneCount > _multiplayerSceneIndex)
-                {
-                    Debug.LogFormat("<b>[VRSF] :</b> Trying to load the scene with index '{0}'", _multiplayerSceneIndex);
-                    PhotonNetwork.LoadLevel(_multiplayerSceneIndex);
-                    return true;
-                }
-                // If not, we try to load the scene using the _multiplayerSceneName variable of this script
-                else
-                {
-                    Debug.LogFormat("<b>[VRSF] :</b> Trying to load the scene with name '{0}'", _multiplayerSceneName);
-                    PhotonNetwork.LoadLevel(_multiplayerSceneName);
-                    return true;
-                }
+                Debug.LogFormat("<b>[VRSF] :</b> Trying to load the scene with name '{0}'", MultiplayerSceneName);
+                PhotonNetwork.LoadLevel(MultiplayerSceneName);
+                return true;
             }
             catch
             {
-                if (index != -1)
-                    Debug.LogFormat("<Color=Red><b>[VRSF] :</b> Couldn't load scene with index '{0}'.</Color>", _multiplayerSceneIndex);
-                else
-                    Debug.LogFormat("<Color=Red><b>[VRSF] :</b> Couldn't load scene with name '{0}'.</Color>", _multiplayerSceneName);
-
+                Debug.LogFormat("<Color=Red><b>[VRSF] :</b> Couldn't load scene with name '{0}'.</Color>", MultiplayerSceneName);
                 return false;
             }
         }
         #endregion Private_Methods
+
+
+        #region Public_Methods
+        public virtual void JoinRoom(string roomName)
+        {
+            Debug.Log("<b>[VRSF] :</b> Joining Room " + roomName);
+            PhotonNetwork.JoinRoom(roomName);
+        }
+        #endregion Public_Methods
     }
 }

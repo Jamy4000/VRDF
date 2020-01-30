@@ -24,7 +24,7 @@ namespace VRSF.MoveAround.Teleport
                     switch (gtp.CurrentTeleportState)
                     {
                         case ETeleportState.None:
-                            if (InteractionChecker.IsInteracting(bic, cit))
+                            if (InteractionChecker.IsInteractingSimple(bic, cit))
                                 gtp.CurrentTeleportState = ETeleportState.Selecting;
                             break;
                         case ETeleportState.Selecting:

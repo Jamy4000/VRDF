@@ -6,7 +6,7 @@ using VRSF.Core.VRInteractions;
 using VRSF.Core.Events;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
-using UnityEngine.EventSystems;
+using System;
 
 namespace VRSF.UI
 {
@@ -38,18 +38,29 @@ namespace VRSF.UI
 
 
         #region MONOBEHAVIOUR_METHODS
-        protected override void Awake()
+        protected override void Start()
         {
-            base.Awake();
+            base.Start();
 
             if (Application.isPlaying)
             {
                 _boxColliderSetup = false;
 
-                OnSetupVRReady.RegisterSetupVRResponse(Init);
+                if (!UnityEngine.XR.XRSettings.enabled || !VRSF_Components.SetupVRIsReady)
+                    Init(null);
+                else
+                    OnSetupVRReady.RegisterSetupVRResponse(Init);
 
                 // We setup the BoxCollider size and center
-                StartCoroutine(SetupBoxCollider());
+                if (SetColliderAuto)
+                {
+                    _boxColliderSetup = false;
+                    StartCoroutine(SetupBoxCollider());
+                }
+                else
+                {
+                    _boxColliderSetup = true;
+                }
             }
         }
 
@@ -69,8 +80,12 @@ namespace VRSF.UI
         protected override void Update()
         {
             base.Update();
-            if (Application.isPlaying && _boxColliderSetup)
+            if (Application.isPlaying && interactable && _boxColliderSetup)
             {
+                // Support for 2D Users
+                if (!UnityEngine.XR.XRSettings.enabled || !VRSF_Components.SetupVRIsReady)
+                    Check2DInputs();
+
                 switch (_rayHoldingHandle)
                 {
                     case ERayOrigin.LEFT_HAND:
@@ -98,11 +113,16 @@ namespace VRSF.UI
         /// <param name="clickEvent">The event raised when an object is clicked</param>
         private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
-            _rayHoldingHandle = interactable && ObjectClickedIsThis() ? clickEvent.RayOrigin : ERayOrigin.NONE;
+            CheckTransform(clickEvent.ObjectClicked, clickEvent.RayOrigin);
+        }
+
+        private void CheckTransform(Transform toCheck, ERayOrigin raycastOrigin)
+        {
+            _rayHoldingHandle = interactable && ObjectClickedIsThis() ? raycastOrigin : ERayOrigin.NONE;
 
             bool ObjectClickedIsThis()
             {
-                return clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE;
+                return toCheck == transform && _rayHoldingHandle == ERayOrigin.NONE;
             }
         }
 
@@ -127,18 +147,15 @@ namespace VRSF.UI
         private IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            yield return new WaitForEndOfFrame();
 
-            if (SetColliderAuto)
-                VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
             
             _boxColliderSetup = true;
         }
 
         private void Init(OnSetupVRReady _)
         {
-            Debug.Log("Init");
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR && VRSF_Components.DeviceLoaded != EDevice.NONE)
             {
                 ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
                 ObjectWasClickedEvent.Listeners += CheckObjectClick;
@@ -162,6 +179,53 @@ namespace VRSF.UI
                 Debug.LogError("<b>[VRSF] :</b> Please specify a HandleRect in the inspector as a child of this VR Handle Slider.", gameObject);
             }
         }
-        #endregion
+
+        private void Check2DInputs()
+        {
+#if UNITY_STANDALONE || UNITY_EDITOR
+            if (Input.GetMouseButtonDown(0))
+            {
+                var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+#elif UNITY_IOS || UNITY_ANDROID
+                    if (Input.touchCount == 1)
+                    {
+                        var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+#endif
+                if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
+                {
+                    CheckTransform(hit.transform, ERayOrigin.CAMERA);
+                    if (_rayHoldingHandle == ERayOrigin.CAMERA)
+                    {
+                        InteractionVariableContainer.CurrentGazeHit = transform;
+                        InteractionVariableContainer.IsClickingSomethingGaze = true;
+                        InteractionVariableContainer.CurrentGazeHitPosition = hit.point;
+                    }
+                }
+            }
+#if UNITY_STANDALONE || UNITY_EDITOR
+            else if (Input.GetMouseButtonUp(0) && _rayHoldingHandle != ERayOrigin.NONE)
+            {
+#elif UNITY_IOS || UNITY_ANDROID
+            else if (Input.touchCount == 0 && _rayHoldingHandle != ERayOrigin.NONE)
+            {
+#endif
+                _rayHoldingHandle = ERayOrigin.NONE;
+                InteractionVariableContainer.IsClickingSomethingGaze = false;
+                InteractionVariableContainer.CurrentGazeHit = null;
+            }
+#if UNITY_STANDALONE || UNITY_EDITOR
+            else if (Input.GetMouseButton(0) && _rayHoldingHandle == ERayOrigin.CAMERA)
+            {
+                var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+#elif UNITY_IOS || UNITY_ANDROID
+            else if (Input.touchCount == 1 && _rayHoldingHandle == ERayOrigin.CAMERA)
+            {
+                var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+# endif
+                if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
+                    InteractionVariableContainer.CurrentGazeHitPosition = hit.point;
+            }
+        }
+#endregion
     }
 }

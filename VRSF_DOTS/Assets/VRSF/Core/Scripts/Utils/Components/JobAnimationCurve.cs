@@ -87,13 +87,13 @@ namespace E7.DataStructure
 
             var sortedTimes = sortedKeyframes.Select(x => x.time).ToArray();
 
-            using (var ba = new BlobAllocator(-1))
+            using (var ba = new BlobBuilder())
             {
                 ref var root = ref ba.ConstructRoot<AnimationData>();
                 int processorCount = SystemInfo.processorCount + 1;
-                ba.Allocate(sortedKeyframes.Count, ref root.keyframes);
-                ba.Allocate(sortedKeyframes.Count, ref root.soaTimes);
-                ba.Allocate(processorCount, ref root.cachedIndex);
+                ba.Allocate(ref root.keyframes, sortedKeyframes.Count);
+                ba.Allocate(ref root.soaTimes, sortedKeyframes.Count);
+                ba.Allocate(ref root.cachedIndex, processorCount);
                 for (int i = 0; i < sortedKeyframes.Count; i++)
                 {
                     root.keyframes[i] = sortedKeyframes[i];
@@ -215,7 +215,7 @@ namespace E7.DataStructure
 
         public void Dispose()
         {
-            bar.Release();
+            bar.Dispose();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine;
 using VRSF.Core.SetupVR;
 
@@ -15,18 +14,6 @@ namespace VRSF.Multiplayer
         [SerializeField]
         private GameObject _playersPrefab;
 
-        /// <summary>
-        /// Keep track of the localPlayer position whenever a user leave/enter the room
-        /// </summary>
-        private static Vector3 _localPlayerPosCache = Vector3.zero;
-
-        /// <summary>
-        /// Keep track of the localPlayer rotation whenever a user leave/enter the room
-        /// </summary>
-        private static Quaternion _localPlayerRotCache = Quaternion.identity;
-
-        private static int _currentSceneIndex = -1;
-
         public void Awake()
         {
             OnSetupVRReady.RegisterSetupVRResponse(LocalPlayerSetup);
@@ -39,39 +26,6 @@ namespace VRSF.Multiplayer
         }
 
         /// <summary>
-        /// Callback for when a user enter the room. Keep the reference to the localPlayer Position and Rotation
-        /// and destroy the instance of our player (Don't why, but it's needed by Photon apparently)
-        /// </summary>
-        /// <param name="otherPlayer">The player that entered the room</param>
-        public override void OnPlayerEnteredRoom(Player otherPlayer)
-        {
-            PrepareUserReload();
-        }
-        /// <summary>
-        /// Callback for when a user left the room. Keep the reference to the localPlayer Position and Rotation
-        /// and destroy the instance of our player (Don't why, but it's needed by Photon apparently)
-        /// </summary>
-        /// <param name="otherPlayer">The player that left the room</param>
-
-        public override void OnPlayerLeftRoom(Player otherPlayer)
-        {
-            PrepareUserReload();
-        }
-
-        /// <summary>
-        /// Prepare the reload of the user, as we reload the scene when a user leave/join the room
-        /// </summary>
-        private void PrepareUserReload()
-        {
-            _localPlayerPosCache = VRSF_Components.CameraRig.transform.position;
-            _localPlayerRotCache = VRSF_Components.CameraRig.transform.rotation;
-
-            // No idea why, but Photon require us to reload the instance of our local player
-            if (VRSFBasicPlayersManager.LocalPlayerInstance != null)
-                PhotonNetwork.Destroy(VRSFBasicPlayersManager.LocalPlayerInstance);
-        }
-
-        /// <summary>
         /// Setup the LocalPlayer instance whenever setupVR has been setup again
         /// </summary>
         /// <param name="info"></param>
@@ -79,38 +33,34 @@ namespace VRSF.Multiplayer
         {
             if (_playersPrefab == null)
             {
-                Debug.LogError("<b><Color=Red>[VRSF] :</b></Color> Missing playerPrefab Reference, can't refresh local player.", gameObject);
+                Debug.LogError("<Color=Red><b>[VRSF] :</b></Color> Missing playerPrefab Reference, can't refresh local player.", gameObject);
             }
             else
             {
                 Debug.LogFormat("<b>[VRSF] :</b> We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
-                RefreshLocalPlayer();
+
+                PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable
+                {
+                    { VRSFPlayer.DEVICE_USED, VRSF_Components.DeviceLoaded }
+                });
+
+                InstantiateLocalPlayer();
             }
 
             /// <summary>
             /// Setup the LocalPlayer instance Transform
             /// </summary>
-            void RefreshLocalPlayer()
+            void InstantiateLocalPlayer()
             {
                 // Check if there's no more instance of the LocalPlayer
-                if (VRSFBasicPlayersManager.LocalPlayerInstance != null)
-                    PhotonNetwork.Destroy(VRSFBasicPlayersManager.LocalPlayerInstance);
-
-                // If the stored position isn't a vector3 zero AND the active scene loaded is the same as the previous one
-                if (_localPlayerPosCache != Vector3.zero && _currentSceneIndex == UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex)
-                {
-                    // Set the CameraRig pos and rot based on the previous check
-                    VRSF_Components.CameraRig.transform.position = _localPlayerPosCache;
-                    VRSF_Components.CameraRig.transform.rotation = _localPlayerRotCache;
-                }
-
-                _currentSceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+                if (VRSFPlayerManager.LocalPlayerGameObjectInstance != null)
+                    PhotonNetwork.Destroy(VRSFPlayerManager.LocalPlayerGameObjectInstance);
 
                 // Instantiate the loacalPlayer Instance
-                VRSFBasicPlayersManager.LocalPlayerInstance = PhotonNetwork.Instantiate(PlayerPrefabName, _localPlayerPosCache, _localPlayerRotCache);
+                VRSFPlayerManager.LocalPlayerGameObjectInstance = PhotonNetwork.Instantiate(PlayerPrefabName, Vector3.zero, Quaternion.identity);
 
                 // Add the follower scripts for the Camera, RightController and LeftController
-                AddFollowerScript(VRSFBasicPlayersManager.LocalPlayerInstance, VRSF_Components.VRCamera.transform);
+                AddFollowerScript(VRSFPlayerManager.LocalPlayerGameObjectInstance, VRSF_Components.VRCamera.transform);
                 TryGetObjectWithName("RightController", VRSF_Components.RightController.transform);
                 TryGetObjectWithName("LeftController", VRSF_Components.LeftController.transform);
 
@@ -119,7 +69,7 @@ namespace VRSF.Multiplayer
                 /// </summary>
                 void TryGetObjectWithName(string objectName, Transform toFollow)
                 {
-                    var toLookFor = VRSFBasicPlayersManager.LocalPlayerInstance.transform.Find(objectName);
+                    var toLookFor = VRSFPlayerManager.LocalPlayerGameObjectInstance.transform.Find(objectName);
                     if (toLookFor == null)
                         Debug.LogErrorFormat("<b>[VRSF] :</b> Couldn't find object with name {0} under the Player prefab. Not adding any Follower Script.", objectName);
                     else

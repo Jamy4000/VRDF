@@ -26,8 +26,6 @@ namespace VRSF.Core.VRInteractions
                 CanClick = true
             });
 
-            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
-
             Destroy(interactionSet);
             Destroy(this);
         }

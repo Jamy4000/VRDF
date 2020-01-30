@@ -22,7 +22,7 @@ namespace VRSF.MoveAround.Teleport
         protected override void OnCreate()
         {
             base.OnCreate();
-            _entityManager = World.Active.EntityManager;
+            _entityManager = World.EntityManager;
             _parabolQuery = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
@@ -50,7 +50,7 @@ namespace VRSF.MoveAround.Teleport
                 {
                     case ETeleportState.Selecting:
                         // Render the Parabole's pads, aka the targets at the end of the parabole
-                        RenderParabolePads(ctcs[i].PointToGoTo, ctcs[i].PointOnNavMesh, ppes[i], parabolCalculations[i].Normal);
+                        RenderParabolePads(ctcs[i].PointToGoTo, ctcs[i].PointOnNavMesh || ctcs[i].PointOnTeleportableLayer, ppes[i], parabolCalculations[i].Normal);
                         break;
                     default:
                         if (_entityManager.GetEnabled(ppes[i].SelectionPadInstance))

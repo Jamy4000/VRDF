@@ -85,20 +85,25 @@ namespace VRSF.UI
 
 
         #region MONOBEHAVIOUR_METHODS
-        protected override void Awake()
+        protected override void Start()
         {
-            base.Awake();
+            base.Start();
 
             if (Application.isPlaying)
             {
-                _boxColliderSetup = false;
-
-                OnSetupVRReady.RegisterSetupVRResponse(Init);
-
+                if (UnityEngine.XR.XRSettings.enabled)
+                    OnSetupVRReady.RegisterSetupVRResponse(Init);
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
+                {
+                    _boxColliderSetup = false;
                     StartCoroutine(SetupBoxCollider());
+                }
+                else
+                {
+                    _boxColliderSetup = true;
+                }
             }
         }
 
@@ -110,29 +115,25 @@ namespace VRSF.UI
 
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
                 ObjectWasClickedEvent.Listeners -= CheckSliderClick;
+
             if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckSliderHovered))
                 ObjectWasHoveredEvent.Listeners -= CheckSliderHovered;
         }
 
         protected override void Update()
         {
-            base.Update();
-
-            if (Application.isPlaying && _boxColliderSetup)
+            if (Application.isPlaying && interactable && _boxColliderSetup)
             {
                 // if the bar is being filled
-                if (!_isFillingWithMesh)
+                if (UnityEngine.XR.XRSettings.enabled && VRSF_Components.SetupVRIsReady)
                 {
-                    if (_fillBarRoutine != null)
-                    {
-                        CheckHandStillOver();
-                    }
-                    else if (ValueIsGoingDown && value > 0)
-                    {
-                        // Set the value of the slider or the UV based on the normalised time.
-                        Timer -= Time.deltaTime;
-                        value = Timer / FillTime;
-                    }
+                    base.Update();
+                    CheckVRInputs();
+                }
+                // Support for 2D Users
+                else
+                {
+                    Check2DInputs();
                 }
             }
         }
@@ -155,6 +156,55 @@ namespace VRSF.UI
 
 
         #region PRIVATE_METHODS
+
+        private void CheckVRInputs()
+        {
+            if (_isFillingWithMesh)
+                return;
+
+            if (_fillBarRoutine != null)
+            {
+                CheckHandStillOver();
+            }
+            else if (ValueIsGoingDown && value > 0)
+            {
+                // Set the value of the slider or the UV based on the normalised time.
+                Timer -= Time.deltaTime;
+                value = Timer / FillTime;
+            }
+        }
+
+        private void Check2DInputs()
+        {
+#if UNITY_STANDALONE || UNITY_EDITOR
+            if (Input.GetMouseButtonDown(0))
+            {
+                var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+#elif UNITY_IOS || UNITY_ANDROID
+            if (Input.touchCount == 1)
+            {
+                var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+#endif
+                if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
+                    CheckTransform(hit.transform, ERayOrigin.CAMERA);
+            }
+#if UNITY_STANDALONE || UNITY_EDITOR
+            else if (Input.GetMouseButtonUp(0))
+            {
+#elif UNITY_IOS || UNITY_ANDROID
+            else if (Input.touchCount == 0 && _handFilling != ERayOrigin.NONE)
+            {
+#endif
+                HandleUp();
+            }
+            else if (_handFilling == ERayOrigin.NONE && ValueIsGoingDown && value > 0)
+            {
+                // Set the value of the slider or the UV based on the normalised time.
+                Timer -= Time.deltaTime;
+                value = Timer / FillTime;
+            }
+        }
+
         /// <summary>
         /// Event called when the user is clicking on something
         /// </summary>
@@ -299,9 +349,8 @@ namespace VRSF.UI
         {
             yield return new WaitForEndOfFrame();
 
-            if (SetColliderAuto)
-                VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
-            
+            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+
             _boxColliderSetup = true;
         }
 

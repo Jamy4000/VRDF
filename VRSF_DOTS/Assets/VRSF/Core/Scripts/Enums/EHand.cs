@@ -7,6 +7,7 @@
 	public enum EHand : int
     {
         LEFT = 1 << 0,
-        RIGHT = 1 << 1
+        RIGHT = 1 << 1,
+        NONE = 1 << 2
     }
 }

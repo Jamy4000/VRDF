@@ -22,6 +22,7 @@ namespace VRSF.MoveAround.Teleport
         private SerializedProperty p_mesh;
         private SerializedProperty p_query_trigger_interaction;
         private SerializedProperty p_sample_radius;
+        private SerializedProperty p_sphereCast_radius; 
         private SerializedProperty p_ignore_sloped_surfaces;
         private SerializedProperty p_dewarp_method;
 
@@ -36,6 +37,7 @@ namespace VRSF.MoveAround.Teleport
             p_mesh = serializedObject.FindProperty("SelectableMesh");
             p_query_trigger_interaction = serializedObject.FindProperty("QueryTriggerInteraction");
             p_sample_radius = serializedObject.FindProperty("SampleRadius");
+            p_sphereCast_radius = serializedObject.FindProperty("SphereCastRadius");
             p_ignore_sloped_surfaces = serializedObject.FindProperty("IgnoreSlopedSurfaces");
             p_dewarp_method = serializedObject.FindProperty("DewarpingMethod");
         }
@@ -167,6 +169,7 @@ namespace VRSF.MoveAround.Teleport
                 "in the navigation window).  Increase this if the selection disk is not appearing.",
                 wrap);
             EditorGUILayout.PropertyField(p_sample_radius);
+            EditorGUILayout.PropertyField(p_sphereCast_radius);
             EditorGUILayout.PropertyField(p_ignore_sloped_surfaces);
             EditorGUILayout.PropertyField(p_dewarp_method);
 

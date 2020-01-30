@@ -38,7 +38,7 @@ namespace VRSF.Core.Simulator
             {
                 MouseMovements = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")),
                 RightClickIsClicking = Input.GetMouseButton(1),
-                DeltaTime = Time.deltaTime
+                DeltaTime = Time.DeltaTime
             }.Schedule(this, inputDeps);
         }
 

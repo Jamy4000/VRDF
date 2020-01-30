@@ -34,7 +34,7 @@ namespace VRSF.Core.LaserPointer
                         break;
 
                     case EPointerState.DISAPPEARING:
-                        widthComp.CurrentWidth -= (Time.deltaTime * visibilityComp.DisappearanceSpeed) / 2000;
+                        widthComp.CurrentWidth -= (Time.DeltaTime * visibilityComp.DisappearanceSpeed) / 2000;
 
                         if (widthComp.CurrentWidth < 0.0f)
                             stateComp.State = EPointerState.OFF;

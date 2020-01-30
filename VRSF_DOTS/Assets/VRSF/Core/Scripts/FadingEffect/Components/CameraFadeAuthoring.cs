@@ -15,13 +15,18 @@ namespace VRSF.Core.FadingEffect
         /// <summary>
         ///  How long, in seconds, the fade-in/fade-out animation should take
         /// </summary>
-        [Tooltip("Duration of the \"blink\" animation (fading in and out upon teleport) in seconds.")]
-        public float FadingSpeed = 1;
+        [Tooltip("Speed of the \"blink\" animation (fading in and out upon teleport).")]
+        [SerializeField] private float _fadingSpeed = 1;
         /// <summary>
         ///  How long, in seconds, the fade-in/fade-out animation should take
         /// </summary>
         [Tooltip("Whether a Fade In effect should take place when the OnSetupVRReady is called.")]
-        public bool FadeInOnSetupVRReady = true;
+        [SerializeField] private bool _fadeInOnSetupVRReady = true;
+        /// <summary>
+        ///  How long, in seconds, the fade-in/fade-out animation should take
+        /// </summary>
+        [Tooltip("SHould we destroy the object when done with it ?")]
+        [SerializeField] private bool _destroyOnNewScene = true;
 
         [Header("Required Fading Components")]
         [Tooltip("Plane Mesh used to fade")]
@@ -31,7 +36,7 @@ namespace VRSF.Core.FadingEffect
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
-            _fadeMaterial.color = new Color(_fadeMaterial.color.r, _fadeMaterial.color.g, _fadeMaterial.color.b, FadeInOnSetupVRReady ? 1.0f : 0.0f);
+            _fadeMaterial.color = new Color(_fadeMaterial.color.r, _fadeMaterial.color.g, _fadeMaterial.color.b, _fadeInOnSetupVRReady ? 1.0f : 0.0f);
 
             dstManager.AddSharedComponentData(entity, new RenderMesh()
             {
@@ -41,18 +46,22 @@ namespace VRSF.Core.FadingEffect
             
             dstManager.AddComponentData(entity, new CameraFadeParameters()
             {
-                FadingSpeed = FadingSpeed,
+                FadingSpeed = _fadingSpeed,
                 ShouldImmediatlyFadeIn = false,
-                OldFadingSpeedFactor = FadingSpeed,
-                FadeInOnSceneLoaded = FadeInOnSetupVRReady
+                OldFadingSpeedFactor = _fadingSpeed,
+                FadeInOnSceneLoaded = _fadeInOnSetupVRReady
             });
 
-            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
+            if (_destroyOnNewScene)
+                dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window
             dstManager.SetName(entity, "Camera Fade Entity");
 #endif
+
+            if (_fadeInOnSetupVRReady)
+                new StartFadingInEvent();
         }
     }
 } 

@@ -21,7 +21,7 @@ namespace VRSF.MoveAround.Teleport
         protected override void OnCreate()
         {
             base.OnCreate();
-            _entityManager = World.Active.EntityManager;
+            _entityManager = World.EntityManager;
         }
 
         [Unity.Burst.BurstCompile]
@@ -53,7 +53,7 @@ namespace VRSF.MoveAround.Teleport
                 }
                 else if (gtp.CurrentTeleportState == ETeleportState.Teleporting && !gtp.HasTeleported)
                 {
-                    if (ctc.PointOnNavMesh)
+                    if (ctc.PointOnNavMesh || ctc.PointOnTeleportableLayer)
                     {
                         if (gtp.IsUsingFadingEffect)
                         {
@@ -63,7 +63,7 @@ namespace VRSF.MoveAround.Teleport
                         }
                         else
                         {
-                            VRSF_Components.SetCameraRigPosition(ctc.PointToGoTo);
+                            VRSF_Components.SetVRCameraPosition(ctc.PointToGoTo);
                         }
                     }
 
@@ -75,7 +75,7 @@ namespace VRSF.MoveAround.Teleport
         private void TeleportUser(OnFadingOutEndedEvent info)
         {
             OnFadingOutEndedEvent.Listeners -= TeleportUser;
-            VRSF_Components.SetCameraRigPosition(_tempPointToGoTo);
+            VRSF_Components.SetVRCameraPosition(_tempPointToGoTo);
         }
     }
 }

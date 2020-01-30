@@ -14,7 +14,7 @@ namespace VRSF.Core.CBRA
         protected override void OnCreate()
         {
             // Cache the EntityManager in a field, so we don't have to get it every frame
-            _entityManager = World.Active.EntityManager;
+            _entityManager = World.EntityManager;
         }
 
         protected override void OnUpdate()

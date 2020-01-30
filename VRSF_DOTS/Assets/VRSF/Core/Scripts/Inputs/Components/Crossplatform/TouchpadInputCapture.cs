@@ -1,6 +1,5 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
-using VRSF.Core.Controllers;
 
 namespace VRSF.Core.Inputs
 {
@@ -14,9 +13,12 @@ namespace VRSF.Core.Inputs
         /// </summary>
         public float2 ThumbPosition;
 
-        public TouchpadInputCapture(EHand hand)
+        public bool UseThumbPosForTouch;
+
+        public TouchpadInputCapture(bool useThumbPosForTouch)
         {
             ThumbPosition = float2.zero;
+            UseThumbPosForTouch = useThumbPosForTouch;
         }
     }
 }

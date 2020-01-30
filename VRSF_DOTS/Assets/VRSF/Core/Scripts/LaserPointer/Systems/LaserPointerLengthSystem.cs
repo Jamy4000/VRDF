@@ -22,25 +22,27 @@ namespace VRSF.Core.LaserPointer
         {
             Entities.ForEach((ref LaserPointerLength laserLength, ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs) =>
             {
-                Transform originTransform = VRSF_Components.VRCamera.transform;
+                Transform originTransform;
 
                 // Depending on the RayOrigin, we provide references to different ray and raycastHit variables
                 switch (raycastOrigin.RayOrigin)
                 {
                     case ERayOrigin.LEFT_HAND:
-                        originTransform = VRSF_Components.LeftController.transform;
+                        if (!FetchTransformOrigin(VRSF_Components.LeftController, out originTransform))
+                            return;
                         break;
                     case ERayOrigin.RIGHT_HAND:
-                        originTransform = VRSF_Components.RightController.transform;
+                        if (!FetchTransformOrigin(VRSF_Components.RightController, out originTransform))
+                            return;
                         break;
                     case ERayOrigin.CAMERA:
-                        // No need to set it, already done before
-                        // originTransform = VRSF_Components.VRCamera.transform;
+                        if (!FetchTransformOrigin(VRSF_Components.VRCamera, out originTransform))
+                            return;
                         break;
                     default:
                         Debug.LogError("<b>[VRSF] :</b> An error has occured in the RayCalculationsSystems. " +
                             "Please check that the RayOrigin for your VRRaycatAuthoring Components are set correctly. Using Camera as Origin.");
-                        break;
+                        return;
                 }
 
                 // Reduce lineRenderer from the controllers position to the object that was hit
@@ -59,6 +61,21 @@ namespace VRSF.Core.LaserPointer
             bool ShouldAimForCenter()
             {
                 return (raycastOutputs.RaycastHitVar.Value.collider.gameObject.layer == _uiLayer && laserLength.ShouldPointToUICenter) || laserLength.ShouldPointTo3DObjectsCenter;
+            }
+        }
+
+        private bool FetchTransformOrigin(GameObject toFetchFrom, out Transform originTransform)
+        {
+            if (toFetchFrom == null)
+            {
+                Debug.Log("<b>[VRSF] :</b> The transform origin of the Laser couldn't be found. Skipping to next frame.");
+                originTransform = null;
+                return false;
+            }
+            else
+            {
+                originTransform = toFetchFrom.transform;
+                return true;
             }
         }
     }

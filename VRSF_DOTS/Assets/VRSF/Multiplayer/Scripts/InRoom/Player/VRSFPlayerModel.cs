@@ -11,20 +11,18 @@ namespace VRSF.Multiplayer
     {
         [Header("Models for this PhotonView")]
         [Tooltip("The 3D Model to represent this photon view object if the user is a local user")]
-        [SerializeField]
-        private GameObject _localModel;
+        public GameObject LocalModel;
 
         [Tooltip("The 3D Model to represent this photon view object if the user is a remote user")]
-        [SerializeField]
-        private GameObject _remoteModel;
+        public GameObject RemoteModel;
 
         // Use this for initialization
-        void Start()
+        protected virtual void Start()
         {
-            if (photonView.Owner.IsLocal && _localModel != null)
-                GameObject.Instantiate(_localModel, transform);
-            else if (!photonView.Owner.IsLocal && _remoteModel != null)
-                GameObject.Instantiate(_remoteModel, transform);
+            if (photonView.Owner.IsLocal && LocalModel != null)
+                GameObject.Instantiate(LocalModel, transform);
+            else if (!photonView.Owner.IsLocal && RemoteModel != null)
+                GameObject.Instantiate(RemoteModel, transform);
 
             Destroy(this);
         }

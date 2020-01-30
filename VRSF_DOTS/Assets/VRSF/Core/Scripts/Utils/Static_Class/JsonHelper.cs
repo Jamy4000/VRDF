@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 
@@ -38,25 +39,54 @@ namespace VRSF.Core.Utils
         }
 
         /// <summary>
-        /// Generate a JSON file from the json-ready string and the path given
+        /// Generate a JSON file from the json-ready string at the given path
         /// </summary>
         /// <param name="newJSON">The newly created JSON-ready string</param>
-        /// <param name="path">The path where we save the JSON file. StreamingAssets is strongly recommended.</param>
-        public static void GenerateNewJSON(string newJSON, string path)
+        /// <param name="pathToFile">The path where we save the JSON file</param>
+        public static void GenerateNewJSON(string newJSON, string pathToFile, MonoBehaviour coroutineStarter)
         {
+            // Get the path to the directory containing the file
+            string filesDirectoryPath = Path.GetDirectoryName(pathToFile);
+
             // if the file doesn't exists, create file
-            if (!File.Exists(path))
+            if (!Directory.Exists(filesDirectoryPath))
+                Directory.CreateDirectory(filesDirectoryPath);
+
+            // if the file doesn't exists, create file
+            if (!File.Exists(pathToFile))
+                CreateFile();
+
+            // We start the coroutine to check if the file is correctly created
+            coroutineStarter.StartCoroutine(WaitUntilFileIsCreated());
+
+            IEnumerator WaitUntilFileIsCreated()
             {
-                Debug.Log("File doesn't exist");
-                var file = File.Create(path);
+                while (!File.Exists(pathToFile))
+                {
+                    Debug.Log("File still not existing, waiting for next frame.");
+                    yield return new WaitForEndOfFrame();
+                }
+                Debug.Log("File found at path " + pathToFile);
+
+                coroutineStarter.StartCoroutine(WriteText());
+            }
+
+            void CreateFile()
+            {
+                var file = File.Create(pathToFile);
                 file.Dispose();
             }
 
-            // Empty the file
-            File.WriteAllText(path, string.Empty);
+            IEnumerator WriteText()
+            {
+                // Empty the file
+                File.WriteAllText(pathToFile, string.Empty);
 
-            // Rewrite the file
-            File.WriteAllText(path, newJSON);
+                yield return new WaitForEndOfFrame();
+
+                // Rewrite the file
+                File.WriteAllText(pathToFile, newJSON);
+            }
         }
 
         [Serializable]

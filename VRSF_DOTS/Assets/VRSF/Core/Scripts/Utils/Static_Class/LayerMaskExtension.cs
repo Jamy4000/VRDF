@@ -5,6 +5,28 @@ namespace VRSF.Core.Utils
 {
     public static class LayerMaskExtension
     {
+        public static List<GameObject> GetObjectsInLayer(GameObject root, int layer)
+        {
+            var ret = new List<GameObject>();
+            foreach (Transform t in root.GetComponentsInChildren(typeof(Transform), true))
+            {
+                if (t.gameObject.layer == layer)
+                    ret.Add(t.gameObject);
+            }
+            return ret;
+        }
+
+        public static List<GameObject> GetObjectsInLayer(GameObject root, string layerName)
+        {
+            var ret = new List<GameObject>();
+            foreach (Transform t in root.GetComponentsInChildren(typeof(Transform), true))
+            {
+                if (LayerMask.LayerToName(t.gameObject.layer) == layerName)
+                    ret.Add(t.gameObject);
+            }
+            return ret;
+        }
+
         public static LayerMask NamesToMask(params string[] layerNames)
         {
             LayerMask ret = (LayerMask)0;

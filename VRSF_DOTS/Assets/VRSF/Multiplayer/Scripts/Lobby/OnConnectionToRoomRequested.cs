@@ -34,6 +34,9 @@ namespace VRSF.Multiplayer
             RoomName = roomName;
             NeedCreation = needCreation;
             Options = roomOptions ?? new RoomOptions { MaxPlayers = (byte)5 };
+
+            VRSFPlayerUtilities.PlayersInstances = new System.Collections.Generic.List<VRSFPlayer>();
+
             FireEvent(this);
         }
     }

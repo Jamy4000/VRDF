@@ -54,7 +54,7 @@
             switch (hapticDuration)
             {
                 case EHapticDuration.SHORT:
-                    return 0.5f;
+                    return 0.25f;
                 case EHapticDuration.MEDIUM:
                     return 1.0f;
                 default:

@@ -92,9 +92,11 @@ namespace VRSF.MoveAround.Teleport
                 excludedLayer,
                 out pp,
                 out float3 normal,
-                out ctc.LastPointIndex
+                out ctc.LastPointIndex,
+                out bool onTeleportableLayer
             );
 
+            ctc.PointOnTeleportableLayer = onTeleportableLayer;
             ctc.PointToGoTo = pp[ctc.LastPointIndex].Value;
             return normal;
         }
@@ -113,7 +115,7 @@ namespace VRSF.MoveAround.Teleport
         /// <param name="normal">normal of hit point</param>
         /// 
         /// <returns>true if the the parabole is at the end of the NavMesh</returns>
-        private static bool CalculateParabolicCurve(float3 p0, Vector3 v0, Vector3 a, float dist, int points, TeleportNavMesh tnm, int excludedLayer, out NativeArray<Translation> outPts, out float3 normal, out int lastPointIndex)
+        private static bool CalculateParabolicCurve(float3 p0, Vector3 v0, Vector3 a, float dist, int points, TeleportNavMesh tnm, int excludedLayer, out NativeArray<Translation> outPts, out float3 normal, out int lastPointIndex, out bool endOnTeleportableLayer)
         {
             // Init new list of points with p0 as the first point
             outPts = new NativeArray<Translation>(points, Allocator.TempJob);
@@ -127,7 +129,7 @@ namespace VRSF.MoveAround.Teleport
                 t += dist / ParabolicCurveDeriv(v0, a, t).magnitude;
                 float3 next = ParabolicCurve(p0, v0, a, t);
 
-                if (TeleportNavMeshHelper.Linecast(last, next, out bool endOnNavmesh, excludedLayer, out float3 castHit, out float3 norm, tnm))
+                if (TeleportNavMeshHelper.Linecast(last, next, out bool endOnNavmesh, out endOnTeleportableLayer, excludedLayer, out float3 castHit, out float3 norm, tnm))
                 {
                     outPts[i] = new Translation { Value = castHit };
                     normal = norm;
@@ -144,6 +146,7 @@ namespace VRSF.MoveAround.Teleport
 
             normal = Vector3.up;
             lastPointIndex = points - 1;
+            endOnTeleportableLayer = false;
             return false;
         }
 

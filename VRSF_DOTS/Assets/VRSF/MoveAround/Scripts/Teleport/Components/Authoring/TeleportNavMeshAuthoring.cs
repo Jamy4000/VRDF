@@ -20,6 +20,8 @@ namespace VRSF.MoveAround.Teleport
 
         [SerializeField] public float SampleRadius = 0.25f;
 
+        [SerializeField] public float SphereCastRadius = 0.1f;
+
         [SerializeField] public ENavmeshDewarpingMethod DewarpingMethod = ENavmeshDewarpingMethod.RoundToVoxelSize;
 
         [HideInInspector] public Mesh SelectableMesh;

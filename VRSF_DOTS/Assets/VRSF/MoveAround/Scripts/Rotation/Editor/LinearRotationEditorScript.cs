@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.VRRotation
 {
@@ -32,6 +33,8 @@ namespace VRSF.MoveAround.VRRotation
                     PrefabUtility.RecordPrefabInstancePropertyModifications(_lra);
                 }
             }
+
+            _lra.GetComponent<VRInteractionAuthoring>().ButtonToUse = Core.Inputs.EControllersButton.TOUCHPAD;
         }
 
         /// <summary>
@@ -46,6 +49,7 @@ namespace VRSF.MoveAround.VRRotation
             Undo.RegisterCreatedObjectUndo(linearRot, "Adding linearRotation");
             linearRot.transform.SetParent(Selection.activeTransform);
             linearRot.AddComponent<LinearRotationAuthoring>();
+            linearRot.AddComponent<VRInteractionAuthoring>();
             Selection.SetActiveObjectWithContext(linearRot, menuCommand.context);
         }
     }

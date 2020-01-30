@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using VRSF.Core.Controllers;
+using VRSF.Core.Controllers.Haptic;
 using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
 
@@ -21,6 +22,12 @@ namespace VRSF.UI
 
         [Tooltip("If this button can be click using the meshcollider of your controller.")]
         [SerializeField] public bool ControllerClickable = true;
+
+        [Tooltip("Event raised when hovering the button with your gaze or one of the controller's laser.")]
+        [SerializeField] public UnityEngine.Events.UnityEvent OnHover = new UnityEngine.Events.UnityEvent();
+
+        [Tooltip("Event raised when you stop hovering the button with your gaze or one of the controller's laser.")]
+        [SerializeField] public UnityEngine.Events.UnityEvent OnStopHovering = new UnityEngine.Events.UnityEvent();
 
         private bool _isSelected;
         #endregion VARIABLES
@@ -56,8 +63,16 @@ namespace VRSF.UI
 
         private void OnTriggerEnter(Collider other)
         {
-            if (ControllerClickable && interactable && other.gameObject.tag.Contains("ControllerBody"))
-                isOn = !isOn;
+            // if the user is in VR
+            if (UnityEngine.XR.XRSettings.enabled && VRSF_Components.SetupVRIsReady)
+            {
+                var objectTag = other.gameObject.tag;
+                if (ControllerClickable && interactable && (objectTag.Contains("ControllerBody") || objectTag.Contains("UIClicker")))
+                {
+                    isOn = !isOn;
+                    new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+                }
+            }
         }
         #endregion MONOBEHAVIOUR_METHODS
 
@@ -79,10 +94,13 @@ namespace VRSF.UI
             {
                 _isSelected = true;
                 OnSelect(null);
+                OnHover.Invoke();
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
+                OnDeselect(null);
+                OnStopHovering.Invoke();
             }
         }
 

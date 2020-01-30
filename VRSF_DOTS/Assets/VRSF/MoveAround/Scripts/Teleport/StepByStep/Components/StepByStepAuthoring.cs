@@ -22,6 +22,12 @@ namespace VRSF.MoveAround.Teleport
         [Tooltip("The step height of the NavMesh for the Teleport feature. Should be equal to the one specified in the Navigation Window.")]
         [SerializeField] private float _stepHeight = 0.5f;
 
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Meant for Debug, if true, a red ray will be displayed on your scene view with the directon of the SBS Calculations, and a blue one will be shown to display the Raycast done to check for the teleportable/NavMesh surface. DONT FORGET TO TURN GIZMOS ON !")]
+        [SerializeField] private bool _debugCalculationRays;
+
         private void Awake()
         {
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
@@ -29,7 +35,7 @@ namespace VRSF.MoveAround.Teleport
             // If the device loaded is included in the device using this CBRA
             if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
-                var entityManager = World.Active.EntityManager;
+                var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
                 var archetype = entityManager.CreateArchetype
                 (
@@ -46,7 +52,7 @@ namespace VRSF.MoveAround.Teleport
                 var entity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!Core.Utils.InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))
+                if (!InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))
                 {
                     entityManager.DestroyEntity(entity);
                     Destroy(gameObject);
@@ -54,7 +60,7 @@ namespace VRSF.MoveAround.Teleport
                 }
 
                 // Setting up Raycasting
-                if(!TeleporterSetupHelper.SetupRaycast(ref entityManager, ref entity, interactionParameters, _distanceStepByStep))
+                if(!TeleporterSetupHelper.SetupRaycast(ref entityManager, ref entity, interactionParameters, 10))
                 {
                     entityManager.DestroyEntity(entity);
                     Destroy(gameObject);
@@ -68,10 +74,12 @@ namespace VRSF.MoveAround.Teleport
                 entityManager.SetComponentData(entity, new StepByStepComponent
                 {
                     DistanceStepByStep = _distanceStepByStep,
-                    StepHeight = _stepHeight
+                    StepHeight = _stepHeight,
+                    DebugCalculationsRay = _debugCalculationRays
                 });
 
-                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
+                if (_destroyOnSceneUnloaded)
+                    entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

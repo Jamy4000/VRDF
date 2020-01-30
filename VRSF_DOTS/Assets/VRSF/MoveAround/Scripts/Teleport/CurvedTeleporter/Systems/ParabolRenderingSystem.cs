@@ -23,7 +23,7 @@ namespace VRSF.MoveAround.Teleport
         protected override void OnCreate()
         {
             base.OnCreate();
-            _entityManager = World.Active.EntityManager;
+            _entityManager = World.EntityManager;
             _pointsQuery = GetEntityQuery(typeof(Translation), typeof(ParabolPointParent));
         }
 
@@ -36,11 +36,11 @@ namespace VRSF.MoveAround.Teleport
                 {
                     var parabolMesh = _entityManager.GetSharedComponentData<RenderMesh>(e);
 
-                    _pointsQuery.SetFilter(new ParabolPointParent { TeleporterEntityIndex = e.Index });
+                    _pointsQuery.SetSharedComponentFilter(new ParabolPointParent { TeleporterEntityIndex = e.Index });
                     var points = _pointsQuery.ToComponentDataArray<Translation>(Allocator.TempJob);
 
                     // Draw parabola (BEFORE the outside faces of the selection pad, to avoid depth issues)
-                    GenerateMesh(ref parabolMesh.mesh, points, ctc.LastPointIndex, parabolCalculations.Velocity, Time.time % 1, ctr.GraphicThickness);
+                    GenerateMesh(ref parabolMesh.mesh, points, ctc.LastPointIndex, parabolCalculations.Velocity, (float)Time.ElapsedTime % 1, ctr.GraphicThickness);
                     points.Dispose();
 
                     Graphics.DrawMesh(parabolMesh.mesh, Matrix4x4.identity, parabolMesh.material, parabolMesh.layer);

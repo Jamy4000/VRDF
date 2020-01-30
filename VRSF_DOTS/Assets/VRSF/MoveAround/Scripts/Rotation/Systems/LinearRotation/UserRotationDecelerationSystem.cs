@@ -25,7 +25,7 @@ namespace VRSF.MoveAround.VRRotation
 
             var job = new DecelerationJob
             {
-                DeltaTime = Time.deltaTime,
+                DeltaTime = Time.DeltaTime,
                 RotationAxis = rotationAxisOutput,
                 CurrentSpeed = currentSpeedOutput
             }.Schedule(this, inputDeps);

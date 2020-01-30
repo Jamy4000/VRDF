@@ -8,7 +8,7 @@ namespace VRSF.MoveAround.Teleport
 {
     public static class TeleporterSetupHelper
     {
-        public static bool SetupRaycast(ref EntityManager entityManager, ref Entity entity, VRInteractionAuthoring interactionParameters, float distanceSBS)
+        public static bool SetupRaycast(ref EntityManager entityManager, ref Entity entity, VRInteractionAuthoring interactionParameters, float distanceRaycast)
         {
             switch (interactionParameters.ButtonHand)
             {
@@ -27,7 +27,7 @@ namespace VRSF.MoveAround.Teleport
 
             entityManager.SetComponentData(entity, new VRRaycastParameters
             {
-                MaxRaycastDistance = distanceSBS,
+                MaxRaycastDistance = distanceRaycast,
                 ExcludedLayer = generalTeleportParam.ExcludedLayers
             });
 
@@ -61,7 +61,8 @@ namespace VRSF.MoveAround.Teleport
                 IgnoreSlopedSurfaces = tnm.IgnoreSlopedSurfaces,
                 NavAreaMask = tnm.NavAreaMask,
                 QueryTriggerInteraction = tnm.QueryTriggerInteraction,
-                SampleRadius = tnm.SampleRadius
+                SampleRadius = tnm.SampleRadius,
+                SphereCastRadius = tnm.SphereCastRadius
             });
         }
     }

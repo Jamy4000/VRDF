@@ -14,7 +14,9 @@ namespace VRSF.Core.FadingEffect
 
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += Init;
+            OnSetupVRReady.Listeners += InitSetupVR;
+            StartFadingInEvent.Listeners += InitFadingIn;
+            StartFadingOutEvent.Listeners += InitFadingOut;
             base.OnCreate();
         }
 
@@ -36,7 +38,9 @@ namespace VRSF.Core.FadingEffect
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnSetupVRReady.Listeners -= Init;
+            OnSetupVRReady.Listeners -= InitSetupVR;
+            StartFadingInEvent.Listeners -= InitFadingIn;
+            StartFadingOutEvent.Listeners -= InitFadingOut;
         }
 
 
@@ -56,9 +60,22 @@ namespace VRSF.Core.FadingEffect
             }
         }
 
-        private void Init(OnSetupVRReady info)
+        private void InitSetupVR(OnSetupVRReady _)
         {
-            _vrCamera = VRSF_Components.VRCamera.transform;
+            if (VRSF_Components.VRCamera != null)
+                _vrCamera = VRSF_Components.VRCamera.transform;
+        }
+
+        private void InitFadingIn(StartFadingInEvent _)
+        {
+            if (VRSF_Components.VRCamera != null)
+                _vrCamera = VRSF_Components.VRCamera.transform;
+        }
+
+        private void InitFadingOut(StartFadingOutEvent _)
+        {
+            if (VRSF_Components.VRCamera != null)
+                _vrCamera = VRSF_Components.VRCamera.transform;
         }
     }
 }

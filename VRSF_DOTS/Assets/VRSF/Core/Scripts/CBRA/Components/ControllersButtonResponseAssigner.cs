@@ -26,25 +26,29 @@ namespace VRSF.Core.CBRA
         [HideInInspector] public UnityEvent OnButtonStopClicking;
         [HideInInspector] public UnityEvent OnButtonIsClicking;
 
-        private void Awake()
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+
+        public virtual void Awake()
         {
             OnSetupVRReady.RegisterSetupVRResponse(CreateEntity);
         }
 
-        private void OnDestroy()
+        public virtual void OnDestroy()
         {
             if (OnSetupVRReady.IsMethodAlreadyRegistered(CreateEntity))
                 OnSetupVRReady.Listeners -= CreateEntity;
         }
 
-        private void CreateEntity(OnSetupVRReady info)
+        public void CreateEntity(OnSetupVRReady info)
         {
             var interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA
             if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
-                var entityManager = World.Active.EntityManager;
+                var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
                 var archetype = entityManager.CreateArchetype
                 (
@@ -107,6 +111,13 @@ namespace VRSF.Core.CBRA
                     Debug.LogError("<b>[VRSF] :</b> Please give at least one response to one of the Unity Events for the CBRA on the GameObject " + transform.name, gameObject);
                     entityManager.DestroyEntity(entity);
                     return;
+                }
+
+                if (_destroyOnSceneUnloaded)
+                {
+                    // Need to check for index in case the object is placed in a DontDestroyOnLoad scene
+                    var sceneBuildIndex = gameObject.scene.buildIndex;
+                    entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = sceneBuildIndex != -1 ? gameObject.scene.buildIndex : UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex });
                 }
 
 #if UNITY_EDITOR

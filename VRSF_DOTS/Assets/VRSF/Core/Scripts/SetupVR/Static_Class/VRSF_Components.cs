@@ -33,7 +33,7 @@ namespace VRSF.Core.SetupVR
         /// <param name="newPos">The new Pos where the user should be in World coordinate</param>
         /// <param name="useVRCameraOffset">Whether we should use the VRCamera local pos to calculate the new pos of the cameraRig</param>
         /// <param name="setYPos">Wheter we have to change the Y position</param>
-        public static void SetCameraRigPosition(Vector3 newPos, bool useVRCameraOffset = true, bool setYPos = true)
+        public static void SetVRCameraPosition(Vector3 newPos, bool useVRCameraOffset = true, bool setYPos = true)
         {
             if (useVRCameraOffset) GetNewPosWithCameraOffset();
             CameraRig.transform.position = setYPos ? newPos : new Vector3(newPos.x, CameraRig.transform.position.y, newPos.z);
@@ -56,20 +56,24 @@ namespace VRSF.Core.SetupVR
         /// <param name="newRotAxis"></param>
         /// <param name="angle"></param>
         /// <param name="useVRCameraOffset">Whether we should use the VRCamera local pos to calculate the new pos of the cameraRig</param>
-        public static void RotateVRCameraAround(Vector3 newRotAxis, float angle, bool useVRCameraOffset = true)
+        public static void RotateVRCameraAround(Vector3 newRotAxis, float angle)
         {
             // TODO if (useVRCameraOffset) GetNewPosWithCameraOffset();
             CameraRig.transform.RotateAround(VRCamera.transform.position, newRotAxis, angle);
+        }
 
 
-            void GetNewPosWithCameraOffset()
-            {
-                // TODO : Do the same method but with a quaternion in the signature
-                var y = newRotAxis.y;
-                var cameraDirectionVector = new Vector3(newRotAxis.x - VRCamera.transform.position.x, 0.0f, newRotAxis.z - VRCamera.transform.position.z);
-                newRotAxis = CameraRig.transform.position + cameraDirectionVector;
-                newRotAxis.y = y;
-            }
+        /// <summary>
+        /// Method to rotate the CameraRig using the offset with the VRCamera, as the VRCamera can't be rotated directly
+        /// </summary>
+        /// <param name="target">The point in world space we want to look at</param>
+        public static void LookAtVR(Vector3 target)
+        {
+            var basePos = VRCamera.transform.position;
+            var directionToPoint = target - VRCamera.transform.position;
+            var angle = Vector3.SignedAngle(VRCamera.transform.forward, directionToPoint, Vector3.up);
+            CameraRig.transform.Rotate(Vector3.up, angle);
+            SetVRCameraPosition(basePos, true, false);
         }
         #endregion
     }

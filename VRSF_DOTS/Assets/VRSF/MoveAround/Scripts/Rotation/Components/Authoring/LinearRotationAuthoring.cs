@@ -1,6 +1,5 @@
 ﻿using Unity.Entities;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.Utils;
 using VRSF.Core.VRInteractions;
@@ -10,14 +9,9 @@ namespace VRSF.MoveAround.VRRotation
     /// <summary>
     /// Component used by the rotation systems to rotate the user using the thumbstick/Touchpad
     /// </summary>
+    [RequireComponent(typeof(VRInteractionAuthoring))]
     public class LinearRotationAuthoring : MonoBehaviour
     {
-        [Tooltip("How do you want to rotate ?")]
-        [SerializeField] private EControllerInteractionType _interactionType = EControllerInteractionType.TOUCH;
-
-        [Tooltip("How do you want to rotate ?")]
-        [SerializeField] private EHand _hand;
-
         [Tooltip("Speed of the rotation effect when UseSmoothRotation is at true")]
         [SerializeField] private float _maxRotationSpeed = 1.0f;
 
@@ -34,33 +28,15 @@ namespace VRSF.MoveAround.VRRotation
 
         public void Awake()
         {
-            var entityManager = World.Active.EntityManager;
+            VRInteractionAuthoring vrInteractionAuthoring = GetComponent<VRInteractionAuthoring>();
+
+            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             var archetype = entityManager.CreateArchetype(typeof(BaseInputCapture), typeof(TouchpadInputCapture), typeof(ControllersInteractionType));
 
             var entity = entityManager.CreateEntity(archetype);
 
-            switch (_hand)
-            {
-                case EHand.LEFT:
-                    entityManager.AddComponentData(entity, new LeftHand());
-                    break;
-                case EHand.RIGHT:
-                    entityManager.AddComponentData(entity, new RightHand());
-                    break;
-                default:
-                    Debug.LogError("<b>[VRSF] :</b> Please specify a valid hand on your UserRotationAuthoring Components.");
-                    entityManager.DestroyEntity(entity);
-                    Destroy(gameObject);
-                    return;
-            }
-
-            entityManager.SetComponentData(entity, new ControllersInteractionType
-            {
-                InteractionType = _interactionType,
-                HasTouchInteraction = (_interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,
-                HasClickInteraction = (_interactionType & EControllerInteractionType.CLICK) == EControllerInteractionType.CLICK
-            });
+            InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring);
 
             entityManager.AddComponentData(entity, new LinearUserRotation
             {

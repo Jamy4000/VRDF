@@ -46,7 +46,7 @@ namespace VRSF.MoveAround.Fly
                     return;
                 }
 
-                var entityManager = World.Active.EntityManager;
+                var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
                 var archetype = entityManager.CreateArchetype
                 (

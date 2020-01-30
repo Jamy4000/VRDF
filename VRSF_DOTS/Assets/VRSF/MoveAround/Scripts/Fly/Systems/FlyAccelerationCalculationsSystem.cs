@@ -13,7 +13,7 @@ namespace VRSF.MoveAround.Fly
         {
             return new AccelerationCalculationJob
             {
-                DeltaTime = Time.deltaTime
+                DeltaTime = Time.DeltaTime
             }.Schedule(this, inputDeps);
         }
         

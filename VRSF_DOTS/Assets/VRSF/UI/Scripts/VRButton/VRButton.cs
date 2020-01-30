@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
-using UnityEngine.EventSystems;
 using VRSF.Core.Controllers.Haptic;
 using VRSF.Core.Controllers;
 
@@ -24,7 +23,13 @@ namespace VRSF.UI
         [Tooltip("If this button can be click using the meshcollider of your controller.")]
         [SerializeField] public bool ControllerClickable = true;
 
-        private bool _isSelected;
+        [Tooltip("Event raised when hovering the button with your gaze or one of the controller's laser.")]
+        [SerializeField] public UnityEngine.Events.UnityEvent OnHover = new UnityEngine.Events.UnityEvent();
+
+        [Tooltip("Event raised when you stop hovering the button with your gaze or one of the controller's laser.")]
+        [SerializeField] public UnityEngine.Events.UnityEvent OnStopHovering = new UnityEngine.Events.UnityEvent();
+
+        private Core.Raycast.ERayOrigin _handHovering = Core.Raycast.ERayOrigin.NONE;
         #endregion VARIABLES
 
 
@@ -59,13 +64,19 @@ namespace VRSF.UI
 
         private void OnTriggerEnter(Collider other)
         {
-            if (ControllerClickable && interactable && other.gameObject.tag.Contains("ControllerBody"))
+            // if the user is in VR
+            if (UnityEngine.XR.XRSettings.enabled && VRSF_Components.SetupVRIsReady)
             {
-                onClick.Invoke();
-                new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+                var objectTag = other.gameObject.tag;
+                if (ControllerClickable && interactable && (objectTag.Contains("ControllerBody") || objectTag.Contains("UIClicker")))
+                {
+                    onClick.Invoke();
+                    new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+                }
             }
         }
-        #endregion MONOBEHAVIOUR_METHODS
+
+#endregion MONOBEHAVIOUR_METHODS
 
 
         #region PRIVATE_METHODS
@@ -75,21 +86,28 @@ namespace VRSF.UI
         /// <param name="objectClickEvent">The object that was clicked</param>
         void CheckObjectClicked(ObjectWasClickedEvent objectClickEvent)
         {
-            if (interactable && objectClickEvent.ObjectClicked == transform)
+            if (CheckTransform(objectClickEvent.ObjectClicked))
                 onClick.Invoke();
+        }
+
+        private bool CheckTransform(Transform toCheck)
+        {
+            return interactable && toCheck == transform;
         }
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            if (CheckTransform(info.ObjectHovered) && _handHovering == Core.Raycast.ERayOrigin.NONE)
             {
-                _isSelected = true;
+                _handHovering = info.RaycastOrigin;
                 OnSelect(null);
+                OnHover.Invoke();
             }
-            else if (info.ObjectHovered != transform && _isSelected)
+            else if (info.ObjectHovered != transform && _handHovering == info.RaycastOrigin)
             {
-                _isSelected = false;
+                _handHovering = Core.Raycast.ERayOrigin.NONE;
                 OnDeselect(null);
+                OnStopHovering.Invoke();
             }
         }
 
@@ -121,6 +139,6 @@ namespace VRSF.UI
             if (ControllerClickable && boxCollider != null)
                 boxCollider.isTrigger = true;
         }
-        #endregion PRIVATE_METHODS
+#endregion PRIVATE_METHODS
     }
 }

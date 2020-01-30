@@ -7,7 +7,6 @@ namespace VRSF.Core.FadingEffect
     {
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += StartFadingIn;
             StartFadingInEvent.Listeners += StartFadeIn;
             OnFadingInEndedEvent.Listeners += OnFadeInEnded;
             base.OnCreate();
@@ -19,7 +18,6 @@ namespace VRSF.Core.FadingEffect
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnSetupVRReady.Listeners -= StartFadingIn;
             StartFadingInEvent.Listeners -= StartFadeIn;
             OnFadingInEndedEvent.Listeners -= OnFadeInEnded;
         }
@@ -43,18 +41,6 @@ namespace VRSF.Core.FadingEffect
             {
                 EntityManager.RemoveComponent<CameraFadeIn>(e);
                 CameraFadeSystem.ResetParameters(ref cameraFade);
-            });
-        }
-        
-        private void StartFadingIn(OnSetupVRReady info)
-        {
-            Entities.ForEach((ref CameraFadeParameters cameraFade) =>
-            {
-                if (cameraFade.FadeInOnSceneLoaded)
-                {
-                    new StartFadingInEvent(0.5f);
-                    return;
-                }
             });
         }
     }

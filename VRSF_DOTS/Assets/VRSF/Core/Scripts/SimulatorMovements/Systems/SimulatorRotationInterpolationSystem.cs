@@ -21,7 +21,7 @@ namespace VRSF.Core.Simulator
                 {
                     // Interpolate toward new position
                     if (Input.GetMouseButton(1))
-                        SimulatorMovementSystem.Interpolate(sms, smr, ref scs, Time.deltaTime);
+                        SimulatorMovementSystem.Interpolate(sms, smr, ref scs, Time.DeltaTime);
                 });
             }
         }

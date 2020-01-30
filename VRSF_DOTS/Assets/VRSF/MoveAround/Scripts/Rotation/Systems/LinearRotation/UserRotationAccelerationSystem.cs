@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using VRSF.Core.SetupVR;
+﻿using VRSF.Core.SetupVR;
 using VRSF.Core.Inputs;
 using Unity.Entities;
 using Unity.Jobs;
@@ -25,7 +24,7 @@ namespace VRSF.MoveAround.VRRotation
 
             var job = new RotationJob
             {
-                DeltaTime = Time.deltaTime,
+                DeltaTime = Time.DeltaTime,
                 RotationAxis = rotationAxisOutput,
                 CurrentSpeed = currentSpeedOutput
             }.Schedule(this, inputDeps);
@@ -50,7 +49,7 @@ namespace VRSF.MoveAround.VRRotation
 
             public void Execute(ref LinearUserRotation lur, [ReadOnly] ref ControllersInteractionType cit, [ReadOnly] ref BaseInputCapture bic, [ReadOnly] ref TouchpadInputCapture tic)
             {
-                if (InteractionChecker.IsInteracting(bic, cit))
+                if (InteractionChecker.IsInteractingSimple(bic, cit))
                 {
                     // maxSpeedTimeDeltaTime : To calculate the current speed according to deltaTime, Max Speed and acceleration factor
                     float maxSpeedTimeDeltaTime = DeltaTime * lur.AccelerationFactor * (lur.MaxRotationSpeed / 50);

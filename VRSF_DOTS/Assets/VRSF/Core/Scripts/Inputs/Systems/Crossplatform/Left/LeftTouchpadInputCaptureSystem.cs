@@ -13,6 +13,7 @@ namespace VRSF.Core.Inputs
     public class LeftTouchpadInputCaptureSystem : JobComponentSystem
     {
         private EndSimulationEntityCommandBufferSystem _endSimEcbSystem;
+        private bool _isUsingOculusDevice;
 
         protected override void OnCreate()
         {
@@ -31,6 +32,7 @@ namespace VRSF.Core.Inputs
                 LeftThumbClickUp = Input.GetButtonUp("LeftThumbClick"),
                 LeftThumbTouchDown = Input.GetButtonDown("LeftThumbTouch"),
                 LeftThumbTouchUp = Input.GetButtonUp("LeftThumbTouch"),
+                IsUsingOculusDevice = _isUsingOculusDevice,
                 Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
 
@@ -55,6 +57,8 @@ namespace VRSF.Core.Inputs
             [ReadOnly] public bool LeftThumbTouchDown;
             [ReadOnly] public bool LeftThumbTouchUp;
 
+            [ReadOnly] public bool IsUsingOculusDevice;
+
             public EntityCommandBuffer.Concurrent Commands;
 
             public void Execute(Entity entity, int index, ref TouchpadInputCapture touchpadInput, ref BaseInputCapture baseInput)
@@ -75,27 +79,43 @@ namespace VRSF.Core.Inputs
                     baseInput.IsTouching = true;
                 }
                 // Check Touch Events if user is not clicking
-                else if (!baseInput.IsClicking && !baseInput.IsTouching && LeftThumbTouchDown)
+                else if (!baseInput.IsClicking && !baseInput.IsTouching && UserIsTouching(touchpadInput.UseThumbPosForTouch))
                 {
                     Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.TOUCHPAD });
                     baseInput.IsTouching = true;
                 }
-                else if (baseInput.IsTouching && LeftThumbTouchUp)
+                else if (baseInput.IsTouching && UserStopTouching(touchpadInput.UseThumbPosForTouch))
                 {
                     Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.TOUCHPAD });
                     baseInput.IsTouching = false;
                 }
             }
+
+            private bool UserStopTouching(bool useThumbPosForTouch)
+            {
+                return useThumbPosForTouch && IsUsingOculusDevice ? !UserIsMovingThumbstick() : LeftThumbTouchUp;
+            }
+
+            private bool UserIsTouching(bool useThumbPosForTouch)
+            {
+                return useThumbPosForTouch && IsUsingOculusDevice ? UserIsMovingThumbstick() : LeftThumbTouchDown;
+            }
+
+            private bool UserIsMovingThumbstick()
+            {
+                return LeftThumbPosition.x != 0.0f || LeftThumbPosition.y != 0.0f;
+            }
         }
 
         #region PRIVATE_METHODS
         /// <summary>
-        /// Check if we use the good device
+        /// Check which device we're using
         /// </summary>
         /// <param name="info"></param>
         private void CheckDevice(OnSetupVRReady info)
         {
             this.Enabled = VRSF_Components.DeviceLoaded != EDevice.SIMULATOR;
+            _isUsingOculusDevice = VRSF_Components.DeviceLoaded == EDevice.OCULUS_GO || VRSF_Components.DeviceLoaded == EDevice.OCULUS_QUEST || VRSF_Components.DeviceLoaded == EDevice.OCULUS_RIFT || VRSF_Components.DeviceLoaded == EDevice.OCULUS_RIFT_S;
         }
         #endregion PRIVATE_METHODS
     }

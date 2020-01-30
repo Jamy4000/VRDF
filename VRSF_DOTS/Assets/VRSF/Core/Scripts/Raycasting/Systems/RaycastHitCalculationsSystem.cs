@@ -15,20 +15,23 @@ namespace VRSF.Core.Raycast
         /// </summary>
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
+            Entities.ForEach((Entity e, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin origin) =>
             {
-                var hits = Physics.RaycastAll(raycastOutputs.RayVar, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
+                var rayHitSomething = Physics.Raycast(raycastOutputs.RayVar, out raycastOutputs.RaycastHitVar.Value, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
+                raycastOutputs.RaycastHitVar.SetIsNull(!rayHitSomething);
 
-                if (hits.Length > 0)
-                {
-                    var first3DHit = hits.OrderBy(x => x.distance).First();
-                    raycastOutputs.RaycastHitVar.Value = first3DHit;
-                    raycastOutputs.RaycastHitVar.SetIsNull(false);
-                }
-                else
-                {
-                    raycastOutputs.RaycastHitVar.SetIsNull(true);
-                }
+                //var hits = Physics.RaycastAll(raycastOutputs.RayVar, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
+
+                //if (hits.Length > 0)
+                //{
+                //    var first3DHit = hits.OrderBy(x => x.distance).First();
+                //    raycastOutputs.RaycastHitVar.Value = first3DHit;
+                //    raycastOutputs.RaycastHitVar.SetIsNull(false);
+                //}
+                //else
+                //{
+                //    raycastOutputs.RaycastHitVar.SetIsNull(true);
+                //}
             });
         }
     }

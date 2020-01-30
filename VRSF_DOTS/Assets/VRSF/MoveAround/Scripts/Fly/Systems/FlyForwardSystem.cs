@@ -11,10 +11,10 @@ namespace VRSF.MoveAround.Fly
     {
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity e, ref FlyDirection direction, ref TouchpadInputCapture tic, ref BaseInputCapture bic, ref ControllersInteractionType cit) =>
+            Entities.ForEach((Entity e, ref FlyDirection direction, ref TouchpadInputCapture tic, ref InteractionThumbPosition itp, ref BaseInputCapture bic, ref ControllersInteractionType cit) =>
             {
                 // If user just started to press/touch the thumbstick
-                if (tic.ThumbPosition.y != 0.0f && InteractionChecker.IsInteracting(bic, cit))
+                if (InteractionChecker.IsInteractingTouchpad(bic, cit, itp, tic, true, false))
                 {
                     direction.FlightDirection = tic.ThumbPosition.y;
 

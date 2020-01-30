@@ -45,7 +45,7 @@ namespace VRSF.Core.Simulator
         {
             if (VRSF_Components.DeviceLoaded == EDevice.SIMULATOR)
             {
-                var entityManager = World.Active.EntityManager;
+                var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
                 var archetype = entityManager.CreateArchetype
                 (

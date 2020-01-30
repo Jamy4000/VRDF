@@ -48,8 +48,6 @@ namespace VRSF.Core.LaserPointer
                 ShouldPointToUICenter = _shouldPointToUICenter
             });
 
-            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
-
 #if UNITY_EDITOR
             // Set the name of the entity in Editor Mode for the Entity Debugger Window
             dstManager.SetName(entity, string.Format("Laser Pointer {0}", raycastAuthoring.RayOrigin.ToString()));

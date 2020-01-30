@@ -2,6 +2,7 @@
 using UnityEngine;
 using VRSF.Core.LaserPointer;
 using VRSF.Core.Raycast;
+using VRSF.Core.SetupVR;
 
 namespace VRSF.Multiplayer
 {
@@ -10,38 +11,49 @@ namespace VRSF.Multiplayer
     /// This component replace the LaserWidthSetter and the LaserLengthSetter component when in multiplayer
     /// </summary>
     [RequireComponent(typeof(PhotonView))]
-    public class LaserDataSender : MonoBehaviour, IPunObservable
+    public class LaserDataSender : MonoBehaviourPun, IPunObservable
     {
         [SerializeField] private ERayOrigin _rayOrigin;
 
-        private bool _isSendingData;
         private LineRenderer _lineRenderer;
-        private PhotonView _punComp;
 
         private float _startWidthToSend;
         private float _endWidthToSend;
-        private Vector3 _startPosToSend;
         private Vector3 _endPosToSend;
 
         private void Awake()
         {
-            _punComp = GetComponent<PhotonView>();
             _lineRenderer = GetComponent<LineRenderer>();
         }
 
         private void Start()
         {
-            if (_punComp.IsMine)
+            var device = (EDevice)photonView.Owner.CustomProperties[VRSFPlayer.DEVICE_USED];
+            if (photonView.IsMine)
             {
-                OnLaserWidthChanged.Listeners += UpdateLineRenderWidth;
-                OnLaserLengthChanged.Listeners += UpdateLineRenderLength;
-                Destroy(_lineRenderer);
+                if (device != EDevice.NONE && device != EDevice.SIMULATOR)
+                {
+                    OnLaserWidthChanged.Listeners += UpdateLineRenderWidth;
+                    OnLaserLengthChanged.Listeners += UpdateLineRenderLength;
+                    Destroy(_lineRenderer);
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
+            }
+            else
+            {
+                if (device != EDevice.NONE && device != EDevice.SIMULATOR)
+                    this._lineRenderer.SetPosition(0, Vector3.zero);
+                else
+                    Destroy(gameObject);
             }
         }
 
         private void OnDestroy()
         {
-            if (_punComp.IsMine)
+            if (OnLaserWidthChanged.IsMethodAlreadyRegistered(UpdateLineRenderWidth))
             {
                 OnLaserWidthChanged.Listeners -= UpdateLineRenderWidth;
                 OnLaserLengthChanged.Listeners -= UpdateLineRenderLength;
@@ -54,42 +66,31 @@ namespace VRSF.Multiplayer
             {
                 _startWidthToSend = info.NewWidth;
                 _endWidthToSend = info.NewWidth;
-
-                _isSendingData = true;
             }
         }
 
         private void UpdateLineRenderLength(OnLaserLengthChanged info)
         {
             if (info.LaserOrigin == _rayOrigin)
-            {
-                _startPosToSend = Vector3.zero;
                 _endPosToSend = info.NewEndPos;
-
-                _isSendingData = true;
-            }
         }
 
         #region IPunObservable implementation
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            if (!stream.IsWriting)
+            if (!stream.IsWriting && !photonView.IsMine)
             {
-                // Network player, receive data
                 this._lineRenderer.startWidth = (float)stream.ReceiveNext();
                 this._lineRenderer.endWidth = (float)stream.ReceiveNext();
-                this._lineRenderer.SetPosition(0, (Vector3)stream.ReceiveNext());
                 this._lineRenderer.SetPosition(1, (Vector3)stream.ReceiveNext());
             }
-            else if (_isSendingData)
+            else if (stream.IsWriting)
             {
                 // We own this player: send the others our data
                 stream.SendNext(_startWidthToSend);
                 stream.SendNext(_endWidthToSend);
-                stream.SendNext(_startPosToSend);
                 stream.SendNext(_endPosToSend);
-                _isSendingData = false;
             }
         }
 

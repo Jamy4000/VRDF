@@ -2,7 +2,6 @@
 using UnityEngine.SceneManagement;
 using Photon.Realtime;
 using Photon.Pun;
-using UnityEngine.SceneManagement;
 
 namespace VRSF.Multiplayer
 {
@@ -24,7 +23,7 @@ namespace VRSF.Multiplayer
         void Start()
         {
             // in case we started this demo with the wrong scene being active, simply load the menu scene
-            if (!PhotonNetwork.IsConnected)
+            if (!PhotonNetwork.IsConnectedAndReady)
                 SceneManager.LoadScene(_lobbySceneName);
         }
 
@@ -35,9 +34,6 @@ namespace VRSF.Multiplayer
         public override void OnPlayerEnteredRoom(Player other)
         {
             Debug.Log("<b>[VRSF] :</b> OnPlayerEnteredRoom() " + other.NickName); // not seen if you're the player connecting
-            
-            if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
         }
 
         /// <summary>
@@ -47,9 +43,6 @@ namespace VRSF.Multiplayer
         public override void OnPlayerLeftRoom(Player other)
         {
             Debug.Log("<b>[VRSF] :</b> OnPlayerLeftRoom() " + other.NickName); // seen when other disconnects
-
-            if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.LoadLevel(SceneManager.GetActiveScene().buildIndex);
         }
 
         /// <summary>
@@ -59,7 +52,5 @@ namespace VRSF.Multiplayer
         {
             SceneManager.LoadScene(_lobbySceneName);
         }
-
     }
-
 }

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using VRSF.Core.Events;
 using UnityEngine.Events;
 using VRSF.Core.SetupVR;
+using VRSF.Core.Controllers.Haptic;
+using VRSF.Core.Controllers;
 
 namespace VRSF.UI
 {
@@ -18,6 +20,8 @@ namespace VRSF.UI
         #region PUBLIC_VARIABLES
         [Tooltip("If you want to set the collider yourself, set this value to false.")]
         [SerializeField] public bool SetColliderAuto = true;
+        [Tooltip("If this button can be click using the meshcollider of your controller.")]
+        [SerializeField] public bool ControllerClickable = true;
         #endregion PUBLIC_VARIABLES
 
 
@@ -46,6 +50,20 @@ namespace VRSF.UI
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
                     StartCoroutine(SetupBoxCollider());
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            // if the user is in VR
+            if (UnityEngine.XR.XRSettings.enabled && VRSF_Components.SetupVRIsReady)
+            {
+                var objectTag = other.gameObject.tag;
+                if (ControllerClickable && interactable && (objectTag.Contains("ControllerBody") || objectTag.Contains("UIClicker")))
+                {
+                    SetDropDownNewState();
+                    new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+                }
             }
         }
 

@@ -17,6 +17,7 @@ namespace VRSF.MoveAround.Teleport
 
         public int LastPointIndex;
         public bool PointOnNavMesh { get; set; }
+        public bool PointOnTeleportableLayer { get; set; }
         public float CurrentParabolaAngleY { get; set; }
         public float3 CurrentPointVector { get; set; }
 

@@ -26,8 +26,23 @@ namespace VRSF.MoveAround.Fly
             Entities.WithAny(typeof(IsFlying), typeof(IsDecelerating)).ForEach((ref FlyDirection direction) => 
             {
                 if (direction.CurrentDirection != Vector3.zero)
-                    _cameraRigTransform.position += direction.CurrentDirection;
+                {
+                    if (Vector3IsCorrect(direction.CurrentDirection))
+                        _cameraRigTransform.position += direction.CurrentDirection;
+                    else
+                        direction.CurrentDirection = Vector3.zero;
+                }
             });
+
+            bool Vector3IsCorrect(Vector3 posToTest)
+            {
+                return FloatIsCorrect(posToTest.x) && FloatIsCorrect(posToTest.y) && FloatIsCorrect(posToTest.z);
+            
+                bool FloatIsCorrect(float toTest)
+                {
+                    return !float.IsInfinity(toTest) && !float.IsNaN(toTest);
+                }
+            }
         }
 
         protected override void OnDestroy()

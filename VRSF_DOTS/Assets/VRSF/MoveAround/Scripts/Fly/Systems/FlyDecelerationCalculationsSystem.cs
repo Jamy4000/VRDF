@@ -12,10 +12,10 @@ namespace VRSF.MoveAround.Fly
         {
             Entities.WithAll(typeof(IsDecelerating)).ForEach((Entity e, ref FlySpeed speed, ref FlyDirection direction, ref FlyAcceleration acceleration, ref FlyDeceleration deceleration) =>
             {
-                bool hasDeceleteractionFactor = deceleration.DecelerationEffectFactor != 0.0f;
+                bool hasDeceleteractionFactor = deceleration.DecelerationEffectFactor > 0.0f;
                 deceleration.SlowDownTimer = hasDeceleteractionFactor ? deceleration.SlowDownTimer + (UnityEngine.Time.deltaTime / deceleration.DecelerationEffectFactor) : 0.0f;
-                speed.CurrentFlightVelocity = hasDeceleteractionFactor ? 0.0f : speed.CurrentFlightVelocity - speed.GetSpeed() * deceleration.SlowDownTimer;
-
+                speed.CurrentFlightVelocity = hasDeceleteractionFactor ? speed.CurrentFlightVelocity - speed.GetSpeed() * deceleration.SlowDownTimer : 0.0f;
+                
                 if (speed.CurrentFlightVelocity <= 0.0f)
                 {
                     PostUpdateCommands.RemoveComponent<IsDecelerating>(e);
