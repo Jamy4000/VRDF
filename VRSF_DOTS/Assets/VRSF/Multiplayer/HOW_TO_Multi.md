@@ -72,7 +72,7 @@ That's it for the Multiplayer Room, let's now create the lobby where the connect
 ```c#
 private void Awake()
 {
-    new OnConnectionToRoomRequested("My Room Name");
+    new VRSF.Multiplayer.OnConnectionToRoomRequested("My Room Name");
 }
 ```
 
