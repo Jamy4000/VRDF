@@ -90,7 +90,6 @@ namespace VRSF.Core.SetupVR
             Destroy(VRSF_Components.LeftController.GetComponent<TrackedPoseDriver>());
             Destroy(VRSF_Components.RightController.GetComponent<TrackedPoseDriver>());
             Destroy(VRSF_Components.VRCamera.GetComponent<TrackedPoseDriver>());
-            //XRSettings.enabled = false;
         }
     }
 }

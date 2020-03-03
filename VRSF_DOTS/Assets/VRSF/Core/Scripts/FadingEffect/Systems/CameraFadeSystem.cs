@@ -11,7 +11,7 @@ namespace VRSF.Core.FadingEffect
 
         protected override void OnCreate()
         {
-            SetupVR.OnSetupVRReady.Listeners += SetupVrIsReady;
+            OnSetupVRReady.Listeners += SetupVrIsReady;
             StartFadingInEvent.Listeners += OnStartFadingIn;
             StartFadingOutEvent.Listeners += OnStartFadingOut;
             OnFadingInEndedEvent.Listeners += OnFadeInEnded;
@@ -51,7 +51,7 @@ namespace VRSF.Core.FadingEffect
 
         protected override void OnDestroy()
         {
-            SetupVR.OnSetupVRReady.Listeners -= SetupVrIsReady;
+            OnSetupVRReady.Listeners -= SetupVrIsReady;
             StartFadingInEvent.Listeners -= OnStartFadingIn;
             StartFadingOutEvent.Listeners -= OnStartFadingOut;
             OnFadingInEndedEvent.Listeners -= OnFadeInEnded;
@@ -101,7 +101,7 @@ namespace VRSF.Core.FadingEffect
             cameraFade.FadingSpeed = cameraFade.OldFadingSpeedFactor;
         }
 
-        protected void SetupVrIsReady(SetupVR.OnSetupVRReady _)
+        protected void SetupVrIsReady(OnSetupVRReady _)
         {
             bool fadingOnStart = false;
             Entities.WithAny(typeof(CameraFadeOut), typeof(CameraFadeIn)).ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
