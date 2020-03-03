@@ -14,7 +14,7 @@ namespace VRSF.Utils.Editor
     {
         private int _layer = -1;
 
-        [MenuItem("Window/VRSF/Util/Get Objects in layer")]
+        [MenuItem("VRSF/Utils/Get Objects in layer", priority = 2)]
         public static void ShowWindow()
         {
             GetWindow<GetAllObjectsInLayer>("Get Objects in layer");
@@ -32,7 +32,7 @@ namespace VRSF.Utils.Editor
 
             EditorGUILayout.Space();
             
-            if (GUILayout.Button("Select objects in layer " + _layer) && _layer != -1)
+            if (_layer > -1 && GUILayout.Button("Select objects in layer " + _layer))
             {
                 SelectObjectsInLayer();
             }

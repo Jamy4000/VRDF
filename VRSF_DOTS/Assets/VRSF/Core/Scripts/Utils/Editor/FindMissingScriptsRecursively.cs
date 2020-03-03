@@ -11,19 +11,12 @@ namespace VRSF.Utils.Editor
     {
         static int go_count = 0, components_count = 0, missing_count = 0;
 
-        [MenuItem("Window/VRSF/Util/Find Missing Scripts")]
-        public static void ShowWindow()
+        [MenuItem("VRSF/Utils/Find Missing Scripts", priority = 2)]
+        public static void FindMissing(MenuCommand menuCommand)
         {
-            EditorWindow.GetWindow(typeof(FindMissingScriptsRecursively));
+            FindInSelected();
         }
 
-        public void OnGUI()
-        {
-            if (GUILayout.Button("Find Missing Scripts in selected GameObjects"))
-            {
-                FindInSelected();
-            }
-        }
         private static void FindInSelected()
         {
             GameObject[] go = Selection.gameObjects;
