@@ -22,6 +22,7 @@ namespace VRSF.Multiplayer
         public override void OnCreateRoomFailed(short returnCode, string message)
         {
             Debug.LogErrorFormat("<Color=Red><b>[VRSF] :</b> The room couldn't be CREATED. Here's the return code :</Color>\n{0}.<Color=Red>\nAnd here's the message :</Color>\n{1}.", returnCode, message);
+            _errorPanel.SetActive(true);
         }
 
         /// <summary>

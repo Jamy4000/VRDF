@@ -21,6 +21,8 @@ namespace VRSF.Multiplayer
         private float _endWidthToSend;
         private Vector3 _endPosToSend;
 
+        private bool _needToSendData;
+
         private void Awake()
         {
             _lineRenderer = GetComponent<LineRenderer>();
@@ -66,13 +68,17 @@ namespace VRSF.Multiplayer
             {
                 _startWidthToSend = info.NewWidth;
                 _endWidthToSend = info.NewWidth;
+                _needToSendData = true;
             }
         }
 
         private void UpdateLineRenderLength(OnLaserLengthChanged info)
         {
             if (info.LaserOrigin == _rayOrigin)
+            {
                 _endPosToSend = info.NewEndPos;
+                _needToSendData = true;
+            }
         }
 
         #region IPunObservable implementation
@@ -85,12 +91,13 @@ namespace VRSF.Multiplayer
                 this._lineRenderer.endWidth = (float)stream.ReceiveNext();
                 this._lineRenderer.SetPosition(1, (Vector3)stream.ReceiveNext());
             }
-            else if (stream.IsWriting)
+            else if (_needToSendData && stream.IsWriting)
             {
                 // We own this player: send the others our data
                 stream.SendNext(_startWidthToSend);
                 stream.SendNext(_endWidthToSend);
                 stream.SendNext(_endPosToSend);
+                _needToSendData = false;
             }
         }
 
