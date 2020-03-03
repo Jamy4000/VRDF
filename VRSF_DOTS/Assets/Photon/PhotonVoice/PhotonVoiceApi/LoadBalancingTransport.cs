@@ -279,6 +279,13 @@ namespace Photon.Voice
 
         void onStateChangeVoiceClient(ClientState fromState, ClientState state)
         {
+            switch (fromState)
+            {
+                case ClientState.Joined:
+                    this.voiceClient.onLeaveChannel(VOICE_CHANNEL);
+                    break;
+            }
+
             switch (state)
             {
                 case ClientState.Joined:
@@ -287,9 +294,6 @@ namespace Photon.Voice
                     {
                         this.LoadBalancingPeer.OpChangeGroups(new byte[0], new byte[] { this.voiceClient.GlobalInterestGroup });
                     }
-                    break;
-                case ClientState.Disconnected:
-                    this.voiceClient.onLeaveChannel(VOICE_CHANNEL);
                     break;
             }
         }        

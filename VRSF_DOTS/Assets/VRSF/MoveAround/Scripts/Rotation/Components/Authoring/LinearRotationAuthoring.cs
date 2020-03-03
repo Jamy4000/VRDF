@@ -1,6 +1,7 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Inputs;
+using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
 using VRSF.Core.VRInteractions;
 
@@ -26,41 +27,53 @@ namespace VRSF.MoveAround.VRRotation
         [SerializeField]
         [HideInInspector] public float DecelerationFactor = 3.0f;
 
-        public void Awake()
+        private void Awake()
         {
+            OnSetupVRReady.RegisterSetupVRResponse(Init);
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             VRInteractionAuthoring vrInteractionAuthoring = GetComponent<VRInteractionAuthoring>();
 
-            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-            var archetype = entityManager.CreateArchetype(typeof(BaseInputCapture), typeof(TouchpadInputCapture), typeof(ControllersInteractionType));
-
-            var entity = entityManager.CreateEntity(archetype);
-
-            InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring);
-
-            entityManager.AddComponentData(entity, new LinearUserRotation
+            // If the device loaded is included in the device using this CBRA
+            if ((vrInteractionAuthoring.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
-                CurrentRotationSpeed = 0.0f,
-                MaxRotationSpeed = _maxRotationSpeed,
-                AccelerationFactor = _accelerationFactor
-            });
+                var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-            if (UseDecelerationEffect)
-            {
-                entityManager.AddComponentData(entity, new LinearRotationDeceleration
+                var archetype = entityManager.CreateArchetype(typeof(BaseInputCapture), typeof(TouchpadInputCapture), typeof(ControllersInteractionType));
+
+                var entity = entityManager.CreateEntity(archetype);
+
+                InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring);
+
+                entityManager.AddComponentData(entity, new LinearUserRotation
                 {
-                    DecelerationFactor = DecelerationFactor
+                    CurrentRotationSpeed = 0.0f,
+                    MaxRotationSpeed = _maxRotationSpeed,
+                    AccelerationFactor = _accelerationFactor
                 });
-            }
 
-            entityManager.SetComponentData(entity, new BaseInputCapture());
-            entityManager.SetComponentData(entity, new TouchpadInputCapture());
-            entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
+                if (UseDecelerationEffect)
+                {
+                    entityManager.AddComponentData(entity, new LinearRotationDeceleration
+                    {
+                        DecelerationFactor = DecelerationFactor
+                    });
+                }
+
+                entityManager.SetComponentData(entity, new BaseInputCapture());
+                entityManager.SetComponentData(entity, new TouchpadInputCapture());
+                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
 #if UNITY_EDITOR
-            // Set it's name in Editor Mode for the Entity Debugger Window
-            entityManager.SetName(entity, "User Linear Rotation Entity");
+                // Set it's name in Editor Mode for the Entity Debugger Window
+                entityManager.SetName(entity, "User Linear Rotation Entity");
 #endif
+            }
 
             Destroy(gameObject);
         }

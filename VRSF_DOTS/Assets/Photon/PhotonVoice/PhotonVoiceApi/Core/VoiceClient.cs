@@ -115,7 +115,7 @@ namespace Photon.Voice
                 v.Value.service();
             }
         }
-        private LocalVoice createLocalVoice(VoiceInfo voiceInfo, int channelId, Func<byte, int, LocalVoice> voiceFactory)
+        private LocalVoice createLocalVoice(int channelId, Func<byte, int, LocalVoice> voiceFactory)
         {
             var newId = getNewVoiceId();
             if (newId != 0)
@@ -139,7 +139,7 @@ namespace Photon.Voice
         /// <returns>Outgoing stream handler.</returns>
         public LocalVoice CreateLocalVoice(VoiceInfo voiceInfo, int channelId = 0, IEncoder encoder = null)
         {
-            return (LocalVoice)createLocalVoice(voiceInfo, channelId, (vId, chId) => new LocalVoice(this, encoder, vId, voiceInfo, chId));
+            return (LocalVoice)createLocalVoice(channelId, (vId, chId) => new LocalVoice(this, encoder, vId, voiceInfo, chId));
         }
         /// <summary>
         /// Creates outgoing stream consuming sequence of values passed in array buffers of arbitrary length which repacked in frames of constant length for further processing and encoding.
@@ -152,7 +152,7 @@ namespace Photon.Voice
         /// <returns>Outgoing stream handler.</returns>
         public LocalVoiceFramed<T> CreateLocalVoiceFramed<T>(VoiceInfo voiceInfo, int frameSize, int channelId = 0, IEncoder encoder = null)
         {
-            return (LocalVoiceFramed<T>)createLocalVoice(voiceInfo, channelId, (vId, chId) => new LocalVoiceFramed<T>(this, encoder, vId, voiceInfo, chId, frameSize));
+            return (LocalVoiceFramed<T>)createLocalVoice(channelId, (vId, chId) => new LocalVoiceFramed<T>(this, encoder, vId, voiceInfo, chId, frameSize));
         }
         /// <summary>
         /// Creates outgoing audio stream. Adds audio specific features (e.g. resampling, level meter) to processing pipeline and to returning stream handler.
@@ -167,7 +167,7 @@ namespace Photon.Voice
         /// </remarks>
         public LocalVoiceAudio<T> CreateLocalVoiceAudio<T>(VoiceInfo voiceInfo, IAudioDesc audioSourceDesc, int channelId = 0, IEncoder encoder = null)
         {
-            return (LocalVoiceAudio<T>)createLocalVoice(voiceInfo, channelId, (vId, chId) => LocalVoiceAudio<T>.Create(this, vId, encoder, voiceInfo, audioSourceDesc, chId));
+            return (LocalVoiceAudio<T>)createLocalVoice(channelId, (vId, chId) => LocalVoiceAudio<T>.Create(this, vId, encoder, voiceInfo, audioSourceDesc, chId));
         }
         /// <summary>
         /// Creates outgoing audio stream of type automatically assigned and adds procedures (callback or serviceable) for consuming given audio source data.
@@ -250,7 +250,7 @@ namespace Photon.Voice
         /// <returns>Outgoing stream handler.</returns>
         public LocalVoiceVideo CreateLocalVoiceVideo(VoiceInfo voiceInfo, int channelId = 0, IEncoder encoder = null)
         {
-            return (LocalVoiceVideo)createLocalVoice(voiceInfo, channelId, (vId, chId) => new LocalVoiceVideo(this, encoder, vId, voiceInfo, chId));
+            return (LocalVoiceVideo)createLocalVoice(channelId, (vId, chId) => new LocalVoiceVideo(this, encoder, vId, voiceInfo, chId));
         }
 #endif
         private byte getNewVoiceId()

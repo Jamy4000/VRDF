@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.Serialization;
 #if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
 #endif
@@ -75,6 +76,12 @@ namespace Photon.Voice.Unity
 
         protected List<RemoteVoiceLink> cachedRemoteVoices = new List<RemoteVoiceLink>();
 
+        [SerializeField]
+        [FormerlySerializedAs("PrimaryRecorder")]
+        private Recorder primaryRecorder;
+
+        private bool primaryRecorderInitialized;
+
         #endregion
 
         #region Public Fields
@@ -85,8 +92,6 @@ namespace Photon.Voice.Unity
         [HideInInspector]
         public bool ShowSettings;
         #endif
-        /// <summary> Main Recorder to be used for transmission by default</summary>
-        public Recorder PrimaryRecorder;
 
         /// <summary> Special factory to link Speaker components with incoming remote audio streams</summary>
         public Func<int, byte, object, Speaker> SpeakerFactory;
@@ -103,6 +108,14 @@ namespace Photon.Voice.Unity
         public int PS4UserID = 0;                       // set from your games code
         #endif
         
+        /// <summary>Configures the minimal Time.timeScale at which Voice client will dispatch incoming messages within LateUpdate.</summary>
+        /// <remarks>
+        /// It may make sense to dispatch incoming messages, even if the timeScale is near 0.
+        /// In some cases, stopping the game time makes sense, so this option defaults to -1f, which is "off".
+        /// Without dispatching messages, Voice client won't change state and does not handle updates.
+        /// </remarks>
+        public float MinimalTimeScaleToDispatchInFixedUpdate = -1f;
+
         #endregion
 
         #region Properties
@@ -204,6 +217,37 @@ namespace Photon.Voice.Unity
         }
         #endif
 
+        /// <summary> Main Recorder to be used for transmission by default</summary>
+        public Recorder PrimaryRecorder
+        {
+            get
+            {
+                #if UNITY_EDITOR
+                if (!Application.isPlaying)
+                {
+                    return this.primaryRecorder;
+                }
+                #endif
+                if (!this.primaryRecorderInitialized)
+                {
+                    this.TryInitializePrimaryRecorder();
+                }
+                return this.primaryRecorder;
+            }
+            set
+            {
+                this.primaryRecorder = value;
+                #if UNITY_EDITOR
+                if (!Application.isPlaying)
+                {
+                    return;
+                }
+                #endif
+                this.primaryRecorderInitialized = false;
+                this.TryInitializePrimaryRecorder();
+            }
+        }
+
         #endregion
 
         #region Public Methods
@@ -220,6 +264,14 @@ namespace Photon.Voice.Unity
                 if (this.Logger.IsWarningEnabled)
                 {
                     this.Logger.LogWarning("ConnectUsingSettings() failed. Can only connect while in state 'Disconnected'. Current state: {0}", this.Client.LoadBalancingPeer.PeerState);
+                }
+                return false;
+            }
+            if (AppQuits)
+            {
+                if (this.Logger.IsWarningEnabled)
+                {
+                    this.Logger.LogWarning("Can't connect: Application is closing. Unity called OnApplicationQuit().");
                 }
                 return false;
             }
@@ -303,6 +355,23 @@ namespace Photon.Voice.Unity
             return this.Client.ConnectToRegionMaster(Settings.FixedRegion);
         }
 
+        /// <summary>
+        /// Initializes the Recorder component to be able to transmit audio.
+        /// </summary>
+        /// <param name="rec">The Recorder to be initialized.</param>
+        public void InitRecorder(Recorder rec)
+        {
+            if (rec == null)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("rec is null.");
+                }
+                return;
+            }
+            rec.Init(this);
+        }
+
         #endregion
 
         #region Private Methods
@@ -326,6 +395,10 @@ namespace Photon.Voice.Unity
                 Application.runInBackground = runInBackground;
             }
             #endif
+            if (!this.primaryRecorderInitialized)
+            {
+                this.TryInitializePrimaryRecorder();
+            }
         }
 
         protected virtual void Update()
@@ -334,6 +407,18 @@ namespace Photon.Voice.Unity
         }
 
         protected virtual void FixedUpdate()
+        {
+            this.Dispatch();
+        }
+
+        /// <summary>Dispatches incoming network messages for Voice client. Called in FixedUpdate or LateUpdate.</summary>
+        /// <remarks>
+        /// It may make sense to dispatch incoming messages, even if the timeScale is near 0.
+        /// That can be configured with <see cref="MinimalTimeScaleToDispatchInFixedUpdate"/>.
+        ///
+        /// Without dispatching messages, Voice client won't change state and does not handle updates.
+        /// </remarks>
+        protected void Dispatch()
         {
             bool doDispatch = true;
             while (doDispatch)
@@ -347,6 +432,12 @@ namespace Photon.Voice.Unity
 
         private void LateUpdate()
         {
+            // see MinimalTimeScaleToDispatchInFixedUpdate for explanation
+            if (Time.timeScale <= MinimalTimeScaleToDispatchInFixedUpdate)
+            {
+                this.Dispatch();
+            }
+
             int currentMsSinceStart = (int)(Time.realtimeSinceStartup * 1000); // avoiding Environment.TickCount, which could be negative on long-running platforms
             if (currentMsSinceStart > this.nextSendTickCount)
             {
@@ -416,11 +507,14 @@ namespace Photon.Voice.Unity
 
         internal void DeleteVoiceOnRemoteVoiceRemove(Speaker speaker)
         {
-            if (this.Logger.IsInfoEnabled)
+            if (speaker != null)
             {
-                this.Logger.LogInfo("Remote voice removed, delete speaker");
+                if (this.Logger.IsInfoEnabled)
+                {
+                    this.Logger.LogInfo("Remote voice removed, delete speaker");
+                }
+                Destroy(speaker.gameObject);
             }
-            Destroy(speaker.gameObject);
         }
         
         private void OnRemoteVoiceInfo(int channelId, int playerId, byte voiceId, VoiceInfo voiceInfo, ref RemoteVoiceOptions options)
@@ -591,27 +685,20 @@ namespace Photon.Voice.Unity
         {
             if (speaker != null)
             {
-                if (speaker.IsLinked)
+                if (speaker.OnRemoteVoiceInfo(remoteVoice))
                 {
-                    if (this.Logger.IsWarningEnabled)
+                    if (speaker.Actor == null && this.Client.CurrentRoom != null)
                     {
-                        this.Logger.LogWarning("Speaker already linked. Remote voice {0}/{1} not linked.",
-                            remoteVoice.PlayerId, remoteVoice.VoiceId);
+                        speaker.Actor = this.Client.CurrentRoom.GetPlayer(remoteVoice.PlayerId);
                     }
-                    return;
-                }
-                speaker.OnRemoteVoiceInfo(remoteVoice);
-                if (speaker.Actor == null && this.Client.CurrentRoom != null)
-                {
-                    speaker.Actor = this.Client.CurrentRoom.GetPlayer(remoteVoice.PlayerId);
-                }
-                if (this.Logger.IsInfoEnabled)
-                {
-                    this.Logger.LogInfo("Speaker linked with remote voice {0}/{1}", remoteVoice.PlayerId, remoteVoice.VoiceId);
-                }
-                if (SpeakerLinked != null)
-                {
-                    SpeakerLinked(speaker);
+                    if (this.Logger.IsInfoEnabled)
+                    {
+                        this.Logger.LogInfo("Speaker linked with remote voice {0}/{1}", remoteVoice.PlayerId, remoteVoice.VoiceId);
+                    }
+                    if (SpeakerLinked != null)
+                    {
+                        SpeakerLinked(speaker);
+                    }
                 }
             }
             else if (this.Logger.IsWarningEnabled)
@@ -629,6 +716,18 @@ namespace Photon.Voice.Unity
                     this.Logger.LogInfo("{0} cached remote voices info cleared", cachedRemoteVoices.Count);
                 }
                 cachedRemoteVoices.Clear();
+            }
+        }
+
+        private void TryInitializePrimaryRecorder()
+        {
+            if (this.primaryRecorder != null)
+            {
+                if (!this.primaryRecorder.IsInitialized)
+                {
+                    this.primaryRecorder.Init(this);
+                }
+                this.primaryRecorderInitialized = this.primaryRecorder.IsInitialized;
             }
         }
 

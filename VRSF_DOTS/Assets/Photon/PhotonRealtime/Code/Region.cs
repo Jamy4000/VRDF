@@ -61,7 +61,7 @@ namespace Photon.Realtime
             codeAsString = codeAsString.ToLower();
             int slash = codeAsString.IndexOf('/');
             this.Code = slash <= 0 ? codeAsString : codeAsString.Substring(0, slash);
-            this.Cluster = slash <= 0 ? "" : codeAsString.Substring(1, slash);
+            this.Cluster = slash <= 0 ? "" : codeAsString.Substring(slash+1, codeAsString.Length-slash-1);
         }
 
         public override string ToString()

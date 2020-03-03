@@ -1037,7 +1037,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2279628518816896346}
+      - m_Target: {fileID: 1319628711}
         m_MethodName: Connect
         m_Mode: 1
         m_Arguments:
@@ -1196,6 +1196,7 @@ GameObject:
   - component: {fileID: 1319628707}
   - component: {fileID: 1319628706}
   - component: {fileID: 1319628710}
+  - component: {fileID: 1319628711}
   m_Layer: 5
   m_Name: ConnectionCanvas
   m_TagString: Untagged
@@ -1298,6 +1299,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _errorPanel: {fileID: 1706511408}
+--- !u!114 &1319628711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319628705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5b2cf6ada4dea44f811a3cbdb808bcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RoomName: A Room Name
 --- !u!1 &1403729099
 GameObject:
   m_ObjectHideFlags: 0
@@ -1669,17 +1683,10 @@ PrefabInstance:
       propertyPath: _multiplayerSceneIndex
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2279628518798762634, guid: f85b9bb0711ad4246b57ba7b71317dca,
+        type: 3}
+      propertyPath: MultiplayerSceneName
+      value: MultiLab
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f85b9bb0711ad4246b57ba7b71317dca, type: 3}
---- !u!114 &2279628518816896346 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2151015803803014181, guid: f85b9bb0711ad4246b57ba7b71317dca,
-    type: 3}
-  m_PrefabInstance: {fileID: 2279628518816896344}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5b2cf6ada4dea44f811a3cbdb808bcd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -5,6 +5,7 @@ using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
+using System;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -30,6 +31,14 @@ namespace VRSF.MoveAround.Teleport
 
         private void Awake()
         {
+            OnSetupVRReady.RegisterSetupVRResponse(Init);
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA
@@ -60,7 +69,7 @@ namespace VRSF.MoveAround.Teleport
                 }
 
                 // Setting up Raycasting
-                if(!TeleporterSetupHelper.SetupRaycast(ref entityManager, ref entity, interactionParameters, 10))
+                if (!TeleporterSetupHelper.SetupRaycast(ref entityManager, ref entity, interactionParameters, 10))
                 {
                     entityManager.DestroyEntity(entity);
                     Destroy(gameObject);

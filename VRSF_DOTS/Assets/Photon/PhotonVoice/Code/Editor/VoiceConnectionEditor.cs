@@ -21,8 +21,9 @@
         private SerializedProperty keepAliveInBackgroundSp;
         #endif
         private SerializedProperty applyDontDestroyOnLoadSp;
-        private SerializedProperty primaryRecorderSp;
         private SerializedProperty statsResetInterval;
+        private SerializedProperty primaryRecorderSp;
+        private SerializedProperty speakerPrefabSp;
 
         protected virtual void OnEnable()
         {
@@ -37,13 +38,19 @@
             keepAliveInBackgroundSp = serializedObject.FindProperty("KeepAliveInBackground");
             #endif
             applyDontDestroyOnLoadSp = serializedObject.FindProperty("ApplyDontDestroyOnLoad");
-            primaryRecorderSp = serializedObject.FindProperty("PrimaryRecorder");
             statsResetInterval = serializedObject.FindProperty("statsResetInterval");
+            this.primaryRecorderSp = this.serializedObject.FindProperty("primaryRecorder");
+            if (this.primaryRecorderSp == null) // [FormerlySerializedAs("PrimaryRecorder")]
+            {
+                this.primaryRecorderSp = this.serializedObject.FindProperty("PrimaryRecorder");
+            }
+            this.speakerPrefabSp = this.serializedObject.FindProperty("speakerPrefab");
         }
 
         public override void OnInspectorGUI()
         {
-            // Show default inspector property editor
+            serializedObject.UpdateIfRequiredOrScript();
+
             VoiceLogger.ExposeLogLevel(serializedObject, connection);
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(updateIntervalSp, new GUIContent("Update Interval (ms)", "time [ms] between consecutive SendOutgoingCommands calls"));
@@ -54,11 +61,35 @@
             #if !UNITY_IOS
             EditorGUILayout.PropertyField(keepAliveInBackgroundSp, new GUIContent("Background Timeout (ms)", "Defines for how long the Fallback Thread should keep the connection, before it may time out as usual."));
             #endif
-            EditorGUILayout.PropertyField(applyDontDestroyOnLoadSp, new GUIContent("Don't Destroy On Load", "Persists the GameObject across scenes using Unity's GameObject.DontDestoryOnLoad"));
-            EditorGUILayout.PropertyField(primaryRecorderSp, new GUIContent("Primary Recorder", "Main Recorder to be used for transmission by default"));
-            connection.SpeakerPrefab = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Speaker Prefab",
-                    "Prefab that contains Speaker component to be instantiated when receiving a new remote audio source info"), connection.SpeakerPrefab, 
-                typeof(GameObject), false);
+            EditorGUILayout.PropertyField(applyDontDestroyOnLoadSp, new GUIContent("Don't Destroy On Load", "Persists the GameObject across scenes using Unity's GameObject.DontDestroyOnLoad"));
+            if (Application.isPlaying)
+            {
+                connection.PrimaryRecorder = EditorGUILayout.ObjectField(
+                    new GUIContent("Primary Recorder", "Main Recorder to be used for transmission by default"),
+                    connection.PrimaryRecorder, typeof(Recorder), true) as Recorder;
+                EditorGUILayout.HelpBox("Speaker prefab needs to have a Speaker component in the hierarchy.", MessageType.Info);
+                connection.SpeakerPrefab = EditorGUILayout.ObjectField(new GUIContent("Speaker Prefab",
+                        "Prefab that contains Speaker component to be instantiated when receiving a new remote audio source info"), connection.SpeakerPrefab, 
+                    typeof(GameObject), false) as GameObject;
+            }
+            else
+            {
+                EditorGUILayout.PropertyField(this.primaryRecorderSp,
+                    new GUIContent("Primary Recorder", "Main Recorder to be used for transmission by default"));
+                EditorGUILayout.HelpBox("Speaker prefab needs to have a Speaker component in the hierarchy.", MessageType.Info);
+                GameObject prefab = this.speakerPrefabSp.objectReferenceValue as GameObject;
+                prefab = EditorGUILayout.ObjectField(new GUIContent("Speaker Prefab",
+                        "Prefab that contains Speaker component to be instantiated when receiving a new remote audio source info"), prefab, 
+                    typeof(GameObject), false) as GameObject;
+                if (prefab == null || prefab.GetComponentInChildren<Speaker>() != null)
+                {
+                    this.speakerPrefabSp.objectReferenceValue = prefab;
+                }
+                else
+                {
+                    Debug.LogError("SpeakerPrefab must have a component of type Speaker in its hierarchy.", this);
+                }
+            }
             this.DisplayAppSettings();
             EditorGUILayout.PropertyField(statsResetInterval, new GUIContent("Stats Reset Interval (ms)", "time [ms] between statistics calculations"));
 
@@ -67,7 +98,7 @@
                 serializedObject.ApplyModifiedProperties();
             }
 
-            if (Application.isPlaying)
+            if (PhotonVoiceEditorUtils.IsInTheSceneInPlayMode(connection.gameObject))
             {
                 this.DisplayVoiceStats();
                 this.DisplayDebugInfo(this.connection.Client);

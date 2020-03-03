@@ -14,6 +14,7 @@ namespace Photon.Pun
     using System;
     using System.Linq;
     using UnityEngine;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Reflection;
 
@@ -140,7 +141,7 @@ namespace Photon.Pun
         {
             get
             {
-                return prefabPool; 
+                return prefabPool;
             }
             set
             {
@@ -169,6 +170,10 @@ namespace Photon.Pun
         /// list of MonoBehaviours on demand (when a new MonoBehaviour gets added to a networked GameObject, e.g.).
         /// </remarks>
         public static bool UseRpcMonoBehaviourCache;
+        
+
+        public static bool RunRpcCoroutines = true;
+
 
         private static readonly Dictionary<Type, List<MethodInfo>> monoRPCMethodsCache = new Dictionary<Type, List<MethodInfo>>();
 
@@ -287,30 +292,44 @@ namespace Photon.Pun
 
         // PHOTONVIEW/RPC related
 
+        private static readonly Type typePunRPC = typeof(PunRPC);
+        private static readonly Type typePhotonMessageInfo = typeof(PhotonMessageInfo);
+        private static readonly object keyByteZero = (byte)0;
+        private static readonly object keyByteOne = (byte)1;
+        private static readonly object keyByteTwo = (byte)2;
+        private static readonly object keyByteThree = (byte)3;
+        private static readonly object keyByteFour = (byte)4;
+        private static readonly object keyByteFive = (byte)5;
+        private static readonly object keyByteSix = (byte)6;
+        private static readonly object keyByteSeven = (byte)7;
+        private static readonly object keyByteEight = (byte)8;
+        private static readonly object[] emptyObjectArray = new object[0];
+        private static readonly Type[] emptyTypeArray = new Type[0];
+
         /// <summary>
         /// Executes a received RPC event
         /// </summary>
         internal static void ExecuteRpc(Hashtable rpcData, Player sender)
         {
-            if (rpcData == null || !rpcData.ContainsKey((byte)0))
+            if (rpcData == null || !rpcData.ContainsKey(keyByteZero))
             {
                 Debug.LogError("Malformed RPC; this should never occur. Content: " + SupportClassPun.DictionaryToString(rpcData));
                 return;
             }
 
             // ts: updated with "flat" event data
-            int netViewID = (int)rpcData[(byte)0]; // LIMITS PHOTONVIEWS&PLAYERS
+            int netViewID = (int)rpcData[keyByteZero]; // LIMITS PHOTONVIEWS&PLAYERS
             int otherSidePrefix = 0;    // by default, the prefix is 0 (and this is not being sent)
-            if (rpcData.ContainsKey((byte)1))
+            if (rpcData.ContainsKey(keyByteOne))
             {
-                otherSidePrefix = (short)rpcData[(byte)1];
+                otherSidePrefix = (short)rpcData[keyByteOne];
             }
 
 
             string inMethodName;
-            if (rpcData.ContainsKey((byte)5))
+            if (rpcData.ContainsKey(keyByteFive))
             {
-                int rpcIndex = (byte)rpcData[(byte)5];  // LIMITS RPC COUNT
+                int rpcIndex = (byte)rpcData[keyByteFive];  // LIMITS RPC COUNT
                 if (rpcIndex > PhotonNetwork.PhotonServerSettings.RpcList.Count - 1)
                 {
                     Debug.LogError("Could not find RPC with index: " + rpcIndex + ". Going to ignore! Check PhotonServerSettings.RpcList");
@@ -323,13 +342,13 @@ namespace Photon.Pun
             }
             else
             {
-                inMethodName = (string)rpcData[(byte)3];
+                inMethodName = (string)rpcData[keyByteThree];
             }
 
             object[] arguments = null;
-            if (rpcData.ContainsKey((byte)4))
+            if (rpcData.ContainsKey(keyByteFour))
             {
-                arguments = (object[])rpcData[(byte)4];
+                arguments = (object[])rpcData[keyByteFour];
             }
 
             PhotonView photonNetview = GetPhotonView(netViewID);
@@ -337,15 +356,15 @@ namespace Photon.Pun
             {
                 int viewOwnerId = netViewID / PhotonNetwork.MAX_VIEW_IDS;
                 bool owningPv = (viewOwnerId == NetworkingClient.LocalPlayer.ActorNumber);
-                bool ownerSent = (viewOwnerId == sender.ActorNumber);
+                bool ownerSent = sender != null && viewOwnerId == sender.ActorNumber;
 
                 if (owningPv)
                 {
-                    Debug.LogWarning("Received RPC \"" + inMethodName + "\" for viewID " + netViewID + " but this PhotonView does not exist! View was/is ours." + (ownerSent ? " Owner called." : " Remote called.") + " By: " + sender.ActorNumber);
+                    Debug.LogWarning("Received RPC \"" + inMethodName + "\" for viewID " + netViewID + " but this PhotonView does not exist! View was/is ours." + (ownerSent ? " Owner called." : " Remote called.") + " By: " + sender);
                 }
                 else
                 {
-                    Debug.LogWarning("Received RPC \"" + inMethodName + "\" for viewID " + netViewID + " but this PhotonView does not exist! Was remote PV." + (ownerSent ? " Owner called." : " Remote called.") + " By: " + sender.ActorNumber + " Maybe GO was destroyed but RPC not cleaned up.");
+                    Debug.LogWarning("Received RPC \"" + inMethodName + "\" for viewID " + netViewID + " but this PhotonView does not exist! Was remote PV." + (ownerSent ? " Owner called." : " Remote called.") + " By: " + sender + " Maybe GO was destroyed but RPC not cleaned up.");
                 }
                 return;
             }
@@ -364,7 +383,9 @@ namespace Photon.Pun
             }
 
             if (PhotonNetwork.LogLevel >= PunLogLevel.Full)
+            {
                 Debug.Log("Received RPC: " + inMethodName);
+            }
 
 
             // SetReceiving filtering
@@ -419,7 +440,7 @@ namespace Photon.Pun
 
                 if (!methodsOfTypeInCache)
                 {
-                    List<MethodInfo> entries = SupportClassPun.GetMethods(type, typeof(PunRPC));
+                    List<MethodInfo> entries = SupportClassPun.GetMethods(type, typePunRPC);
 
                     monoRPCMethodsCache[type] = entries;
                     cachedRPCMethods = entries;
@@ -449,14 +470,30 @@ namespace Photon.Pun
                         if (parameters.Length == 0)
                         {
                             receivers++;
-                            mInfo.Invoke((object)monob, null);
+                            object o = mInfo.Invoke((object)monob, null);
+                            if (PhotonNetwork.RunRpcCoroutines)
+                            {
+                                IEnumerator ie = null;//o as IEnumerator;
+                                if ((ie = o as IEnumerator) != null)
+                                {
+                                    PhotonHandler.Instance.StartCoroutine(ie);
+                                }
+                            }
                         }
                         else if (parameters.Length == 1 && parameters[0].ParameterType == typeof(PhotonMessageInfo))
                         {
-                            int sendTime = (int)rpcData[(byte)2];
+                            int sendTime = (int)rpcData[keyByteTwo];
 
                             receivers++;
-                            mInfo.Invoke((object)monob, new object[] { new PhotonMessageInfo(sender, sendTime, photonNetview) });
+                            object o = mInfo.Invoke((object)monob, new object[] { new PhotonMessageInfo(sender, sendTime, photonNetview) });
+                            if (PhotonNetwork.RunRpcCoroutines)
+                            {
+                                IEnumerator ie = null;//o as IEnumerator;
+                                if ((ie = o as IEnumerator) != null)
+                                {
+                                    PhotonHandler.Instance.StartCoroutine(ie);
+                                }
+                            }
                         }
                         continue;
                     }
@@ -469,7 +506,15 @@ namespace Photon.Pun
                         if (CheckTypeMatch(parameters, argumentsTypes))
                         {
                             receivers++;
-                            mInfo.Invoke((object)monob, arguments);
+                            object o = mInfo.Invoke((object)monob, arguments);
+                            if (PhotonNetwork.RunRpcCoroutines)
+                            {
+                                IEnumerator ie = null;//o as IEnumerator;
+                                if ((ie = o as IEnumerator) != null)
+                                {
+                                    PhotonHandler.Instance.StartCoroutine(ie);
+                                }
+                            }
                         }
                         continue;
                     }
@@ -485,7 +530,15 @@ namespace Photon.Pun
                             argumentsWithInfo[argumentsWithInfo.Length - 1] = new PhotonMessageInfo(sender, sendTime, photonNetview);
 
                             receivers++;
-                            mInfo.Invoke((object)monob, argumentsWithInfo);
+                            object o = mInfo.Invoke((object)monob, argumentsWithInfo);
+                            if (PhotonNetwork.RunRpcCoroutines)
+                            {
+                                IEnumerator ie = null;//o as IEnumerator;
+                                if ((ie = o as IEnumerator) != null)
+                                {
+                                    PhotonHandler.Instance.StartCoroutine(ie);
+                                }
+                            }
                         }
                         continue;
                     }
@@ -493,7 +546,15 @@ namespace Photon.Pun
                     if (parameters.Length == 1 && parameters[0].ParameterType.IsArray)
                     {
                         receivers++;
-                        mInfo.Invoke((object)monob, new object[] { arguments });
+                        object o = mInfo.Invoke((object)monob, new object[] { arguments });
+                        if (PhotonNetwork.RunRpcCoroutines)
+                        {
+                            IEnumerator ie = null;//o as IEnumerator;
+                            if ((ie = o as IEnumerator) != null)
+                            {
+                                PhotonHandler.Instance.StartCoroutine(ie);
+                            }
+                        }
                         continue;
                     }
                 }
@@ -503,21 +564,26 @@ namespace Photon.Pun
             if (receivers != 1)
             {
                 string argsString = string.Empty;
-                for (int index = 0; index < argumentsTypes.Length; index++)
+                int argsLength = 0;
+                if (argumentsTypes != null)
                 {
-                    Type ty = argumentsTypes[index];
-                    if (argsString != string.Empty)
+                    argsLength = argumentsTypes.Length;
+                    for (int index = 0; index < argumentsTypes.Length; index++)
                     {
-                        argsString += ", ";
-                    }
+                        Type ty = argumentsTypes[index];
+                        if (argsString != string.Empty)
+                        {
+                            argsString += ", ";
+                        }
 
-                    if (ty == null)
-                    {
-                        argsString += "null";
-                    }
-                    else
-                    {
-                        argsString += ty.Name;
+                        if (ty == null)
+                        {
+                            argsString += "null";
+                        }
+                        else
+                        {
+                            argsString += ty.Name;
+                        }
                     }
                 }
 
@@ -525,16 +591,16 @@ namespace Photon.Pun
                 {
                     if (foundMethods == 0)
                     {
-                        Debug.LogError("PhotonView with ID " + netViewID + " has no method \"" + inMethodName + "\" marked with the [PunRPC](C#) or @PunRPC(JS) property! Args: " + argsString);
+                        Debug.LogError("PhotonView with ID " + netViewID + " has no (non-static) method \"" + inMethodName + "\" marked with the [PunRPC](C#) or @PunRPC(JS) property! Args: " + argsString);
                     }
                     else
                     {
-                        Debug.LogError("PhotonView with ID " + netViewID + " has no method \"" + inMethodName + "\" that takes " + argumentsTypes.Length + " argument(s): " + argsString);
+                        Debug.LogError("PhotonView with ID " + netViewID + " has no (non-static) method \"" + inMethodName + "\" that takes " + argsLength + " argument(s): " + argsString);
                     }
                 }
                 else
                 {
-                    Debug.LogError("PhotonView with ID " + netViewID + " has " + receivers + " methods \"" + inMethodName + "\" that takes " + argumentsTypes.Length + " argument(s): " + argsString + ". Should be just one?");
+                    Debug.LogError("PhotonView with ID " + netViewID + " has " + receivers + " methods \"" + inMethodName + "\" that takes " + argsLength + " argument(s): " + argsString + ". Should be just one?");
                 }
             }
         }
@@ -573,7 +639,7 @@ namespace Photon.Pun
 
             return true;
         }
-        
+
 
         /// <summary>
         /// Destroys all Instantiates and RPCs locally and (if not localOnly) sends EvDestroy(player) and clears related events in the server buffer.
@@ -660,7 +726,7 @@ namespace Photon.Pun
             PhotonView viewZero = views[0];
             int creatorId = viewZero.CreatorActorNr;            // creatorId of obj is needed to delete EvInstantiate (only if it's from that user)
             int instantiationId = viewZero.InstantiationId;     // actual, live InstantiationIds start with 1 and go up
-            
+
             // Don't remove GOs that are owned by others (unless this is the master and the remote player left)
             if (!localOnly)
             {
@@ -1009,29 +1075,29 @@ namespace Photon.Pun
 
             //ts: changed RPCs to a one-level hashtable as described in internal.txt
             rpcEvent.Clear();
-            
-            rpcEvent[(byte)0] = (int)view.ViewID; // LIMITS NETWORKVIEWS&PLAYERS
+
+            rpcEvent[keyByteZero] = (int)view.ViewID; // LIMITS NETWORKVIEWS&PLAYERS
             if (view.Prefix > 0)
             {
-                rpcEvent[(byte)1] = (short)view.Prefix;
+                rpcEvent[keyByteOne] = (short)view.Prefix;
             }
-            rpcEvent[(byte)2] = PhotonNetwork.ServerTimestamp;
+            rpcEvent[keyByteTwo] = PhotonNetwork.ServerTimestamp;
 
 
             // send name or shortcut (if available)
             int shortcut = 0;
             if (rpcShortcuts.TryGetValue(methodName, out shortcut))
             {
-                rpcEvent[(byte)5] = (byte)shortcut; // LIMITS RPC COUNT
+                rpcEvent[keyByteFive] = (byte)shortcut; // LIMITS RPC COUNT
             }
             else
             {
-                rpcEvent[(byte)3] = methodName;
+                rpcEvent[keyByteThree] = methodName;
             }
 
             if (parameters != null && parameters.Length > 0)
             {
-                rpcEvent[(byte)4] = (object[])parameters;
+                rpcEvent[keyByteFour] = (object[])parameters;
             }
 
             SendOptions sendOptions = new SendOptions () { Reliability = true, Encrypt = encrypt };
@@ -1512,19 +1578,19 @@ namespace Photon.Pun
             if (view.syncValues == null) view.syncValues = new List<object>();
             view.syncValues.Clear();
             serializeStreamOut.SetWriteStream(view.syncValues);
-            serializeStreamOut.SendNext(null);  //to become: viewID, 
+            serializeStreamOut.SendNext(null);  //to become: viewID,
             serializeStreamOut.SendNext(null);  //to become: is compressed
             serializeStreamOut.SendNext(null);  //to become: null-values (for compression) followed by: values for this object's update
 
 
             view.SerializeView(serializeStreamOut, info);
-            
+
             // check if there are actual values to be sent (after the "header" of viewId, (bool)compressed and (int[])nullValues)
             if (serializeStreamOut.Count <= SyncFirstValue)
             {
                 return null;
             }
-            
+
 
             List<object> currentValues = serializeStreamOut.GetWriteStream();
             currentValues[SyncViewId] = view.ViewID;
@@ -1561,7 +1627,7 @@ namespace Photon.Pun
                     view.syncValues = temp;
                 }
 
-                
+
                 return currentValues;
             }
 
@@ -1945,7 +2011,7 @@ namespace Photon.Pun
                     // as Unity does not provide all scenes with build index, we only check for the currently loaded scene (with a high chance this is the correct one).
                     int scnIndex = SceneManagerHelper.ActiveSceneBuildIndex;
                     string scnName = SceneManagerHelper.ActiveSceneName;
-                    
+
                     if ((levelId.Equals(scnIndex) && levelIdInProps.Equals(scnName)) || (levelId.Equals(scnName) && levelIdInProps.Equals(scnIndex)))
                     {
                         //Debug.LogWarning("The levelId and levelIdInProps refer to the same scene. Don't set property for it.");
@@ -2064,7 +2130,7 @@ namespace Photon.Pun
                 case EventCode.Leave:
 
                     // destroy objects & buffered messages
-                    if (CurrentRoom != null && CurrentRoom.AutoCleanUp && CurrentRoom.GetPlayer(actorNr) == null)
+                    if (CurrentRoom != null && CurrentRoom.AutoCleanUp)
                     {
                         DestroyPlayerObjects(actorNr, true);
                     }
@@ -2220,7 +2286,10 @@ namespace Photon.Pun
 
             _cachedRegionHandler = regionHandler;
             //PhotonNetwork.BestRegionSummaryInPreferences = regionHandler.SummaryToCache; // can not be called here, as it's not in the main thread
-            PhotonNetwork.NetworkingClient.ConnectToRegionMaster(regionHandler.BestRegion.Code);
+            if (NetworkClientState == ClientState.ConnectedToNameServer)
+            {
+                PhotonNetwork.NetworkingClient.ConnectToRegionMaster(regionHandler.BestRegion.Code);
+            }
         }
     }
 }

@@ -204,7 +204,7 @@ namespace Photon.Realtime
         /// </summary>
         /// <remarks>
         /// The corresponding feature in Photon is called "Slot Reservation" and can be found in the doc pages.
-        /// Define expected players in the PhotonNetwork methods: CreateRoom, JoinRoom and JoinOrCreateRoom.
+        /// Define expected players in the methods: <see cref="LoadBalancingClient.OpCreateRoom"/>, <see cref="LoadBalancingClient.OpJoinRoom"/> and <see cref="LoadBalancingClient.OpJoinRandomRoom"/>.
         /// </remarks>
         public string[] ExpectedUsers
         {

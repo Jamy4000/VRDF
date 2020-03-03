@@ -35,14 +35,11 @@ namespace VRSF.Core.CBRA
             OnSetupVRReady.RegisterSetupVRResponse(CreateEntity);
         }
 
-        public virtual void OnDestroy()
+        public void CreateEntity(OnSetupVRReady info)
         {
             if (OnSetupVRReady.IsMethodAlreadyRegistered(CreateEntity))
                 OnSetupVRReady.Listeners -= CreateEntity;
-        }
 
-        public void CreateEntity(OnSetupVRReady info)
-        {
             var interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA

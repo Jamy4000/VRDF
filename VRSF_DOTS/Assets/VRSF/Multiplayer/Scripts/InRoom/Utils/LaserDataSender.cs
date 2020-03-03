@@ -28,7 +28,7 @@ namespace VRSF.Multiplayer
 
         private void Start()
         {
-            var device = (EDevice)photonView.Owner.CustomProperties[VRSFPlayer.DEVICE_USED];
+            EDevice device = (EDevice)photonView.Owner.CustomProperties[VRSFPlayer.DEVICE_USED];
             if (photonView.IsMine)
             {
                 if (device != EDevice.NONE && device != EDevice.SIMULATOR)

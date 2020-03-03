@@ -61,7 +61,7 @@ public class ServerSettingsInspector : Editor
         {
             showSettingsProp.boolValue = showSettings;
         }
-        
+
         if (showSettingsProp.boolValue)
         {
             SerializedProperty settingsSp = this.serializedObject.FindProperty("AppSettings");
@@ -70,7 +70,7 @@ public class ServerSettingsInspector : Editor
 
             //Realtime APP ID
             this.BuildAppIdField(settingsSp.FindPropertyRelative("AppIdRealtime"));
-            
+
             if (PhotonEditorUtils.HasChat)
             {
                 this.BuildAppIdField(settingsSp.FindPropertyRelative("AppIdChat"));
@@ -99,11 +99,18 @@ public class ServerSettingsInspector : Editor
 
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.PrefixLabel(new GUIContent("Best Region Preference", "Clears the Best Region of the editor.\n.Best region is used if Fixed Region is empty."));
-        
+
         if (!string.IsNullOrEmpty(PhotonNetwork.BestRegionSummaryInPreferences))
         {
             this.regionsPrefsList = PhotonNetwork.BestRegionSummaryInPreferences.Split(';');
-            this.prefLabel = string.Format("'{0}' ping:{1}ms ", this.regionsPrefsList[0], this.regionsPrefsList[1]);
+            if (this.regionsPrefsList == null || this.regionsPrefsList.Length == 0 || string.IsNullOrEmpty(this.regionsPrefsList[0]))
+            {
+                this.prefLabel = notAvailableLabel;
+            }
+            else
+            {
+                this.prefLabel = string.Format("'{0}' ping:{1}ms ", this.regionsPrefsList[0], this.regionsPrefsList[1]);
+            }
         }
         else
         {
@@ -151,8 +158,8 @@ public class ServerSettingsInspector : Editor
                 EditorGUIUtility.systemCopyBuffer = this.rpcCrc;
             }
             EditorGUILayout.SelectableLabel(this.rpcCrc, GUILayout.MaxHeight(16),GUILayout.ExpandWidth(false));
-            
-            
+
+
             EditorGUI.indentLevel++;
             EditorGUILayout.EndHorizontal();
 

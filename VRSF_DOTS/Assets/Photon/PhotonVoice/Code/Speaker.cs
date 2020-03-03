@@ -28,6 +28,8 @@ namespace Photon.Voice.Unity
 
         private bool started;
 
+        private bool initialized; // awake called
+
         #endregion
 
         #region Public Fields
@@ -78,6 +80,9 @@ namespace Photon.Voice.Unity
         }
 
         #if UNITY_EDITOR
+        /// <summary>
+        /// USE IN EDITOR ONLY
+        /// </summary>
         public RemoteVoiceLink RemoteVoiceLink
         {
             get { return this.remoteVoiceLink; }
@@ -99,10 +104,14 @@ namespace Photon.Voice.Unity
             #else
             this.audioOutput = factory();
             #endif
-            this.StartPlaying();
+            this.initialized = true;
+            if (this.IsLinked)
+            {
+                this.StartPlaying();
+            }
         }
 
-        internal void OnRemoteVoiceInfo(RemoteVoiceLink stream)
+        internal bool OnRemoteVoiceInfo(RemoteVoiceLink stream)
         {
             if (stream == null)
             {
@@ -110,7 +119,11 @@ namespace Photon.Voice.Unity
                 {
                     this.Logger.LogError("RemoteVoiceLink is null, cancelled linking");
                 }
-                return;
+                return false;
+            }
+            if (this.Logger.IsDebugEnabled)
+            {
+                this.Logger.LogDebug("OnRemoteVoiceInfo {0}/{1}", stream.PlayerId, stream.PlayerId);
             }
             if (this.IsLinked)
             {
@@ -119,7 +132,7 @@ namespace Photon.Voice.Unity
                     this.Logger.LogWarning("Speaker already linked to {0}/{1}, cancelled linking to {2}/{3}",
                         this.remoteVoiceLink.PlayerId, this.remoteVoiceLink.VoiceId, stream.PlayerId, stream.VoiceId);
                 }
-                return;
+                return false;
             }
             if (stream.Info.Channels <= 0) // early avoid possible crash due to ArgumentException in AudioClip.Create inside UnityAudioOut.Start
             {
@@ -128,32 +141,22 @@ namespace Photon.Voice.Unity
                     this.Logger.LogError("Received voice info channels is not expected: {0} <= 0, cancelled linking to {1}/{2}", stream.Info.Channels, 
                         stream.PlayerId, stream.VoiceId);
                 }
-                return;
+                return false;
             }
             this.remoteVoiceLink = stream;
             this.remoteVoiceLink.RemoteVoiceRemoved += this.OnRemoteVoiceRemove;
-            this.StartPlaying();
+            return !this.initialized || this.StartPlaying();
         }
 
         internal void OnRemoteVoiceRemove()
         {
-            bool wasStarted = this.started;
-            if (this.audioOutput != null)
+            if (this.Logger.IsDebugEnabled)
             {
-                this.audioOutput.Stop();
-                this.started = false;
+                this.Logger.LogDebug("OnRemoteVoiceRemove {0}/{1}", this.remoteVoiceLink.PlayerId, this.remoteVoiceLink.PlayerId);
             }
-            this.Actor = null;
+            this.StopPlaying();
             if (this.OnRemoteVoiceRemoveAction != null) { this.OnRemoteVoiceRemoveAction(this); }
-            if (this.remoteVoiceLink != null)
-            {
-                this.remoteVoiceLink.RemoteVoiceRemoved -= this.OnRemoteVoiceRemove;
-                if (wasStarted)
-                {
-                    this.remoteVoiceLink.FloatFrameDecoded -= this.OnAudioFrame;
-                }
-                this.remoteVoiceLink = null;
-            }
+            this.CleanUp();
         }
 
         internal void OnAudioFrame(float[] frame)
@@ -165,16 +168,119 @@ namespace Photon.Voice.Unity
         {
             this.audioOutput.Service();
         }
-
-        private void StartPlaying()
+        
+        private bool StartPlaying()
         {
-            if (!this.started && this.audioOutput != null && this.IsLinked)
+            if (!this.IsLinked)
             {
-                VoiceInfo voiceInfo = this.remoteVoiceLink.Info;
-                this.audioOutput.Start(voiceInfo.SamplingRate, voiceInfo.Channels, voiceInfo.FrameDurationSamples, this.PlayDelayMs);
-                this.remoteVoiceLink.FloatFrameDecoded += this.OnAudioFrame;
-                this.started = true;
+                if (this.Logger.IsWarningEnabled)
+                {
+                    this.Logger.LogWarning("Cannot start playback because speaker is not linked");
+                }
+                return false;
             }
+            if (this.started)
+            {
+                if (this.Logger.IsWarningEnabled)
+                {
+                    this.Logger.LogWarning("Playback is already started");
+                }
+                return false;
+            }
+            if (!this.initialized)
+            {
+                if (this.Logger.IsWarningEnabled)
+                {
+                    this.Logger.LogWarning("Cannot start playback because not initialized yet");
+                }
+                return false;
+            }
+            if (this.audioOutput == null)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogWarning("Cannot start playback because audioOutput is null");
+                }
+                return false;
+            }
+            if (this.Logger.IsDebugEnabled)
+            {
+                this.Logger.LogDebug("StartPlaying {0}/{1}", this.remoteVoiceLink.PlayerId, this.remoteVoiceLink.PlayerId);
+            }
+            VoiceInfo voiceInfo = this.remoteVoiceLink.Info;
+            if (voiceInfo.Channels == 0)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("Cannot start playback because remoteVoiceLink.Info.Channels == 0");
+                }
+                return false;
+            } 
+            this.audioOutput.Start(voiceInfo.SamplingRate, voiceInfo.Channels, voiceInfo.FrameDurationSamples, this.PlayDelayMs);
+            this.remoteVoiceLink.FloatFrameDecoded += this.OnAudioFrame;
+            this.started = true;
+            return true;
+        }
+
+        private void OnDestroy()
+        {
+            if (this.Logger.IsDebugEnabled)
+            {
+                this.Logger.LogDebug("OnDestroy");
+            }
+            if (this.started)
+            {
+                this.StopPlaying();
+            }
+            this.CleanUp();
+        }
+        
+        private bool StopPlaying()
+        {
+            if (this.Logger.IsDebugEnabled)
+            {
+                this.Logger.LogDebug("StopPlaying");
+            }
+            if (!this.started)
+            {
+                if (this.Logger.IsWarningEnabled)
+                {
+                    this.Logger.LogWarning("Cannot stop playback because it's not started");
+                }
+                return false;
+            }
+            if (this.IsLinked)
+            {
+                this.remoteVoiceLink.FloatFrameDecoded -= this.OnAudioFrame;
+            }
+            else if (this.Logger.IsWarningEnabled)
+            {
+                this.Logger.LogWarning("Speaker not linked while stopping playback");
+            }
+            if (this.audioOutput != null)
+            {
+                this.audioOutput.Stop();
+            }
+            else if (this.Logger.IsWarningEnabled)
+            {
+                this.Logger.LogWarning("audioOutput is null while stopping playback");
+            }
+            this.started = false;
+            return true;
+        }
+
+        private void CleanUp()
+        {
+            if (this.Logger.IsDebugEnabled)
+            {
+                this.Logger.LogDebug("CleanUp");
+            }
+            if (this.remoteVoiceLink != null)
+            {
+                this.remoteVoiceLink.RemoteVoiceRemoved -= this.OnRemoteVoiceRemove;
+                this.remoteVoiceLink = null;
+            }
+            this.Actor = null;
         }
 
         #endregion

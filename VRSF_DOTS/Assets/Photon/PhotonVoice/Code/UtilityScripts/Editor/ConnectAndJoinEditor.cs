@@ -10,7 +10,6 @@
         private SerializedProperty randomRoomSp;
         private SerializedProperty roomNameSp;
         private SerializedProperty autoConnectSp;
-        private SerializedProperty versionSp;
         private SerializedProperty autoTransmitSp;
 
         private void OnEnable()
@@ -19,7 +18,6 @@
             randomRoomSp = serializedObject.FindProperty("RandomRoom");
             roomNameSp = serializedObject.FindProperty("RoomName");
             autoConnectSp = serializedObject.FindProperty("autoConnect");
-            versionSp = serializedObject.FindProperty("version");
             autoTransmitSp = serializedObject.FindProperty("autoTransmit");
         }
 
@@ -27,7 +25,6 @@
         {
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(autoConnectSp);
-            EditorGUILayout.PropertyField(versionSp);
             EditorGUILayout.PropertyField(autoTransmitSp);
             EditorGUILayout.PropertyField(randomRoomSp);
             if (!randomRoomSp.boolValue)

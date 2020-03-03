@@ -9,10 +9,10 @@ namespace VRSF.Core.Simulator
     [UpdateAfter(typeof(SimulatorRotationInterpolationSystem))]
     public class SimulatorMovementSystem : ComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.RegisterSetupVRResponse(CheckSystemState);
-            base.OnCreateManager();
+            base.OnCreate();
         }
         
         protected override void OnUpdate()
@@ -30,9 +30,9 @@ namespace VRSF.Core.Simulator
             });
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
-            base.OnDestroyManager();
+            base.OnDestroy();
             if (OnSetupVRReady.IsMethodAlreadyRegistered(CheckSystemState))
                 OnSetupVRReady.Listeners -= CheckSystemState;
         }

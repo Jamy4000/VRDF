@@ -73,19 +73,11 @@ namespace Photon.Voice
         {
             if (typeof(T) == typeof(float))
             {
-                if (encoder == null || encoder is IEncoderDirect<float>)
-                {
-                    return new LocalVoiceAudioFloat(voiceClient, encoder as IEncoderDirect<float>, voiceId, voiceInfo, audioSourceDesc, channelId) as LocalVoiceAudio<T>;
-                }
-                else
-                    throw new Exception("[PV] CreateLocalVoice: encoder for LocalVoiceAudio<float> is not IEncoderDirect<float>: " + encoder.GetType());
+                return new LocalVoiceAudioFloat(voiceClient, encoder, voiceId, voiceInfo, audioSourceDesc, channelId) as LocalVoiceAudio<T>;
             }
             else if (typeof(T) == typeof(short))
             {
-                if (encoder == null || encoder is IEncoderDirect<short>)
-                    return new LocalVoiceAudioShort(voiceClient, encoder as IEncoderDirect<short>, voiceId, voiceInfo, audioSourceDesc, channelId) as LocalVoiceAudio<T>;
-                else
-                    throw new Exception("[PV] CreateLocalVoice: encoder for LocalVoiceAudio<short> is not IEncoderDirect<short>: " + encoder.GetType());
+                return new LocalVoiceAudioShort(voiceClient, encoder, voiceId, voiceInfo, audioSourceDesc, channelId) as LocalVoiceAudio<T>;
             }
             else
             {

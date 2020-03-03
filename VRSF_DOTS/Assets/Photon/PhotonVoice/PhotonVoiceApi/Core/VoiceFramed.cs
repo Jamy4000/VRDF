@@ -168,8 +168,12 @@ namespace Photon.Voice
         List<IProcessor<T>> processors = new List<IProcessor<T>>();
         internal LocalVoiceFramed(VoiceClient voiceClient, IEncoder encoder, byte id, VoiceInfo voiceInfo, int channelId, int frameSize)
         : base(voiceClient, encoder, id, voiceInfo, channelId, frameSize)
-        {
-            this.framer = new Framer<T>(FrameSize);
+		{
+			if (frameSize == 0)
+			{ 
+				throw new Exception(LogPrefix + ": non 0 frame size required for framed stream");
+			}
+			this.framer = new Framer<T>(FrameSize);
             this.bufferFactory = new FactoryPrimitiveArrayPool<T>(DATA_POOL_CAPACITY, Name + " Data", FrameSize);
         }
         bool dataEncodeThreadStarted;

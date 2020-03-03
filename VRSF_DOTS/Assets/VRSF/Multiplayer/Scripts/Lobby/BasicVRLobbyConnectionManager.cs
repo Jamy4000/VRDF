@@ -13,11 +13,6 @@ namespace VRSF.Multiplayer
         #region Variables
         [Header("Critical Room Parameters")]
         /// <summary>
-        /// SHould we synchronize scenes between players or do you handle it yourself ?
-        /// </summary>
-        [Tooltip("Should we synchronize scenes between players or do you handle it yourself ")]
-        public bool ShouldSynchronizeScene = true;
-        /// <summary>
         /// The Maximal amount of player that can enter a room
         /// </summary>
         [Tooltip("The Maximal amount of player that can enter a room")]
@@ -38,10 +33,8 @@ namespace VRSF.Multiplayer
         /// </summary>
         protected virtual void Awake()
         {
-            // #Critical, this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
-            PhotonNetwork.AutomaticallySyncScene = ShouldSynchronizeScene;
-
             // #Critical, we must first and foremost connect to Photon Online Server.
+            Debug.Log("<b>[VRSF] :</b> Connecting with Master Server ...");
             PhotonNetwork.ConnectUsingSettings();
 
             OnConnectionToRoomRequested.Listeners += ConnectToRoom;
@@ -60,23 +53,15 @@ namespace VRSF.Multiplayer
         /// </summary>
         protected virtual void ConnectToRoom(OnConnectionToRoomRequested info)
         {
-            // we check if we are connected, and join if we are
-            if (PhotonNetwork.IsConnectedAndReady)
+            if (info.NeedCreation)
             {
-                if (info.NeedCreation)
-                {
-                    Debug.Log("<b>[VRSF] :</b> Creating Room " + info.RoomName);
-                    // #Critical we need at this point to create a Room.
-                    PhotonNetwork.CreateRoom(info.RoomName, info.Options);
-                }
-                else
-                {
-                    JoinRoom(info.RoomName);
-                }
+                Debug.Log("<b>[VRSF] :</b> Creating Room " + info.RoomName);
+                // #Critical we need at this point to create a Room.
+                PhotonNetwork.CreateRoom(info.RoomName, info.Options);
             }
             else
             {
-                Debug.LogError("<Color=Red><b>[VRSF] :</b> You're not connected to the Photon network. Please check that one of the PhotonNetwork.Connect method was called.</Color>");
+                JoinRoom(info.RoomName);
             }
         }
         #endregion EventCallbacks
@@ -88,7 +73,7 @@ namespace VRSF.Multiplayer
         /// </summary>
         public override void OnConnectedToMaster()
         {
-            Debug.Log("<b>[VRSF] :</b> Connection with Master established, joining Lobby ...");
+            Debug.Log("<Color=Green><b>[VRSF] :</b> Connection with Master established ! Trying to join Lobby ...</Color>");
             // When the user is connected to the server, we make him load a basic lobby so he can get the rooms info.
             PhotonNetwork.JoinLobby(new TypedLobby("BaseVRLobby", LobbyType.Default));
         }
@@ -98,7 +83,7 @@ namespace VRSF.Multiplayer
         /// </summary>
         public override void OnJoinedLobby()
         {
-            Debug.Log("<b>[VRSF] :</b> Lobby was successfully joined !");
+            Debug.Log("<Color=Green><b>[VRSF] :</b> Lobby was successfully joined !</Color>");
             Debug.LogFormat("<b>[VRSF]:</b> {0} players, including this instance of the game, are currently online in your app.", PhotonNetwork.CountOfPlayers);
         }
 
@@ -107,16 +92,12 @@ namespace VRSF.Multiplayer
         /// </summary>
         public override void OnCreatedRoom()
         {
-            Debug.Log("<b>[VRSF] :</b> The room was successfully CREATED, loading multipalyer scene ...");
+            Debug.Log("<Color=Green><b>[VRSF] :</b> The room was successfully CREATED, loading scene ...</Color>");
 
             if (!TryLoadScene())
             {
-                Debug.LogError("<Color=Red><b>[VRSF] :</b> Can't load the Multiplayer's Scene. Check the name and index of your multiplayer scene, and be sure that this scene was added in the Build Settings. Stopping app.</Color>", gameObject);
+                Debug.LogError("<Color=Red><b>[VRSF] :</b> Can't load the Scene. Check the name and index of your multiplayer scene, and be sure that this scene was added in the Build Settings. Stopping app.</Color>", gameObject);
                 Application.Quit();
-            }
-            else
-            {
-                PhotonNetwork.LeaveLobby();
             }
         }
 
@@ -136,7 +117,6 @@ namespace VRSF.Multiplayer
         public override void OnJoinedRoom()
         {
             Debug.Log("<Color=Green><b>[VRSF] :</b> The room was successfully JOINED, loading the scene ...</Color>");
-            PhotonNetwork.LeaveLobby();
         }
 
         /// <summary>
@@ -146,7 +126,7 @@ namespace VRSF.Multiplayer
         /// <param name="message">The error message returned by photon and describing the problem</param>
         public override void OnJoinRoomFailed(short returnCode, string message)
         {
-            Debug.LogErrorFormat("<Color=Red><b>[VRSF] :</b> The room couldn't be JOINED. Here's the return code :\n{0}.\nAnd here's the message :\n{1}.</Color>", returnCode, message);
+            Debug.LogErrorFormat("<Color=Red><b>[VRSF] :</b> The room couldn't be JOINED. Here's the return code :</Color> \n{0}.\nAnd here's the message :\n{1}.", returnCode, message);
         }
 
         public override void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics)
@@ -161,7 +141,7 @@ namespace VRSF.Multiplayer
         /// Try to load a scene based on its name
         /// </summary>
         /// <returns>true if the scene was correctly loaded</returns>
-        private bool TryLoadScene()
+        public bool TryLoadScene()
         {
             try
             {
@@ -179,7 +159,7 @@ namespace VRSF.Multiplayer
 
 
         #region Public_Methods
-        public virtual void JoinRoom(string roomName)
+        public void JoinRoom(string roomName)
         {
             Debug.Log("<b>[VRSF] :</b> Joining Room " + roomName);
             PhotonNetwork.JoinRoom(roomName);

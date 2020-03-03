@@ -37,6 +37,8 @@ namespace Photon.Voice.PUN
         [SerializeField]
         private Speaker speakerInUse;
 
+        private bool onEnableCalledOnce;
+
         #endregion
 
         #region Public Fields
@@ -121,13 +123,26 @@ namespace Photon.Voice.PUN
 
         private void OnEnable()
         {
-            if (photonView.ViewID > 0)
+            if (this.onEnableCalledOnce)
             {
-                Setup();
-                if (IsSpeaker && !this.SpeakerInUse.IsLinked)
-                {
-                    PhotonVoiceNetwork.Instance.CheckLateLinking(this, photonView.ViewID);
-                }
+                this.Init();
+            }
+            else
+            {
+                this.onEnableCalledOnce = true;
+            }
+        }
+
+        private void Start()
+        {
+            this.Init();
+        }
+        
+        private void CheckLateLinking()
+        {
+            if (this.IsSpeaker && !this.SpeakerInUse.IsLinked)
+            {
+                PhotonVoiceNetwork.Instance.CheckLateLinking(this, photonView.ViewID);
             }
         }
 
@@ -212,7 +227,8 @@ namespace Photon.Voice.PUN
                 }
                 return true;
             }
-            RecorderInUse.Init(PhotonVoiceNetwork.Instance.VoiceClient, photonView.ViewID);
+            RecorderInUse.UserData = photonView.ViewID;
+            RecorderInUse.Init(PhotonVoiceNetwork.Instance);
             return true;
         }
 
@@ -283,6 +299,32 @@ namespace Photon.Voice.PUN
             }
             return true;
         }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Initializes this PhotonVoiceView for Voice usage based on the PhotonView, Recorder and Speaker components.
+        /// </summary>
+        /// <remarks>
+        /// The initialization should happen automatically.
+        /// Call this method explicitly if this does not succeed.
+        /// The initialization is a two steps operation: step one is the setup of Recorder and Speaker to be used.
+        /// Step two is the late-linking -if needed- of the SpeakerInUse and corresponding remote voice info -if any- via ViewID.
+        /// </remarks>
+        public void Init()
+        {
+            if (this.photonView.ViewID > 0)
+            {
+                this.Setup();
+                this.CheckLateLinking();
+            }
+            else if (this.Logger.IsWarningEnabled)
+            {
+                this.Logger.LogWarning("Tried to initialize PhotonVoiceView but PhotonView does not have a valid allocated ViewID yet.");
+            }
+        }        
 
         #endregion
     }

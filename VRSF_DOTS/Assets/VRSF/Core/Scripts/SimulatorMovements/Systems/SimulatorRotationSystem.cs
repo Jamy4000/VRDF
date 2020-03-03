@@ -10,10 +10,10 @@ namespace VRSF.Core.Simulator
     [UpdateBefore(typeof(SimulatorRotationInterpolationSystem))]
     public class SimulatorRotationSystem : JobComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             OnSetupVRReady.RegisterSetupVRResponse(CheckSystemState);
-            base.OnCreateManager();
+            base.OnCreate();
         }
         
         protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -42,9 +42,9 @@ namespace VRSF.Core.Simulator
             }.Schedule(this, inputDeps);
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
-            base.OnDestroyManager();
+            base.OnDestroy();
             if (OnSetupVRReady.IsMethodAlreadyRegistered(CheckSystemState))
                 OnSetupVRReady.Listeners -= CheckSystemState;
         }

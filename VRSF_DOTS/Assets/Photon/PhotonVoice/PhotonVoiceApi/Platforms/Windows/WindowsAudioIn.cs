@@ -1,9 +1,18 @@
 ﻿#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Photon.Voice.Windows
 {
+#pragma warning disable 0414
+    public class MonoPInvokeCallbackAttribute : System.Attribute
+    {
+        private Type type;
+        public MonoPInvokeCallbackAttribute(Type t) { type = t; }
+    }
+#pragma warning restore 0414
+
     public class WindowsAudioInPusher : IAudioPusher<short>
     {
         enum SystemMode
@@ -15,22 +24,29 @@ namespace Photon.Voice.Windows
         }
 
         [DllImport("AudioIn")]
-        private static extern IntPtr Photon_Audio_In_Create(SystemMode systemMode, int micDevIdx, int spkDevIdx, Action<IntPtr, int> callback, bool featrModeOn, bool noiseSup, bool agc, bool cntrClip);
+        private static extern IntPtr Photon_Audio_In_Create(int instanceID, SystemMode systemMode, int micDevIdx, int spkDevIdx, Action<int, IntPtr, int> callback, bool featrModeOn, bool noiseSup, bool agc, bool cntrClip);
 
         [DllImport("AudioIn")]
         private static extern void Photon_Audio_In_Destroy(IntPtr handler);
 
+        private delegate void CallbackDelegate(int instanceID, IntPtr buf, int len);
+
         IntPtr handle;
+        int instanceID;
         Action<short[]> pushCallback;
         ObjectFactory<short[], int> bufferFactory;
 
         public WindowsAudioInPusher(int deviceID, ILogger logger)
         {
-            pushRef = push;            
             try
             {
-                // use default playback device
-                handle = Photon_Audio_In_Create(SystemMode.SINGLE_CHANNEL_AEC, deviceID, -1, pushRef, true, true, true, true); // defaults in original ms sample: false, true, false, false
+                lock (instancePerHandle)
+                {
+                    // use default playback device
+                    handle = Photon_Audio_In_Create(instanceCnt, SystemMode.SINGLE_CHANNEL_AEC, deviceID, -1, nativePushCallback, true, true, true, true); // defaults in original ms sample: false, true, false, false
+                    this.instanceID = instanceCnt;
+                    instancePerHandle.Add(instanceCnt++, this);
+                }
             }
             catch (Exception e)
             {
@@ -42,7 +58,26 @@ namespace Photon.Voice.Windows
                 logger.LogError("[PV] WindowsAudioInPusher: " + Error);
             }
         }
-        Action<IntPtr, int> pushRef;
+
+        // IL2CPP does not support marshaling delegates that point to instance methods to native code.
+        // Using static method and per instance table.
+        static int instanceCnt;
+        private static Dictionary<int, WindowsAudioInPusher> instancePerHandle = new Dictionary<int, WindowsAudioInPusher>();
+        [MonoPInvokeCallbackAttribute(typeof(CallbackDelegate))]
+        private static void nativePushCallback(int instanceID, IntPtr buf, int len)
+        {
+            WindowsAudioInPusher instance;
+            bool ok;
+            lock (instancePerHandle)
+            {
+                ok = instancePerHandle.TryGetValue(instanceID, out instance);
+            }
+            if (ok)
+            {
+                instance.push(buf, len);
+            }
+        }
+
         // Supposed to be called once at voice initialization.
         // Otherwise recreate native object (instead of adding 'set callback' method to native interface)
         public void SetCallback(Action<short[]> callback, ObjectFactory<short[], int> bufferFactory)
@@ -70,6 +105,10 @@ namespace Photon.Voice.Windows
 
         public void Dispose()
         {
+            lock (instancePerHandle)
+            {
+                instancePerHandle.Remove(instanceID);
+            }
             if (handle != IntPtr.Zero)
             {
                 Photon_Audio_In_Destroy(handle);

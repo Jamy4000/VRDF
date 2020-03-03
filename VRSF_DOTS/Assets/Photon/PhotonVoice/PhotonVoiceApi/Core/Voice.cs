@@ -321,8 +321,13 @@ namespace Photon.Voice
                         voiceClient.transport.LogInfo(LogPrefix + ": Creating default decoder for output type = " + options.outType);
                         return new OpusCodec.DecoderFloat(options.output as Action<float[]>, voiceClient.transport);
                     }
-                    else
-                    {
+                    else if (Info.Codec == Codec.Raw)
+					{
+						voiceClient.transport.LogInfo(LogPrefix + ": Creating default decoder for output type = " + options.outType);
+						return new RawCodec.Decoder<float>(options.output as Action<float[]>);
+					}
+					else
+					{
                         voiceClient.transport.LogError(LogPrefix + ": Action<float[]> output set for not audio decoder (output type = " + options.outType + ")");
                         return null;
                     }
@@ -332,8 +337,13 @@ namespace Photon.Voice
                         voiceClient.transport.LogInfo(LogPrefix + ": Creating default decoder for output type = " + options.outType);
                         return new OpusCodec.DecoderShort(options.output as Action<short[]>, voiceClient.transport);
                     }
-                    else
-                    {
+					else if (Info.Codec == Codec.Raw)
+					{
+						voiceClient.transport.LogInfo(LogPrefix + ": Creating default decoder for output type = " + options.outType);
+						return new RawCodec.Decoder<short>(options.output as Action<short[]>);
+					}
+					else
+					{
                         voiceClient.transport.LogError(LogPrefix + ": Action<short[]> output set for not audio decoder (output type = " + options.outType + ")");
                         return null;
                     }

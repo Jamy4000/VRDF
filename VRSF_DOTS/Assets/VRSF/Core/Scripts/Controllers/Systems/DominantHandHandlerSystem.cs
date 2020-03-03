@@ -9,18 +9,18 @@ namespace VRSF.Core.Controllers
     /// </summary>
     public class DominantHandHandlerSystem : ComponentSystem
     {
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
-            base.OnCreateManager();
+            base.OnCreate();
             OnSetupVRReady.Listeners += Setup;
             this.Enabled = false;
         }
 
         protected override void OnUpdate() { }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
-            base.OnDestroyManager();
+            base.OnDestroy();
             OnSetupVRReady.Listeners -= Setup;
 
             if (ChangeDominantHandEvent.IsMethodAlreadyRegistered(ChangeDominantHand))

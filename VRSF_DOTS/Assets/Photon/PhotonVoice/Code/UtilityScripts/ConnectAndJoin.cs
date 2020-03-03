@@ -14,7 +14,6 @@
 using Photon.Realtime;
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 
 namespace Photon.Voice.Unity.UtilityScripts
 {
@@ -31,14 +30,10 @@ namespace Photon.Voice.Unity.UtilityScripts
         [SerializeField]
         private bool autoTransmit = true;
 
-        [SerializeField]
-        private byte version = 1;
-
         public string RoomName;
 
         private RoomOptions roomOptions = new RoomOptions();
         private TypedLobby typedLobby = TypedLobby.Default;
-        //public bool HideRoom;
 
         public bool IsConnected { get { return voiceConnection.Client.IsConnected; } }
 
@@ -65,7 +60,6 @@ namespace Photon.Voice.Unity.UtilityScripts
         {
             Debug.Log("ConnectAndJoin.ConnectNow() will now call: VoiceConnection.ConnectUsingSettings().");
             voiceConnection.ConnectUsingSettings();
-            voiceConnection.Client.AppVersion = string.Format("{0}.{1}", this.version, SceneManager.GetActiveScene().buildIndex);
         }
 
         #region MatchmakingCallbacks
@@ -87,14 +81,13 @@ namespace Photon.Voice.Unity.UtilityScripts
 
         public void OnJoinedRoom()
         {
+            if (voiceConnection.PrimaryRecorder == null)
+            {
+                voiceConnection.PrimaryRecorder = this.gameObject.AddComponent<Recorder>();
+            }
             if (this.autoTransmit)
             {
-                if (voiceConnection.PrimaryRecorder == null)
-                {
-                    voiceConnection.PrimaryRecorder = this.gameObject.AddComponent<Recorder>();
-                }
                 voiceConnection.PrimaryRecorder.TransmitEnabled = autoTransmit;
-                voiceConnection.PrimaryRecorder.Init(voiceConnection.VoiceClient);
             }
         }
 

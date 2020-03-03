@@ -32,13 +32,13 @@ namespace VRSF.Core.Simulator
 
         public void Awake()
         {
-            OnSetupVRReady.RegisterSetupVRResponse(Init);
+            //OnSetupVRReady.RegisterSetupVRResponse(Init);
         }
 
         public void OnDestroy()
         {
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
-                OnSetupVRReady.Listeners -= Init;
+            //if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+            //    OnSetupVRReady.Listeners -= Init;
         }
 
         private void Init(OnSetupVRReady info)

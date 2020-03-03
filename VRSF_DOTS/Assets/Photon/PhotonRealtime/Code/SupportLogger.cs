@@ -40,6 +40,7 @@ namespace Photon.Realtime
     /// Set SupportLogger.Client for this to work.
     /// </remarks>
     #if SUPPORTED_UNITY
+    [DisallowMultipleComponent]
 	[AddComponentMenu("")] // hide from Unity Menus and searches
 	public class SupportLogger : MonoBehaviour, IConnectionCallbacks , IMatchmakingCallbacks , IInRoomCallbacks, ILobbyCallbacks
     #else
@@ -74,7 +75,10 @@ namespace Photon.Realtime
                         this.client.RemoveCallbackTarget(this);
                     }
                     this.client = value;
-                    this.client.AddCallbackTarget(this);
+                    if (this.client != null)
+                    {
+                        this.client.AddCallbackTarget(this);
+                    }
                 }
             }
         }
@@ -88,13 +92,11 @@ namespace Photon.Realtime
                 this.startStopwatch = new Stopwatch();
                 this.startStopwatch.Start();
             }
-
-            this.InvokeRepeating("TrackValues", 0.5f, 0.5f);
         }
 
         protected void OnApplicationPause(bool pause)
         {
-            Debug.Log(this.GetFormattedTimestamp() + " SupportLogger OnApplicationPause: " + pause + " connected: " + this.client.IsConnected);
+            Debug.Log(this.GetFormattedTimestamp() + " SupportLogger OnApplicationPause: " + pause + " connected: " + (this.client == null ? "false" : this.client.IsConnected.ToString()));
         }
 
         protected void OnApplicationQuit()
@@ -121,6 +123,23 @@ namespace Photon.Realtime
             #endif
         }
 
+        private void StartTrackValues()
+        {
+            #if SUPPORTED_UNITY
+            this.InvokeRepeating("TrackValues", 0.5f, 0.5f);
+            #else
+            Debug.Log("Not implemented for non-Unity projects.");
+            #endif
+        }
+
+        private void StopTrackValues()
+        {
+            #if SUPPORTED_UNITY
+            this.CancelInvoke("TrackValues");
+            #else
+            Debug.Log("Not implemented for non-Unity projects.");
+            #endif
+        }
 
         private string GetFormattedTimestamp()
         {
@@ -136,14 +155,17 @@ namespace Photon.Realtime
         // called via InvokeRepeatedly
         private void TrackValues()
         {
-            int currentRtt = this.client.LoadBalancingPeer.RoundTripTime;
-            if (currentRtt > this.pingMax)
+            if (this.client != null)
             {
-                this.pingMax = currentRtt;
-            }
-            if (currentRtt < this.pingMin)
-            {
-                this.pingMin = currentRtt;
+                int currentRtt = this.client.LoadBalancingPeer.RoundTripTime;
+                if (currentRtt > this.pingMax)
+                {
+                    this.pingMax = currentRtt;
+                }
+                if (currentRtt < this.pingMin)
+                {
+                    this.pingMin = currentRtt;
+                }
             }
         }
 
@@ -153,7 +175,7 @@ namespace Photon.Realtime
         /// </summary>
         public void LogStats()
         {
-            if (this.client.State == ClientState.PeerCreated)
+            if (this.client == null || this.client.State == ClientState.PeerCreated)
             {
                 return;
             }
@@ -169,17 +191,21 @@ namespace Photon.Realtime
         /// </summary>
         private void LogBasics()
         {
-            StringBuilder sb = new StringBuilder();
+            if (this.client != null)
+            {
+                StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("{0} SupportLogger Info: ", this.GetFormattedTimestamp());
-            sb.AppendFormat("AppID: \"{0}\" AppVersion: \"{1}\" PeerID: {2} ",
-                string.IsNullOrEmpty(this.client.AppId) || this.client.AppId.Length < 8
-                    ? this.client.AppId
-                    : string.Concat(this.client.AppId.Substring(0, 8), "***"), this.client.AppVersion, this.client.LoadBalancingPeer.PeerID);
-            //NOTE: this.client.LoadBalancingPeer.ServerIpAddress requires Photon3Unity3d.dll v4.1.2.5 and up
-            sb.AppendFormat("NameServer: {0} Server: {1} IP: {2} Region: {3}", this.client.NameServerHost, this.client.CurrentServerAddress, this.client.LoadBalancingPeer.ServerIpAddress, this.client.CloudRegion);
+                sb.AppendFormat("{0} SupportLogger Info: ", this.GetFormattedTimestamp());
+                sb.AppendFormat("AppID: \"{0}\" AppVersion: \"{1}\" UserId: {3} PeerID: {2} ",
+                    string.IsNullOrEmpty(this.client.AppId) || this.client.AppId.Length < 8
+                        ? this.client.AppId
+                        : string.Concat(this.client.AppId.Substring(0, 8), "***"), this.client.AppVersion, this.client.LoadBalancingPeer.PeerID,
+                    this.client.UserId);
+                //NOTE: this.client.LoadBalancingPeer.ServerIpAddress requires Photon3Unity3d.dll v4.1.2.5 and up
+                sb.AppendFormat("NameServer: {0} Server: {1} IP: {2} Region: {3}", this.client.NameServerHost, this.client.CurrentServerAddress, this.client.LoadBalancingPeer.ServerIpAddress, this.client.CloudRegion);
 
-            Debug.Log(sb.ToString());
+                Debug.Log(sb.ToString());
+            }
         }
 
 
@@ -196,6 +222,8 @@ namespace Photon.Realtime
                 this.client.LoadBalancingPeer.TrafficStatsEnabled = true;
                 this.StartLogStats();
             }
+
+            this.StartTrackValues();
         }
 
         public void OnConnectedToMaster()
@@ -250,6 +278,7 @@ namespace Photon.Realtime
 		public void OnDisconnected(DisconnectCause cause)
         {
             this.StopLogStats();
+            this.StopTrackValues();
 
 			Debug.Log(this.GetFormattedTimestamp() + " SupportLogger OnDisconnected(" + cause + ").");
 			this.LogBasics();

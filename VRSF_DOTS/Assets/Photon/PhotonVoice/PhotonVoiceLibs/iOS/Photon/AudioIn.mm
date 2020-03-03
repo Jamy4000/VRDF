@@ -126,7 +126,10 @@ static OSStatus    performRender (void                         *inRefCon,
         
         if (!err) {
             if (cd.pushCallback) {
-                cd.pushCallback(cd.pushHostID, (float*)ioData->mBuffers[0].mData, inNumberFrames);
+                NSData *data = [[NSData alloc] initWithBytes:ioData->mBuffers[0].mData length:ioData->mBuffers[0].mDataByteSize];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    cd.pushCallback(cd.pushHostID, (float*)data.bytes, (int)data.length/sizeof(float));
+                });
             } else {
                 int pos = cd.ringWritePos % BUFFER_SIZE;
                 if (pos + inNumberFrames > BUFFER_SIZE) {

@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 using UnityEngine;
-using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
+using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
 using VRSF.Core.VRInteractions;
 
@@ -18,24 +18,36 @@ namespace VRSF.MoveAround.VRRotation
 
         private void Awake()
         {
+            OnSetupVRReady.RegisterSetupVRResponse(Init);
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             VRInteractionAuthoring vrInteractionAuthoring = GetComponent<VRInteractionAuthoring>();
 
-            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            // If the device loaded is included in the device using this CBRA
+            if ((vrInteractionAuthoring.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
+            {
+                var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-            var archetype = entityManager.CreateArchetype(typeof(BaseInputCapture), typeof(TouchpadInputCapture), typeof(ControllersInteractionType));
+                var archetype = entityManager.CreateArchetype(typeof(BaseInputCapture), typeof(TouchpadInputCapture), typeof(ControllersInteractionType));
 
-            var entity = entityManager.CreateEntity(archetype);
+                var entity = entityManager.CreateEntity(archetype);
 
-            InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring);
+                InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring);
 
-            entityManager.AddComponentData(entity, new NonLinearUserRotation { DegreesToRotate = this._degreesToRotate });
+                entityManager.AddComponentData(entity, new NonLinearUserRotation { DegreesToRotate = this._degreesToRotate });
 
-            entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
+                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
 
 #if UNITY_EDITOR
-            // Set it's name in Editor Mode for the Entity Debugger Window
-            entityManager.SetName(entity, "User Non Linear Rotation Entity");
+                // Set it's name in Editor Mode for the Entity Debugger Window
+                entityManager.SetName(entity, "User Non Linear Rotation Entity");
 #endif
+            }
 
             Destroy(gameObject);
         }

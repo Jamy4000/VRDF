@@ -51,8 +51,6 @@ namespace Photon.Voice.Unity
 
         private VoiceClient client;
 
-        private bool forceShort;
-
         [SerializeField]
         [FormerlySerializedAs("audioGroup")]
         private byte interestGroup;
@@ -190,6 +188,11 @@ namespace Photon.Voice.Unity
         {
             get
             {
+                if (this.debugEchoMode && this.InterestGroup != 0)
+                {
+                    this.voice.DebugEchoMode = false;
+                    this.debugEchoMode = false;
+                }
                 return debugEchoMode;
             }
             set
@@ -202,7 +205,7 @@ namespace Photon.Voice.Unity
                 {
                     if (this.Logger.IsWarningEnabled)
                     {
-                        this.Logger.LogWarning("Cannot enable DebugEchoMode when InterestGroup value ({0}) is different than 0.", this.InterestGroup);
+                        this.Logger.LogWarning("Cannot enable DebugEchoMode when InterestGroup value ({0}) is different than 0.", this.interestGroup);
                     }
                     return;
                 }
@@ -351,7 +354,7 @@ namespace Photon.Voice.Unity
         {
             get
             {
-                if (!string.IsNullOrEmpty(this.unityMicrophoneDevice) && !Microphone.devices.Contains(this.unityMicrophoneDevice))
+                if (!IsValidUnityMic(this.unityMicrophoneDevice))
                 {
                     if (this.Logger.IsInfoEnabled)
                     {
@@ -363,7 +366,7 @@ namespace Photon.Voice.Unity
             }
             set
             {
-                if (!string.IsNullOrEmpty(value) && !Microphone.devices.Contains(value))
+                if (!IsValidUnityMic(value))
                 {
                     if (this.Logger.IsErrorEnabled)
                     {
@@ -374,8 +377,9 @@ namespace Photon.Voice.Unity
 
                 if (value == null && this.unityMicrophoneDevice != null || value != null && !value.Equals(unityMicrophoneDevice))
                 {
+                    bool requiresRestart = this.IsRecording && !CompareUnityMicNames(this.unityMicrophoneDevice, value);
                     this.unityMicrophoneDevice = value;
-                    if (this.IsRecording)
+                    if (requiresRestart)
                     {
                         this.RequiresRestart = true;
                         if (this.Logger.IsInfoEnabled)
@@ -459,12 +463,32 @@ namespace Photon.Voice.Unity
         /// <remarks>If InterestGroup != 0, recorder's audio data is sent only to clients listening to this group.</remarks>
         public byte InterestGroup
         {
-            get { return interestGroup; }
+            get
+            {
+                if (this.isRecording && this.voice.InterestGroup != this.interestGroup)
+                {
+                    // interest group probably set via GlobalInterestGroup!
+                    this.interestGroup = this.voice.InterestGroup;
+                    if (this.debugEchoMode && this.interestGroup != 0)
+                    {
+                        this.debugEchoMode = false;
+                    }
+                }
+                return interestGroup;
+            }
             set
             {
                 if (interestGroup == value)
                 {
                     return;
+                }
+                if (this.debugEchoMode && value != 0)
+                {
+                    this.debugEchoMode = false;
+                    if (this.Logger.IsWarningEnabled)
+                    {
+                        this.Logger.LogWarning("DebugEchoMode disabled because InterestGroup changed to {0}. DebugEchoMode works only with Interest Group 0.", value);
+                    }
                 }
                 interestGroup = value;
                 voice.InterestGroup = value;
@@ -484,7 +508,7 @@ namespace Photon.Voice.Unity
         }
 
         /// <summary>If true, voice detector calibration is in progress.</summary>
-        public bool VoiceDetectorCalibrating { get { return voiceAudio != null && voiceAudio.VoiceDetectorCalibrating; } }
+        public bool VoiceDetectorCalibrating { get { return voiceAudio != null && this.TransmitEnabled && voiceAudio.VoiceDetectorCalibrating; } }
 
         protected ILocalVoiceAudio voiceAudio { get { return this.voice as ILocalVoiceAudio; } }
 
@@ -719,6 +743,7 @@ namespace Photon.Voice.Unity
         /// </summary>
         /// <param name="voiceClient">The VoiceClient to be used with this Recorder.</param>
         /// <param name="customObj">Optional user data object to be transmitted with the voice stream info</param>
+        [Obsolete("use Init(VoiceConnection) instead")]
         public void Init(VoiceClient voiceClient, object customObj = null)
         {
             if (this.IsInitialized)
@@ -742,6 +767,43 @@ namespace Photon.Voice.Unity
             this.client = voiceClient;
             this.userData = customObj;
 
+            if (this.AutoStart)
+            {
+                this.StartRecording();
+            }
+        }
+
+        /// <summary>
+        /// Initializes the Recorder component to be able to transmit audio.
+        /// </summary>
+        /// <param name="voiceConnection">The VoiceConnection to be used with this Recorder.</param>
+        public void Init(VoiceConnection voiceConnection)
+        {
+            if (this.IsInitialized)
+            {
+                if (this.Logger.IsWarningEnabled)
+                {
+                    this.Logger.LogWarning("Recorder already initialized.");
+                }
+                return;
+            }
+            if (voiceConnection == null)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("voiceConnection is null.");
+                }
+                return;
+            }
+            if (voiceConnection.VoiceClient == null)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("voiceConnection.VoiceClient is null.");
+                }
+                return;
+            }
+            this.client = voiceConnection.VoiceClient;
             if (this.AutoStart)
             {
                 this.StartRecording();
@@ -772,13 +834,22 @@ namespace Photon.Voice.Unity
         }
 
         /// <summary>Trigger voice detector calibration process.
-        /// While calibrating, keep silence. Voice detector sets threshold basing on measured backgroud noise level.
+        /// While calibrating, keep silence. Voice detector sets threshold basing on measured background noise level.
         /// </summary>
         /// <param name="durationMs">Duration of calibration in milliseconds.</param>
+        /// <param name="detectionEndedCallback">Callback when VAD calibration ends.</param>
         public void VoiceDetectorCalibrate(int durationMs, Action<float> detectionEndedCallback = null)
         {
             if (this.voiceAudio != null)
             {
+                if (!this.TransmitEnabled)
+                {
+                    if (this.Logger.IsWarningEnabled)
+                    {
+                        this.Logger.LogWarning("Cannot start voice detection calibration when transmission is not enabled");
+                    }
+                    return;
+                }
                 this.voiceAudio.VoiceDetectorCalibrate(durationMs, newThreshold =>
                 {
                     this.GetThresholdFromDetector();
@@ -885,23 +956,6 @@ namespace Photon.Voice.Unity
 
         private void Setup()
         {
-            WebRtcAudioDsp dsp = gameObject.GetComponent<WebRtcAudioDsp>();
-            if (dsp != null && dsp.isActiveAndEnabled)
-            {
-                forceShort = true;
-                if (this.Logger.IsInfoEnabled)
-                {
-                    this.Logger.LogInfo("Type Conversion set to Short. Audio samples will be converted if source samples types differ.");
-                }
-            }
-            else if (forceShort)
-            {
-                forceShort = false;
-                if (this.Logger.IsInfoEnabled)
-                {
-                    this.Logger.LogInfo("Type Conversion disabled. Audio samples will not be converted if source samples types differ.");
-                }
-            }
             this.voice = CreateLocalVoiceAudioAndSource();
             if (this.voice == LocalVoiceAudioDummy.Dummy)
             {
@@ -1019,11 +1073,9 @@ namespace Photon.Voice.Unity
                         }
                         return LocalVoiceAudioDummy.Dummy;
                     }
-                    inputSource = new AudioClipWrapper(AudioClip); // never fails, no need to check Error
-                    if (this.LoopAudioClip)
-                    {
-                        ((AudioClipWrapper)inputSource).Loop = true;
-                    }
+                    AudioClipWrapper audioClipWrapper = new AudioClipWrapper(this.AudioClip); // never fails, no need to check Error
+                    audioClipWrapper.Loop = this.LoopAudioClip;
+                    this.inputSource = audioClipWrapper;
                 }
                     break;
                 case InputSourceType.Factory:
@@ -1054,7 +1106,25 @@ namespace Photon.Voice.Unity
             {
                 return LocalVoiceAudioDummy.Dummy;
             }
+            if (inputSource.Channels == 0)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("inputSource.Channels is zero");
+                }
+                return LocalVoiceAudioDummy.Dummy;
+            }
             VoiceInfo voiceInfo = VoiceInfo.CreateAudioOpus(SamplingRate, inputSource.Channels, FrameDuration, Bitrate, UserData);
+            bool forceShort = false;
+            WebRtcAudioDsp dsp = this.GetComponent<WebRtcAudioDsp>();
+            if (dsp != null && dsp.enabled)
+            {
+                forceShort = true;
+                if (this.Logger.IsInfoEnabled)
+                {
+                    this.Logger.LogInfo("Type Conversion set to Short. Audio samples will be converted if source samples types differ.");
+                }
+            }
             return client.CreateLocalVoiceAudioFromSource(voiceInfo, inputSource, forceShort);
         }
 
@@ -1081,7 +1151,13 @@ namespace Photon.Voice.Unity
             this.GetActivityDelayFromDetector();
             if (this.voice != LocalVoiceAudioDummy.Dummy)
             {
+                this.interestGroup = this.voice.InterestGroup;
+                if (this.debugEchoMode && this.interestGroup != 0)
+                {
+                    this.debugEchoMode = false;
+                }
                 this.voice.RemoveSelf();
+                this.voice = LocalVoiceAudioDummy.Dummy;
             }
             if (this.inputSource != null)
             {
@@ -1151,6 +1227,29 @@ namespace Photon.Voice.Unity
                 }
                 this.voiceDetection = this.VoiceDetector.On;
             }
+        }
+
+        private static bool CompareUnityMicNames(string mic1, string mic2)
+        {
+            if (IsDefaultUnityMic(mic1) && IsDefaultUnityMic(mic2))
+            {
+                return true;
+            }
+            if (mic1 != null && mic1.Equals(mic2))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static bool IsDefaultUnityMic(string mic)
+        {
+            return string.IsNullOrEmpty(mic) || Array.IndexOf(Microphone.devices, mic) == 0;
+        }
+
+        private static bool IsValidUnityMic(string mic)
+        {
+            return string.IsNullOrEmpty(mic) || Microphone.devices.Contains(mic);
         }
 
         #endregion

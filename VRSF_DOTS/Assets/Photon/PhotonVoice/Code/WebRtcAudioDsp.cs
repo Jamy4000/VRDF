@@ -52,7 +52,7 @@ namespace Photon.Voice.Unity
             {AudioSpeakerMode.Surround, 5},
             {AudioSpeakerMode.Mode5point1, 6},
             {AudioSpeakerMode.Mode7point1, 8},
-            {AudioSpeakerMode.Prologic, 0}
+            {AudioSpeakerMode.Prologic, 2}
         };
 
         private LocalVoice localVoice;
@@ -235,24 +235,24 @@ namespace Photon.Voice.Unity
         protected override void Awake()
         {
             base.Awake();
-            AudioListener audioListener = FindObjectOfType<AudioListener>();
-            if (audioListener != null)
+            AudioListener[] audioListeners = FindObjectsOfType<AudioListener>();
+            AudioListener audioListener = null;
+            for(int i=0; i < audioListeners.Length; i++)
             {
-                this.ac = audioListener.gameObject.GetComponent<AudioOutCapture>();
-                if (this.ac == null)
+                if (audioListeners[i].gameObject.activeInHierarchy && audioListeners[i].enabled)
                 {
-                    this.ac = audioListener.gameObject.AddComponent<AudioOutCapture>();
+                    audioListener = audioListeners[i];
+                    break;
                 }
             }
-            else if (this.Logger.IsErrorEnabled)
+            if (!this.SetOrSwitchAudioListener(audioListener, false))
             {
-                this.Logger.LogError("AudioListener component is required");
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("AudioListener and AudioOutCapture components are required");
+                }
+                this.enabled = false;
             }
-        }
-
-        private void OnEnable()
-        {
-            this.SetOutputListener();
             this.recorder = GetComponent<Recorder>();
             if (this.recorder == null)
             {
@@ -262,6 +262,11 @@ namespace Photon.Voice.Unity
                 }
                 this.enabled = false;
             }
+        }
+
+        private void OnEnable()
+        {
+            this.SetOutputListener();
         }
 
         private void OnDisable()
@@ -395,6 +400,140 @@ namespace Photon.Voice.Unity
             this.proc.AGC = this.AGC;
             this.proc.VAD = this.VAD;
             this.proc.Bypass = this.Bypass;
+        }
+
+        private bool SetOrSwitchAudioListener(AudioListener audioListener, bool extraChecks)
+        {
+            if (audioListener == null)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("audioListener passed is null or is being destroyed");
+                }
+                return false;
+            }
+            if (extraChecks)
+            {
+                if (audioListener.gameObject.activeInHierarchy)
+                {
+                    if (this.Logger.IsErrorEnabled)
+                    {
+                        this.Logger.LogError("The GameObject to which the audioListener is attached is not active in hierarchy");
+                    }
+                    return false;
+                }
+                if (!audioListener.enabled)
+                {
+                    if (this.Logger.IsErrorEnabled)
+                    {
+                        this.Logger.LogError("audioListener passed is disabled");
+                    }
+                    return false;
+                }
+            }
+            AudioOutCapture audioOutCapture = audioListener.GetComponent<AudioOutCapture>();
+            if (audioOutCapture == null)
+            {
+                audioOutCapture = audioListener.gameObject.AddComponent<AudioOutCapture>();
+            }
+            return this.SetOrSwitchAudioOutCapture(audioOutCapture, false);
+        }
+
+
+        private bool SetOrSwitchAudioOutCapture(AudioOutCapture audioOutCapture, bool extraChecks)
+        {
+            if (audioOutCapture == null)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("audioOutCapture passed is null or is being destroyed");
+                }
+                return false;
+            }
+            if (!audioOutCapture.enabled)
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("audioOutCapture passed is disabled");
+                }
+                return false;
+            }
+            if (extraChecks)
+            {
+                if (audioOutCapture.gameObject.activeInHierarchy)
+                {
+                    if (this.Logger.IsErrorEnabled)
+                    {
+                        this.Logger.LogError("The GameObject to which the audioOutCapture is attached is not active in hierarchy");
+                    }
+                    return false;
+                }
+                AudioListener audioListener = audioOutCapture.GetComponent<AudioListener>();
+                if (audioListener == null)
+                {
+                    if (this.Logger.IsErrorEnabled)
+                    {
+                        this.Logger.LogError("The AudioListener attached to the same GameObject as the audioOutCapture is null or being destroyed");
+                    }
+                    return false;
+                }
+                if (!audioListener.enabled)
+                {
+                    if (this.Logger.IsErrorEnabled)
+                    {
+                        this.Logger.LogError("The AudioListener attached to the same GameObject as the audioOutCapture is disabled");
+                    }
+                    return false;
+                }
+            }
+            if (this.ac != null)
+            {
+                if (this.ac != audioOutCapture)
+                {
+                    if (this.started)
+                    {
+                        this.ac.OnAudioFrame -= this.OnAudioOutFrameFloat;
+                    }
+                }
+                else
+                {
+                    if (this.Logger.IsErrorEnabled)
+                    {
+                        this.Logger.LogError("The same audioOutCapture is being used already");
+                    }
+                    return false;
+                }
+            }
+            this.ac = audioOutCapture;
+            if (this.started)
+            {
+                this.ac.OnAudioFrame += this.OnAudioOutFrameFloat;
+            }
+            return true;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Set the AudioListener to be used with this WebRtcAudioDsp
+        /// </summary>
+        /// <param name="audioListener">The audioListener to be used</param>
+        /// <returns>Success or failure</returns>
+        public bool SetOrSwitchAudioListener(AudioListener audioListener)
+        {
+            return this.SetOrSwitchAudioListener(audioListener, true);
+        }
+
+        /// <summary>
+        /// Set the AudioOutCapture to be used with this WebRtcAudioDsp
+        /// </summary>
+        /// <param name="audioOutCapture">The audioOutCapture to be used</param>
+        /// <returns>Success or failure</returns>
+        public bool SetOrSwitchAudioOutCapture(AudioOutCapture audioOutCapture)
+        {
+            return this.SetOrSwitchAudioOutCapture(audioOutCapture, true);
         }
 
         #endregion

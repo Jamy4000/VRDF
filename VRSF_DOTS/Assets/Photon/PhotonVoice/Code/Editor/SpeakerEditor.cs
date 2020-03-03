@@ -31,7 +31,6 @@
 
         #endregion
 
-
         private void OnEnable()
         {
             speaker = target as Speaker;
@@ -46,7 +45,7 @@
 
         public override void OnInspectorGUI()
         {
-            //            serializedObject.UpdateIfRequiredOrScript();
+            serializedObject.UpdateIfRequiredOrScript();
             VoiceLogger.ExposeLogLevel(serializedObject, speaker);
 
             EditorGUI.BeginChangeCheck();

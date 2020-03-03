@@ -28,11 +28,12 @@ namespace VRSF.Multiplayer
             if (photonView.IsMine)
             {
                 Destroy(gameObject);
-                return;
             }
-
-            _controllersMesh = GetComponent<ControllerMeshListing>();
-            InstantiateRemoteControllers();
+            else
+            {
+                _controllersMesh = GetComponent<ControllerMeshListing>();
+                InstantiateRemoteControllers();
+            }
         }
 
         private void OnDestroy()
@@ -50,8 +51,17 @@ namespace VRSF.Multiplayer
         private void InstantiateRemoteControllers()
         {
             EDevice deviceUsed = (EDevice)photonView.Owner.CustomProperties[VRSFPlayer.DEVICE_USED];
+            
             // If the other user use the simulator, we do not need to generate a controller
-            _controllerInstance = HasControllers() ? GameObject.Instantiate(_controllersMesh.ControllersPerDevice[deviceUsed], transform.parent) : null;
+            if (HasControllers()) 
+            {
+                _controllerInstance = GameObject.Instantiate(_controllersMesh.ControllersPerDevice[deviceUsed], transform.parent);
+                _controllerInstance.tag = "Untagged";
+
+                for (int i = 0; i < _controllerInstance.transform.childCount; i++) 
+                    _controllerInstance.transform.GetChild(i).tag = "Untagged";
+            }
+            
 
             bool HasControllers()
             {

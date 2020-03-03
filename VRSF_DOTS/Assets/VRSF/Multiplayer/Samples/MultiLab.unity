@@ -593,6 +593,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6976133493758874836, guid: 3ddaf1ccea5c7b54e950df840646be28,
+        type: 3}
+      propertyPath: _lobbySceneName
+      value: ConnectionScene
+      objectReference: {fileID: 0}
     - target: {fileID: 6976133493758874839, guid: 3ddaf1ccea5c7b54e950df840646be28,
         type: 3}
       propertyPath: m_Name

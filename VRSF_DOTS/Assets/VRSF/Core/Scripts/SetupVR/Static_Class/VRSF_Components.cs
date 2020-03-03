@@ -33,18 +33,22 @@ namespace VRSF.Core.SetupVR
         /// <param name="newPos">The new Pos where the user should be in World coordinate</param>
         /// <param name="useVRCameraOffset">Whether we should use the VRCamera local pos to calculate the new pos of the cameraRig</param>
         /// <param name="setYPos">Wheter we have to change the Y position</param>
-        public static void SetVRCameraPosition(Vector3 newPos, bool useVRCameraOffset = true, bool setYPos = true)
+        public static void SetVRCameraPosition(Vector3 newPos, bool useVRCameraOffset = true)
         {
-            if (useVRCameraOffset) GetNewPosWithCameraOffset();
-            CameraRig.transform.position = setYPos ? newPos : new Vector3(newPos.x, CameraRig.transform.position.y, newPos.z);
+            if (useVRCameraOffset)
+                newPos = GetNewPosWithCameraOffset();
+
+            CameraRig.transform.position = newPos;
 
 
-            void GetNewPosWithCameraOffset()
+            Vector3 GetNewPosWithCameraOffset()
             {
-                var y = newPos.y;
-                var cameraDirectionVector = new Vector3(newPos.x - VRCamera.transform.position.x, 0.0f, newPos.z - VRCamera.transform.position.z);
-                newPos = CameraRig.transform.position + cameraDirectionVector;
-                newPos.y = y;
+                Vector3 newPosWithOffset = newPos;
+                var y = newPosWithOffset.y;
+                var cameraDirectionVector = new Vector3(newPosWithOffset.x - VRCamera.transform.position.x, 0.0f, newPosWithOffset.z - VRCamera.transform.position.z);
+                newPosWithOffset = CameraRig.transform.position + cameraDirectionVector;
+                newPosWithOffset.y = y;
+                return newPosWithOffset;
             }
         }
 
@@ -73,7 +77,7 @@ namespace VRSF.Core.SetupVR
             var directionToPoint = target - VRCamera.transform.position;
             var angle = Vector3.SignedAngle(VRCamera.transform.forward, directionToPoint, Vector3.up);
             CameraRig.transform.Rotate(Vector3.up, angle);
-            SetVRCameraPosition(basePos, true, false);
+            SetVRCameraPosition(basePos, true);
         }
         #endregion
     }

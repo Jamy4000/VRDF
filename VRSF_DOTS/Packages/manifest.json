@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "com.unity.entities": "0.5.1-preview.11",
-    "com.unity.rendering.hybrid": "0.3.3-preview.11",
+    "com.unity.entities": "0.6.0-preview.24",
+    "com.unity.rendering.hybrid": "0.3.4-preview.24",
     "com.unity.textmeshpro": "2.0.1",
-    "com.unity.xr.legacyinputhelpers": "2.0.6",
+    "com.unity.xr.legacyinputhelpers": "2.0.8",
     "com.unity.xr.oculus.android": "2.38.6",
     "com.unity.xr.oculus.standalone": "2.38.4",
     "com.unity.xr.openvr.standalone": "2.0.5",

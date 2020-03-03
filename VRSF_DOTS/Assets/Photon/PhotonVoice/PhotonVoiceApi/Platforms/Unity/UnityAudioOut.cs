@@ -9,9 +9,10 @@ namespace Photon.Voice.Unity
     public class UnityAudioOut : ISyncAudioOut<float>
     {
         private int bufferSamples;
-        private int inputSamplePos; 
+        private int inputSamplePos;
 
         private AudioSource source;
+        private int channels;
         private bool started;
 
         public UnityAudioOut(AudioSource audioSource)
@@ -51,6 +52,7 @@ namespace Photon.Voice.Unity
 
         public void Start(int frequency, int channels, int frameSamples, int playDelayMs)
         {
+            this.channels = channels;
             this.bufferSamples = playDelayMs * frequency / 1000 + frameSamples + frequency; // max delay + frame +  1 sec. just in case
 
             this.source.loop = true;
@@ -80,7 +82,7 @@ namespace Photon.Voice.Unity
                     {
                         var frame = frameQueue.Dequeue();
                         this.source.clip.SetData(frame, this.inputSamplePos % this.bufferSamples);
-                        this.inputSamplePos += frame.Length / this.source.clip.channels;
+                        this.inputSamplePos += frame.Length / this.channels;
                         framePool.Release(frame);
                     }
                 }

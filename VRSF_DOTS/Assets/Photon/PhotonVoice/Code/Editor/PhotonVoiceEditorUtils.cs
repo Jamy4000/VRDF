@@ -134,5 +134,24 @@ namespace Photon.Voice.Unity.Editor
                 }
             }
         }
+
+        /// <summary>
+		/// Check if a GameObject is a prefab asset or part of a prefab asset, as opposed to an instance in the scene hierarchy
+		/// </summary>
+		/// <returns><c>true</c>, if a prefab asset or part of it, <c>false</c> otherwise.</returns>
+		/// <param name="go">The GameObject to check</param>
+		public static bool IsPrefab(GameObject go)
+		{
+            #if UNITY_2018_3_OR_NEWER
+            return UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(go) != null || EditorUtility.IsPersistent(go);
+            #else
+            return EditorUtility.IsPersistent(go);
+			#endif
+		}
+
+        public static bool IsInTheSceneInPlayMode(GameObject go)
+        {
+            return Application.isPlaying && !IsPrefab(go);
+        }
     }
 }

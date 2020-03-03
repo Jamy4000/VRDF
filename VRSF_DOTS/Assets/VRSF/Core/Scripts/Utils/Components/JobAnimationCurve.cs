@@ -33,17 +33,12 @@ namespace E7.DataStructure
         // [ReadOnly] [NativeDisableParallelForRestriction] NativeArray<Keyframe> keyframes;
         // [ReadOnly] [NativeDisableParallelForRestriction] NativeArray<float> soaTimes;
 
-        //Not supported yet..
-        private WrapMode postWrapMode;
-        private WrapMode preWrapMode;
-        private InterpolationMode interpolationMode;
-
         /// <summary>
         /// Used for caching optimization. Each thread would get its own cache area which is selected based on this integer.
         /// </summary>
-        [NativeSetThreadIndex] private int threadIndex;
+        [NativeSetThreadIndex] private int _threadIndex;
 
-        public int length => bar.Value.keyframes.Length;
+        public int Length => bar.Value.keyframes.Length;
 
         /// <summary>
         /// These are currently useless, just a plan draft..
@@ -107,10 +102,7 @@ namespace E7.DataStructure
                 bar = ba.CreateBlobAssetReference<AnimationData>(allocator);
             }
 
-            postWrapMode = animationCurve.postWrapMode;
-            preWrapMode = animationCurve.preWrapMode;
-            interpolationMode = InterpolationMode.CubicHermiteSpline;
-            threadIndex = 0;
+            _threadIndex = 0;
 
             int KeyframeTimeSort(Keyframe a, Keyframe b) => a.time.CompareTo(b.time);
         }
@@ -128,7 +120,7 @@ namespace E7.DataStructure
         {
             //TODO : Use interval tree to find neighbouring keyframes of a given time.
             //for (int i = 0; i < bar.Value.soaTimes.Length; i++)
-            for (int i = bar.Value.cachedIndex[threadIndex], count = 0;
+            for (int i = bar.Value.cachedIndex[_threadIndex], count = 0;
                 count < bar.Value.soaTimes.Length;
                 count++, i = (i + 1) % bar.Value.soaTimes.Length)
             {

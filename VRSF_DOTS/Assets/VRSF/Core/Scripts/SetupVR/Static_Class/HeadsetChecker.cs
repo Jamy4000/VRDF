@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.XR;
 
 namespace VRSF.Core.SetupVR
@@ -8,6 +10,8 @@ namespace VRSF.Core.SetupVR
     /// </summary>
     public static class HeadsetChecker
     {
+        private static List<InputDevice> _connectedDevices = new List<InputDevice>();
+
         /// <summary>
         /// Check which device is connected, and set the DeviceToLoad to the right name.
         /// </summary>
@@ -15,9 +19,7 @@ namespace VRSF.Core.SetupVR
         {
             if (XRDevice.isPresent)
             {
-                string detectedHmd = XRDevice.model.ToLower();
-
-                Debug.LogFormat("<b>[VRSF] :</b> {0} is connected.", XRDevice.model);
+                string detectedHmd = GetConnectedDevice().ToLower(); 
 
                 if (detectedHmd.Contains("vive") || detectedHmd.Contains("focus"))
                 {
@@ -45,8 +47,15 @@ namespace VRSF.Core.SetupVR
             {
                 return LoadSimulatorWithDebugText("<b>[VRSF] :</b> No XRDevice present, loading Simulator");
             }
+
+            string GetConnectedDevice()
+            {
+                InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, _connectedDevices);
+                Debug.LogFormat("<b>[VRSF] :</b> {0} is connected.", _connectedDevices[0].name);
+                return _connectedDevices[0].name;
+            }
         }
-        
+
         private static EDevice CheckHtcHeadset(string detectedHmd)
         {
             if (detectedHmd.ToLower().Contains("vive"))

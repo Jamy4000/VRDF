@@ -452,7 +452,7 @@ namespace Photon.Pun
         ///
         /// <param name="targetPlayer">Contains Player that changed.</param>
         /// <param name="changedProps">Contains the properties that changed.</param>
-        public virtual void OnPlayerPropertiesUpdate(Player target, Hashtable changedProps)
+        public virtual void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
         }
 
@@ -604,7 +604,7 @@ namespace Photon.Pun
     {
         private List<object> writeData;
         private object[] readData;
-        private byte currentItem; //Used to track the next item to receive.
+        private int currentItem; //Used to track the next item to receive.
 
         /// <summary>If true, this client should add data to the stream to send it.</summary>
         public bool IsWriting { get; private set; }
@@ -634,14 +634,14 @@ namespace Photon.Pun
             }
         }
 
-        public void SetReadStream(object[] incomingData, byte pos = 0)
+        public void SetReadStream(object[] incomingData, int pos = 0)
         {
             this.readData = incomingData;
             this.currentItem = pos;
             this.IsWriting = false;
         }
 
-        internal void SetWriteStream(List<object> newWriteData, byte pos = 0)
+        internal void SetWriteStream(List<object> newWriteData, int pos = 0)
         {
             if (pos != newWriteData.Count)
             {

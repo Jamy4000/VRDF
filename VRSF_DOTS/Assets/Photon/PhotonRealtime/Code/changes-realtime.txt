@@ -4,6 +4,18 @@ Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
 
+Version 4.1.2.19 (12. November 2019 - rev5266)
+    Fixed: The ExpectedProtocol is now also set for Authmode "AuthOnce" for ConnectToNameServer and ConnectToRegionMaster.
+    Changed: Player.ToString() to show ActorNumber and NickName. The PlayerProperties are included in ToStringFull().
+    Changed: Logging message for OpAuthenticateOnce (only logged at info level and up).
+    Changed: Avoiding a potential nullreference exception on leave of another player.
+    Updated: Cluster support. The LoadBalancingClient.CurrentCluster gives access to the current cluster. Region.SetCodeAndCluster() now separates the cluster string properly. See ConnectToRegionMaster, too.
+    Fixed: Changing the SupportLogger.Client now skips registering for callbacks, if the new value is null.
+    Changed: Logging of SupportLogger.
+    Added: LoadBalancingClient.OpJoinRandomOrCreateRoom. This can be used to create a room, should random matchmaking fail. This helps avoid race conditons where players can't find one another.
+    Added: Extra null-check in handling of event leave.
+
+
 Version 4.1.2.17 (9. August 2019 - rev5188)
     Changed: SupportLogger. Traffic stats are enabled by default. The PhotonHandler no longer has to enable this.
     Added: Min/max ping to logged statistics. SupportLogger.TrackValues is invoked to keep track of min/max ping for each connection.

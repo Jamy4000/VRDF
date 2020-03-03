@@ -1,5 +1,4 @@
 ﻿using Unity.Entities;
-using Unity.Rendering;
 using UnityEngine;
 using VRSF.Core.Utils;
 
@@ -8,8 +7,7 @@ namespace VRSF.Core.FadingEffect
     /// <summary>
     /// Component handling the fading effects. Need to be placed a canvas with an Image in front of the user's eyes
     /// </summary>
-    [RequiresEntityConversion]
-    public class CameraFadeAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+    public class CameraFadeAuthoring : MonoBehaviour
     {
         [Header("Fading Parameters")]
         /// <summary>
@@ -22,29 +20,26 @@ namespace VRSF.Core.FadingEffect
         /// </summary>
         [Tooltip("Whether a Fade In effect should take place when the OnSetupVRReady is called.")]
         [SerializeField] private bool _fadeInOnSetupVRReady = true;
+
         /// <summary>
         ///  How long, in seconds, the fade-in/fade-out animation should take
         /// </summary>
-        [Tooltip("SHould we destroy the object when done with it ?")]
+        [Tooltip("Should we destroy the object when done with it ?")]
         [SerializeField] private bool _destroyOnNewScene = true;
 
         [Header("Required Fading Components")]
         [Tooltip("Plane Mesh used to fade")]
-        [SerializeField] private Mesh _mesh;
-        [Tooltip("Plane Mesh used to fade")]
-        [SerializeField] private Material _fadeMaterial;
+        [SerializeField] private GameObject _planePrefab;
 
-        public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+        private void Start()
         {
-            _fadeMaterial.color = new Color(_fadeMaterial.color.r, _fadeMaterial.color.g, _fadeMaterial.color.b, _fadeInOnSetupVRReady ? 1.0f : 0.0f);
+            var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, null);
+            var prefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(_planePrefab, settings);
+            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-            dstManager.AddSharedComponentData(entity, new RenderMesh()
-            {
-                mesh = _mesh,
-                material = _fadeMaterial
-            });
-            
-            dstManager.AddComponentData(entity, new CameraFadeParameters()
+            var entity = entityManager.Instantiate(prefab);
+
+            entityManager.AddComponentData(entity, new CameraFadeParameters()
             {
                 FadingSpeed = _fadingSpeed,
                 ShouldImmediatlyFadeIn = false,
@@ -53,15 +48,32 @@ namespace VRSF.Core.FadingEffect
             });
 
             if (_destroyOnNewScene)
-                dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window
-            dstManager.SetName(entity, "Camera Fade Entity");
+            entityManager.SetName(entity, "Camera Fade Entity");
 #endif
 
             if (_fadeInOnSetupVRReady)
                 new StartFadingInEvent();
+
+            Destroy(gameObject);
         }
     }
-} 
+
+
+#if UNITY_EDITOR
+    [UnityEditor.CustomEditor(typeof(CameraFadeAuthoring))]
+    public class CameraFadeAuthoringInspector : UnityEditor.Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            UnityEditor.EditorGUILayout.Space();
+            UnityEditor.EditorGUILayout.HelpBox("This GameObject will be destroyed on Start.", UnityEditor.MessageType.Warning);
+        }
+    }
+#endif
+}

@@ -46,11 +46,20 @@ namespace VRSF.MoveAround.Teleport
 
         private void Awake()
         {
+            OnSetupVRReady.RegisterSetupVRResponse(Init);
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA
             if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
+                var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, null);
                 var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
                 var archetype = entityManager.CreateArchetype
@@ -134,8 +143,8 @@ namespace VRSF.MoveAround.Teleport
                 });
 
                 // Create the valid and Invalid Pads
-                var selectionPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(SelectionPad, World.DefaultGameObjectInjectionWorld);
-                var invalidPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(InvalidPad, World.DefaultGameObjectInjectionWorld);
+                var selectionPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(SelectionPad, settings);
+                var invalidPad = GameObjectConversionUtility.ConvertGameObjectHierarchy(InvalidPad, settings);
 
                 entityManager.SetEnabled(selectionPad, false);
                 entityManager.SetEnabled(invalidPad, false);

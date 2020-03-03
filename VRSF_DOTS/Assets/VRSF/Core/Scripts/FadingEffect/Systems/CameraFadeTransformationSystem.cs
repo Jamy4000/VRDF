@@ -1,16 +1,13 @@
 ﻿using UnityEngine;
 using Unity.Entities;
-using Unity.Collections;
 using Unity.Transforms;
 using VRSF.Core.SetupVR;
-using Unity.Jobs;
-using Unity.Mathematics;
 
 namespace VRSF.Core.FadingEffect
 {
-    public class CameraFadeTransformationSystem : JobComponentSystem
+    public class CameraFadeTransformationSystem : ComponentSystem
     {
-        private Transform _vrCamera;
+        private Transform _camera;
 
         protected override void OnCreate()
         {
@@ -20,62 +17,64 @@ namespace VRSF.Core.FadingEffect
             base.OnCreate();
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
-            if (_vrCamera == null)
-                return inputDeps;
+            if (_camera == null)
+                return;
 
-            var pos = _vrCamera.transform.position + _vrCamera.transform.forward * 0.3f;
-            var rot = Quaternion.LookRotation(_vrCamera.transform.up, _vrCamera.transform.forward);
+            var pos = _camera.transform.position + _camera.transform.forward * 0.3f;
+            var rot = Quaternion.LookRotation(_camera.transform.up, _camera.transform.forward);
 
-            return new CameraFollowJob
+            Entities.ForEach((ref Translation translation, ref Rotation rotation, ref CameraFadeParameters _) =>
             {
-                CameraPos = pos,
-                CameraRot = rot
-            }.Schedule(this, inputDeps);
+                // Place the instantiated canvas in front of the camera
+                translation.Value = pos;
+
+                // Rotate the instantiated canvas to face the camera
+                rotation.Value = rot;
+            });
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            _camera = null;
             OnSetupVRReady.Listeners -= InitSetupVR;
             StartFadingInEvent.Listeners -= InitFadingIn;
             StartFadingOutEvent.Listeners -= InitFadingOut;
         }
 
-
-        [Unity.Burst.BurstCompile]
-        public struct CameraFollowJob : IJobForEach<Translation, Rotation, CameraFadeParameters>
-        {
-            public float3 CameraPos;
-            public quaternion CameraRot;
-
-            public void Execute(ref Translation camPosition, ref Rotation camRotation, [ReadOnly] ref CameraFadeParameters c2)
-            {
-                // Place the instantiated canvas in front of the camera
-                camPosition.Value = CameraPos;
-
-                // Rotate the instantiated canvas to face the camera
-                camRotation.Value = CameraRot;
-            }
-        }
-
         private void InitSetupVR(OnSetupVRReady _)
         {
-            if (VRSF_Components.VRCamera != null)
-                _vrCamera = VRSF_Components.VRCamera.transform;
+            SetCameraRef();
         }
 
         private void InitFadingIn(StartFadingInEvent _)
         {
-            if (VRSF_Components.VRCamera != null)
-                _vrCamera = VRSF_Components.VRCamera.transform;
+            if (_camera == null)
+                SetCameraRef();
         }
 
         private void InitFadingOut(StartFadingOutEvent _)
         {
+            if (_camera == null)
+                SetCameraRef();
+        }
+
+        private void SetCameraRef()
+        {
             if (VRSF_Components.VRCamera != null)
-                _vrCamera = VRSF_Components.VRCamera.transform;
+            {
+                _camera = VRSF_Components.VRCamera.transform;
+            }
+            else
+            {
+                var camObject = GameObject.FindGameObjectWithTag("MainCamera");
+                if (camObject != null)
+                    _camera = camObject.transform;
+                else
+                    Debug.Log("<b>[VRSF] :</b> Couldn't find any Camera with tag MainCamera.");
+            }
         }
     }
 }

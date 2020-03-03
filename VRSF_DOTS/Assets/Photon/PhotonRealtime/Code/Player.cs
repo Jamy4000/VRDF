@@ -92,15 +92,12 @@ namespace Photon.Realtime
         }
 
         /// <summary>UserId of the player, available when the room got created with RoomOptions.PublishUserId = true.</summary>
-        /// <remarks>Useful for PhotonNetwork.FindFriends and blocking slots in a room for expected players (e.g. in PhotonNetwork.CreateRoom).</remarks>
+        /// <remarks>Useful for <see cref="LoadBalancingClient.OpFindFriends"/> and blocking slots in a room for expected players (e.g. in <see cref="LoadBalancingClient.OpCreateRoom"/>).</remarks>
         public string UserId { get; internal set; }
 
         /// <summary>
         /// True if this player is the Master Client of the current room.
         /// </summary>
-        /// <remarks>
-        /// See also: PhotonNetwork.MasterClient.
-        /// </remarks>
         public bool IsMasterClient
         {
             get
@@ -284,11 +281,11 @@ namespace Photon.Realtime
 
 
         /// <summary>
-        /// Brief summary string of the Player. Includes name or player.ID and if it's the Master Client.
+        /// Brief summary string of the Player: ActorNumber and NickName
         /// </summary>
         public override string ToString()
         {
-            return (string.IsNullOrEmpty(this.NickName) ? this.ActorNumber.ToString() : this.nickName) + " " + SupportClass.DictionaryToString(this.CustomProperties);
+            return string.Format("#{0:00} '{1}'",this.ActorNumber, this.NickName);
         }
 
         /// <summary>

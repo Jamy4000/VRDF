@@ -88,8 +88,12 @@ namespace Photon.Realtime
         }
 
         /// <summary>
-        /// This value summarizes the results of pinging the currently available EnabledRegions (after PingMinimumOfRegions finished).
+        /// This value summarizes the results of pinging currently available regions (after PingMinimumOfRegions finished).
         /// </summary>
+        /// <remarks>
+        /// This value should be stored in the client by the game logic.
+        /// When connecting again, use it as previous summary to speed up pinging regions and to make the best region sticky for the client.
+        /// </remarks>
         public string SummaryToCache
         {
             get
@@ -102,8 +106,21 @@ namespace Photon.Realtime
             }
         }
 
+        #if PING_VIA_COROUTINE
+        private ConnectionHandler connectionHandler;
+        
+        public RegionHandler()
+        {
+            this.connectionHandler = UnityEngine.Object.FindObjectOfType<ConnectionHandler>();
+            if (!connectionHandler)
+            {
+                Debug.LogError("ConnectionHandler component not found. It is required to start regions ping coroutine.");
+            }
+        }
+        #endif
+
         public string GetResults()
-        { 
+        {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("Region Pinging Result: {0}\n", this.BestRegion.ToString());
             if (this.pingerList != null)
@@ -226,8 +243,11 @@ namespace Photon.Realtime
 
             Region preferred = this.EnabledRegions.Find(r => r.Code.Equals(prevBestRegionCode));
             RegionPinger singlePinger = new RegionPinger(preferred, this.OnPreferredRegionPinged);
+            #if PING_VIA_COROUTINE
+            singlePinger.Start(this.connectionHandler);
+            #else
             singlePinger.Start();
-
+            #endif
             return true;
         }
 
@@ -259,7 +279,11 @@ namespace Photon.Realtime
             {
                 RegionPinger rp = new RegionPinger(region, this.OnRegionDone);
                 this.pingerList.Add(rp);
+                #if PING_VIA_COROUTINE
+                rp.Start(this.connectionHandler); // TODO: check return value
+                #else
                 rp.Start(); // TODO: check return value
+                #endif
             }
 
             return true;
@@ -298,12 +322,6 @@ namespace Photon.Realtime
         private PhotonPing ping;
 
         private List<int> rttResults;
-
-        #if PING_VIA_COROUTINE
-        // for WebGL exports, a coroutine is used to run pings. this is done on a temporary game object/monobehaviour
-        private MonoBehaviour coroutineMonoBehaviour;
-        #endif
-
 
         public RegionPinger(Region region, Action<Region> onDoneCallback)
         {
@@ -344,8 +362,11 @@ namespace Photon.Realtime
             return ping;
         }
 
-
+        #if PING_VIA_COROUTINE
+        public bool Start(ConnectionHandler connectionHandler)
+        #else
         public bool Start()
+        #endif
         {
             // all addresses for Photon region servers will contain a :port ending. this needs to be removed first.
             // PhotonPing.StartPing() requires a plain (IP) address without port or protocol-prefix (on all but Windows 8.1 and WebGL platforms).
@@ -366,16 +387,18 @@ namespace Photon.Realtime
             this.rttResults = new List<int>(Attempts);
 
             #if PING_VIA_COROUTINE
-            GameObject go = new GameObject();
-            go.name = "RegionPing_" + this.region.Code + "_" + this.region.Cluster;
-            this.coroutineMonoBehaviour = go.AddComponent<MonoBehaviourEmpty>();        // is defined below, as special case for Unity WegGL
-            this.coroutineMonoBehaviour.StartCoroutine(this.RegionPingCoroutine());
-            #else
-            #if UNITY_SWITCH
+            if (connectionHandler)
+            {
+                connectionHandler.StartCoroutine(this.RegionPingCoroutine());
+            }
+            else
+            {
+                Debug.LogError("ConnectionHandler component is null or destroyed. It is required to start regions ping coroutine.");
+            }
+            #elif UNITY_SWITCH
             SupportClass.StartBackgroundCalls(this.RegionPingThreaded, 0);
             #else
             SupportClass.StartBackgroundCalls(this.RegionPingThreaded, 0, "RegionPing_" + this.region.Code+"_"+this.region.Cluster);
-            #endif
             #endif
 
             return true;
@@ -510,11 +533,6 @@ namespace Photon.Realtime
                 yield return new WaitForSeconds(0.1f);
             }
 
-
-            #if PING_VIA_COROUTINE
-            GameObject.Destroy(this.coroutineMonoBehaviour.gameObject);   // this method runs as coroutine on a temp object, which gets destroyed now.
-            #endif
-
             //Debug.Log("Done: "+ this.region.Code);
             this.Done = true;
             this.onDoneCall(this.region);
@@ -555,6 +573,7 @@ namespace Photon.Realtime
                 #if UNITY_WSA || NETFX_CORE || UNITY_WEBGL
                 return hostName;
                 #else
+
                 IPAddress[] address = Dns.GetHostAddresses(hostName);
                 if (address.Length == 1)
                 {
@@ -588,8 +607,4 @@ namespace Photon.Realtime
             return ipv4Address;
         }
     }
-
-    #if PING_VIA_COROUTINE
-    internal class MonoBehaviourEmpty : MonoBehaviour { }
-    #endif
 }

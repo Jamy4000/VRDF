@@ -47,9 +47,13 @@ namespace Photon.Voice.PUN
 
         #region Private Fields
 
-        private RoomOptions voiceRoomOptions = new RoomOptions { IsVisible = false };
+        private EnterRoomParams voiceRoomParams = new EnterRoomParams
+        {
+            RoomOptions = new RoomOptions { IsVisible = false }
+        };
         private bool clientCalledConnectAndJoin;
         private bool clientCalledDisconnect;
+        private bool internalDisconnect;
         private static object instanceLock = new object();
         private static PhotonVoiceNetwork instance;
         private static bool instantiated;
@@ -154,24 +158,11 @@ namespace Photon.Voice.PUN
                 }
                 return false;
             }
-            AppSettings settings = this.Settings;
-            if (this.usePunAppSettings)
+            if (this.Connect())
             {
-                settings = PhotonNetwork.PhotonServerSettings.AppSettings;
-            }
-            if (PhotonNetwork.NetworkingClient != null && !string.IsNullOrEmpty(PhotonNetwork.NetworkingClient.UserId))
-            {
-                this.Client.UserId = PhotonNetwork.NetworkingClient.UserId;
-            }
-            if (this.ConnectUsingSettings(settings))
-            {
-                clientCalledConnectAndJoin = true;
-                clientCalledDisconnect = false;
+                this.clientCalledConnectAndJoin = true;
+                this.clientCalledDisconnect = false;
                 return true;
-            }
-            if (this.Logger.IsErrorEnabled)
-            {
-                this.Logger.LogError("Connecting to server failed.");
             }
             return false;
         }
@@ -189,8 +180,8 @@ namespace Photon.Voice.PUN
                 }
                 return;
             }
-            clientCalledDisconnect = true;
-            clientCalledConnectAndJoin = false;
+            this.clientCalledDisconnect = true;
+            this.clientCalledConnectAndJoin = false;
             this.Client.Disconnect();
         }
 
@@ -207,9 +198,10 @@ namespace Photon.Voice.PUN
         private void OnEnable()
         {
             PhotonNetwork.NetworkingClient.StateChanged += OnPunStateChanged;
-            FollowPun(); // in case this is enabled or activated late
-            clientCalledConnectAndJoin = false;
-            clientCalledDisconnect = false;
+            this.FollowPun(); // in case this is enabled or activated late
+            this.clientCalledConnectAndJoin = false;
+            this.clientCalledDisconnect = false;
+            this.internalDisconnect = false;
         }
 
         protected override void OnDisable()
@@ -238,9 +230,16 @@ namespace Photon.Voice.PUN
         protected override void OnVoiceStateChanged(ClientState fromState, ClientState toState)
         {
             base.OnVoiceStateChanged(fromState, toState);
-            if (!this.clientCalledDisconnect && toState == ClientState.Disconnected && this.Client.DisconnectedCause == DisconnectCause.DisconnectByClientLogic)
+            if (toState == ClientState.Disconnected)
             {
-                this.clientCalledDisconnect = true;
+                if (this.internalDisconnect)
+                {
+                    this.internalDisconnect = false;
+                }
+                else if (!this.clientCalledDisconnect)
+                {
+                    this.clientCalledDisconnect = this.Client.DisconnectedCause == DisconnectCause.DisconnectByClientLogic;
+                }
             }
             this.FollowPun(toState);
         }
@@ -319,20 +318,20 @@ namespace Photon.Voice.PUN
                     {
                         this.Logger.LogInfo("PUN joined room, now connecting Voice client");
                     }
-                    if (!this.ConnectUsingSettings(PhotonNetwork.PhotonServerSettings.AppSettings))
-                    {
-                        if (this.Logger.IsErrorEnabled)
-                        {
-                            this.Logger.LogError("Connecting to server failed.");
-                        }
-                    }
+                    this.Connect();
                     break;
                 case ClientState.ConnectedToMasterServer:
                     if (this.Logger.IsInfoEnabled)
                     {
                         this.Logger.LogInfo("PUN joined room, now joining Voice room");
                     }
-                    JoinRoom(GetVoiceRoomName());
+                    if (!this.JoinRoom(GetVoiceRoomName()))
+                    {
+                        if (this.Logger.IsErrorEnabled)
+                        {
+                            this.Logger.LogError("Joining a voice room failed.");
+                        }
+                    }
                     break;
                 default:
                     if (this.Logger.IsWarningEnabled)
@@ -343,7 +342,29 @@ namespace Photon.Voice.PUN
             }
         }
 
-        private void JoinRoom(string voiceRoomName)
+        private bool Connect()
+        {
+            AppSettings settings = this.Settings;
+            if (this.usePunAppSettings)
+            {
+                settings = PhotonNetwork.PhotonServerSettings.AppSettings;
+                if (string.IsNullOrEmpty(this.Client.UserId) && PhotonNetwork.NetworkingClient != null && !string.IsNullOrEmpty(PhotonNetwork.NetworkingClient.UserId))
+                {
+                    this.Client.UserId = PhotonNetwork.NetworkingClient.UserId;
+                }
+            }
+            if (!this.ConnectUsingSettings(settings))
+            {
+                if (this.Logger.IsErrorEnabled)
+                {
+                    this.Logger.LogError("Connecting to server failed.");
+                }
+                return false;
+            }
+            return true;
+        }
+
+        private bool JoinRoom(string voiceRoomName)
         {
             if (string.IsNullOrEmpty(voiceRoomName))
             {
@@ -351,9 +372,10 @@ namespace Photon.Voice.PUN
                 {
                     this.Logger.LogError("Voice room name is null or empty.");
                 }
-                return;
+                return false;
             }
-            this.Client.OpJoinOrCreateRoom(new EnterRoomParams { RoomName = voiceRoomName, RoomOptions = voiceRoomOptions });
+            this.voiceRoomParams.RoomName = voiceRoomName;
+            return this.Client.OpJoinOrCreateRoom(this.voiceRoomParams);
         }
 
         // Follow PUN client state
@@ -367,7 +389,7 @@ namespace Photon.Voice.PUN
             }
             if (PhotonNetwork.NetworkClientState == this.ClientState)
             {
-                if (PhotonNetwork.NetworkClientState == ClientState.Joined && this.AutoConnectAndJoin)
+                if (PhotonNetwork.InRoom && this.AutoConnectAndJoin)
                 {
                     string expectedRoomName = GetVoiceRoomName();
                     string currentRoomName = this.Client.CurrentRoom.Name;
@@ -379,24 +401,31 @@ namespace Photon.Voice.PUN
                                 "Voice room mismatch: Expected:\"{0}\" Current:\"{1}\", leaving the second to join the first.",
                                 expectedRoomName, currentRoomName);
                         }
-                        this.Client.OpLeaveRoom(false);
+                        if (!this.Client.OpLeaveRoom(false))
+                        {
+                            if (this.Logger.IsErrorEnabled)
+                            {
+                                this.Logger.LogError("Leaving the current voice room failed.");
+                            }
+                        }
                     }
                 }
                 return;
             }
             if (PhotonNetwork.InRoom)
             {
-                if (clientCalledConnectAndJoin || AutoConnectAndJoin && !clientCalledDisconnect)
+                if (this.clientCalledConnectAndJoin || this.AutoConnectAndJoin && !this.clientCalledDisconnect)
                 {
-                    ConnectOrJoin();
+                    this.ConnectOrJoin();
                 }
             }
-            else if (this.ClientState == ClientState.Joined && AutoLeaveAndDisconnect && !clientCalledConnectAndJoin)
+            else if (this.Client.InRoom && this.AutoLeaveAndDisconnect && !this.clientCalledConnectAndJoin)
             {
                 if (this.Logger.IsInfoEnabled)
                 {
                     this.Logger.LogInfo("PUN left room, disconnecting Voice");
                 }
+                this.internalDisconnect = true;
                 this.Client.Disconnect();
             }
         }
@@ -421,6 +450,11 @@ namespace Photon.Voice.PUN
                             LinkSpeaker(speaker, remoteVoice);
                             break;
                         }
+                    } 
+                    else if (this.Logger.IsErrorEnabled)
+                    {
+                        this.Logger.LogError("Unexpected: VoiceInfo.UserData should be int/ViewId, received: {0}", 
+                            remoteVoice.Info.UserData == null ? "null" : string.Format("{0} ({1})", remoteVoice.Info.UserData, remoteVoice.Info.UserData.GetType()));
                     }
                 }
             }

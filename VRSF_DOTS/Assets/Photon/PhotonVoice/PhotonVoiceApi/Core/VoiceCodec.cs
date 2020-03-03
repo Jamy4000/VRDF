@@ -93,6 +93,7 @@ namespace Photon.Voice
     /// <remarks>Transmitted in <see cref="VoiceInfo"></see>. Do not change the values of this Enum!</remarks>
     public enum Codec
     {
+		Raw = 1,
         /// <summary>OPUS audio</summary>
         AudioOpus = 11,
 #if PHOTON_VOICE_VIDEO_ENABLE

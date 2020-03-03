@@ -11,9 +11,9 @@ namespace VRSF.Core.LaserPointer
         [Tooltip("The base width for this pointer when you are pointing at something.")]
         [SerializeField] private float _pointerWidth = 0.001f;
         [Tooltip("If you want the pointer to set its endpoint to the center of the 3D object it just hit.")]
-        [SerializeField] private bool _shouldPointTo3DObjectCenter;
+        [SerializeField] private bool _shouldPointTo3DObjectCenter = false;
         [Tooltip("If you want the pointer to set its endpoint to the center of the UI element it just hit. WARNING : UI Colliders needs to be on the UI Layer.")]
-        [SerializeField] private bool _shouldPointToUICenter;
+        [SerializeField] private bool _shouldPointToUICenter = false;
 
         [Header("Disappearance Parameters")]
         [Tooltip("The base state of the Pointer.")]

@@ -11,8 +11,8 @@
 using System.Collections.Generic;
 namespace Photon.Voice
 {
-    /// <summary>Describes stream properties.</summary>
-    public struct VoiceInfo
+	/// <summary>Describes stream properties.</summary>
+	public struct VoiceInfo
     {
         /// <summary>
         /// Create stream info for an Opus audio stream.
@@ -35,16 +35,36 @@ namespace Photon.Voice
                 UserData = userdata
             };
         }
+		/// <summary>
+		/// Create stream info for an Opus audio stream.
+		/// </summary>
+		/// <param name="samplingRate">Audio sampling rate.</param>
+		/// <param name="channels">Number of channels.</param>
+		/// <param name="frameDurationUs">Uncompressed frame (audio packet) size in microseconds.</param>
+		/// <param name="bitrate">Stream bitrate (in bits/second).</param>
+		/// <param name="userdata">Optional user data. Should be serializable by Photon.</param>
+		/// <returns>VoiceInfo instance.</returns>
+		static public VoiceInfo CreateAudio(Codec codec, int samplingRate, int channels, int frameDurationUs, object userdata = null)
+		{
+			return new VoiceInfo()
+			{
+				Codec = Codec.Raw,
+				SamplingRate = (int)samplingRate,
+				Channels = channels,
+				FrameDurationUs = (int)frameDurationUs,
+				UserData = userdata
+			};
+		}
 #if PHOTON_VOICE_VIDEO_ENABLE
-        /// <summary>
-        /// Helper for VP8 stream info creation.
-        /// </summary>
-        /// <param name="bitrate">Stream bitrate.</param>
-        /// <param name="width">Streamed video width. If 0, width and height of video source used (no rescaling).</param>
-        /// <param name="heigth">Streamed video height. If -1, aspect ratio preserved during rescaling.</param>
-        /// <param name="userdata">Optional user data. Should be serializable by Photon.</param>        
-        /// <returns>VoiceInfo instance.</returns>
-        static public VoiceInfo CreateVideoVP8(int bitrate, int width = 0, int heigth = -1, object userdata = null)
+		/// <summary>
+		/// Helper for VP8 stream info creation.
+		/// </summary>
+		/// <param name="bitrate">Stream bitrate.</param>
+		/// <param name="width">Streamed video width. If 0, width and height of video source used (no rescaling).</param>
+		/// <param name="heigth">Streamed video height. If -1, aspect ratio preserved during rescaling.</param>
+		/// <param name="userdata">Optional user data. Should be serializable by Photon.</param>        
+		/// <returns>VoiceInfo instance.</returns>
+		static public VoiceInfo CreateVideoVP8(int bitrate, int width = 0, int heigth = -1, object userdata = null)
         {
             return new VoiceInfo()
             {
@@ -82,7 +102,7 @@ namespace Photon.Voice
         public Codec Codec { get; set; }
         /// <summary>Audio sampling rate (frequency, in Hz).</summary>
         public int SamplingRate { get; set; }
-        /// <summary>Source audio sampling rate (to be resampled to SamplingRate; in Hz).</summary>
+        /// <summary>Number of channels.</summary>
         public int Channels { get; set; }
         /// <summary>Uncompressed frame (audio packet) size in microseconds.</summary>
         public int FrameDurationUs { get; set; }

@@ -58,7 +58,8 @@ namespace Photon.Pun.UtilityScripts
 
         public override void OnDisable()
         {
-            PlayersPerTeam = new Dictionary<Team, List<Player>>();
+            base.OnDisable();
+            this.Start();
         }
 
         /// <summary>Needed to update the team lists when joining a room.</summary>

@@ -95,7 +95,19 @@ namespace Photon.Pun
 
             if (PhotonNetwork.PhotonServerSettings.EnableSupportLogger)
             {
-                this.supportLoggerComponent = this.gameObject.AddComponent<SupportLogger>();
+                SupportLogger supportLogger = this.gameObject.GetComponent<SupportLogger>();
+                if (supportLogger == null)
+                {
+                    supportLogger = this.gameObject.AddComponent<SupportLogger>();
+                }
+                if (this.supportLoggerComponent != null)
+                {
+                    if (supportLogger.GetInstanceID() != this.supportLoggerComponent.GetInstanceID())
+                    {
+                        Debug.LogWarningFormat("Cached SupportLogger component is different from the one attached to PhotonMono GameObject");
+                    }
+                }
+                this.supportLoggerComponent = supportLogger;
                 this.supportLoggerComponent.Client = PhotonNetwork.NetworkingClient;
             }
 

@@ -28,6 +28,14 @@ namespace VRSF.MoveAround.Fly
 
         private void Awake()
         {
+            OnSetupVRReady.RegisterSetupVRResponse(Init);
+        }
+
+        private void Init(OnSetupVRReady _)
+        {
+            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
+                OnSetupVRReady.Listeners -= Init;
+
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
 
             // If the device loaded is included in the device using this CBRA

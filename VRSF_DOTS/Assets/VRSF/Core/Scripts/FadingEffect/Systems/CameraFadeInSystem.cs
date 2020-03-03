@@ -1,5 +1,4 @@
 ﻿using Unity.Entities;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.FadingEffect
 {

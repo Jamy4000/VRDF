@@ -64,7 +64,7 @@ namespace Photon.Pun
     public static partial class PhotonNetwork
     {
         /// <summary>Version number of PUN. Used in the AppVersion, which separates your playerbase in matchmaking.</summary>
-        public const string PunVersion = "2.14";
+        public const string PunVersion = "2.16";
 
         /// <summary>Version number of your game. Setting this updates the AppVersion, which separates your playerbase in matchmaking.</summary>
         /// <remarks>
@@ -131,7 +131,16 @@ namespace Photon.Pun
 
         /// <summary>Currently used Cloud Region (if any). As long as the client is not on a Master Server or Game Server, the region is not yet defined.</summary>
         public static string CloudRegion { get { return (NetworkingClient != null && IsConnected && Server!=ServerConnection.NameServer) ? NetworkingClient.CloudRegion : null; } }
-
+        
+        /// <summary>The cluster name provided by the Name Server.</summary>
+        /// <remarks>
+        /// The value is provided by the OpResponse for OpAuthenticate/OpAuthenticateOnce. See ConnectToRegion.
+        /// 
+        /// Null until set.
+        ///
+        /// Note that the Name Server may assign another cluster, if the requested one is not configured or available.
+        /// </remarks>
+        public static string CurrentCluster { get { return (NetworkingClient != null ) ? NetworkingClient.CurrentCluster : null; } }
 
         /// <summary>Key to save the "Best Region Summary" in the Player Preferences.</summary>
         private const string PlayerPrefsKey = "PUNCloudBestRegion";
@@ -1232,6 +1241,18 @@ namespace Photon.Pun
         /// <summary>
         /// Connects to the Photon Cloud region of choice.
         /// </summary>
+        /// <remarks>
+        /// It's typically enough to define the region code ("eu", "us", etc).
+        /// Connecting to a specific cluster may be necessary, when regions get sharded and you support friends / invites.
+        /// 
+        /// In all other cases, you should not define a cluster as this allows the Name Server to distribute
+        /// clients as needed. A random, load balanced cluster will be selected.
+        ///
+        /// The Name Server has the final say to assign a cluster as available.
+        /// If the requested cluster is not available another will be assigned.
+        /// 
+        /// Once connected, check the value of CurrentCluster.
+        /// </remarks>
         public static bool ConnectToRegion(string region)
         {
             if (NetworkingClient.LoadBalancingPeer.PeerState != PeerStateValue.Disconnected && NetworkingClient.Server != ServerConnection.NameServer)
@@ -2457,6 +2478,8 @@ namespace Photon.Pun
 
                 photonViews[i].didAwake = true;
                 photonViews[i].ViewID = parameters.viewIDs[i];    // with didAwake true and viewID == 0, this will also register the view
+
+                photonViews[i].Group = parameters.group;
             }
 
             if (localInstantiate)
@@ -2499,41 +2522,41 @@ namespace Photon.Pun
 
             SendInstantiateEvHashtable.Clear();     // SendInstantiate reuses this Hashtable to reduce GC
 
-            SendInstantiateEvHashtable[(byte)0] = parameters.prefabName;
+            SendInstantiateEvHashtable[keyByteZero] = parameters.prefabName;
 
             if (parameters.position != Vector3.zero)
             {
-                SendInstantiateEvHashtable[(byte)1] = parameters.position;
+                SendInstantiateEvHashtable[keyByteOne] = parameters.position;
             }
 
             if (parameters.rotation != Quaternion.identity)
             {
-                SendInstantiateEvHashtable[(byte)2] = parameters.rotation;
+                SendInstantiateEvHashtable[keyByteTwo] = parameters.rotation;
             }
 
             if (parameters.group != 0)
             {
-                SendInstantiateEvHashtable[(byte)3] = parameters.group;
+                SendInstantiateEvHashtable[keyByteThree] = parameters.group;
             }
 
             // send the list of viewIDs only if there are more than one. else the instantiateId is the viewID
             if (parameters.viewIDs.Length > 1)
             {
-                SendInstantiateEvHashtable[(byte)4] = parameters.viewIDs; // LIMITS PHOTONVIEWS&PLAYERS
+                SendInstantiateEvHashtable[keyByteFour] = parameters.viewIDs; // LIMITS PHOTONVIEWS&PLAYERS
             }
 
             if (parameters.data != null)
             {
-                SendInstantiateEvHashtable[(byte)5] = parameters.data;
+                SendInstantiateEvHashtable[keyByteFive] = parameters.data;
             }
 
             if (currentLevelPrefix > 0)
             {
-                SendInstantiateEvHashtable[(byte)8] = currentLevelPrefix;    // photonview's / object's level prefix
+                SendInstantiateEvHashtable[keyByteEight] = currentLevelPrefix;    // photonview's / object's level prefix
             }
 
-            SendInstantiateEvHashtable[(byte)6] = PhotonNetwork.ServerTimestamp;
-            SendInstantiateEvHashtable[(byte)7] = instantiateId;
+            SendInstantiateEvHashtable[keyByteSix] = PhotonNetwork.ServerTimestamp;
+            SendInstantiateEvHashtable[keyByteSeven] = instantiateId;
 
 
             SendInstantiateRaiseEventOptions.CachingOption = (sceneObject) ? EventCaching.AddToRoomCacheGlobal : EventCaching.AddToRoomCache;
@@ -2736,6 +2759,12 @@ namespace Photon.Pun
         /// </summary>
         internal static void RPC(PhotonView view, string methodName, RpcTarget target, bool encrypt, params object[] parameters)
         {
+            if (string.IsNullOrEmpty(methodName))
+            {
+                Debug.LogError("RPC method name cannot be null or empty.");
+                return;
+            }
+
             if (!VerifyCanUseNetwork())
             {
                 return;

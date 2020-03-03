@@ -22,18 +22,22 @@ namespace VRSF.Core.Inputs
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            if (!VRSF_Components.SetupVRIsReady)
-                return inputDeps;
-
-            var handle = new MenuInputCaptureJob()
+            if (VRSF_Components.SetupVRIsReady)
             {
-                MenuButtonDown = Input.GetButtonDown(_rightInput),
-                MenuButtonUp = Input.GetButtonUp(_rightInput),
-                Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(this, inputDeps);
+                var handle = new MenuInputCaptureJob()
+                {
+                    MenuButtonDown = Input.GetButtonDown(_rightInput),
+                    MenuButtonUp = Input.GetButtonUp(_rightInput),
+                    Commands = _endSimEcbSystem.CreateCommandBuffer().ToConcurrent()
+                }.Schedule(this, inputDeps);
 
-            handle.Complete();
-            return handle;
+                handle.Complete();
+                return handle;
+            }
+            else
+            {
+                return inputDeps;
+            }
         }
 
         protected override void OnDestroy()

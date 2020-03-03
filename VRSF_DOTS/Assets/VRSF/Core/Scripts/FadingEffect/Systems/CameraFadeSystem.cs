@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using Unity.Entities;
 using Unity.Rendering;
-using System;
 
 namespace VRSF.Core.FadingEffect
 {
@@ -15,6 +14,7 @@ namespace VRSF.Core.FadingEffect
             SetupVR.OnSetupVRReady.Listeners += SetupVrIsReady;
             StartFadingInEvent.Listeners += OnStartFadingIn;
             StartFadingOutEvent.Listeners += OnStartFadingOut;
+            OnFadingInEndedEvent.Listeners += OnFadeInEnded;
 
             base.OnCreate();
             _entityManager = World.EntityManager;
@@ -54,6 +54,8 @@ namespace VRSF.Core.FadingEffect
             SetupVR.OnSetupVRReady.Listeners -= SetupVrIsReady;
             StartFadingInEvent.Listeners -= OnStartFadingIn;
             StartFadingOutEvent.Listeners -= OnStartFadingOut;
+            OnFadingInEndedEvent.Listeners -= OnFadeInEnded;
+
             base.OnDestroy();
         }
 
@@ -73,7 +75,6 @@ namespace VRSF.Core.FadingEffect
                 // If the fadingIn is finished
                 if (color.a < 0)
                 {
-                    color.a = 0.0f;
                     this.Enabled = false;
                     new OnFadingInEndedEvent();
                 }
@@ -86,7 +87,6 @@ namespace VRSF.Core.FadingEffect
                 // if the alpha is completely dark, we're done with the fade Out
                 if (color.a > 1)
                 {
-                    color.a = 1.0f;
                     this.Enabled = cameraFade.ShouldImmediatlyFadeIn;
                     new OnFadingOutEndedEvent();
                 }
@@ -113,16 +113,21 @@ namespace VRSF.Core.FadingEffect
             this.Enabled = fadingOnStart;
         }
 
-        protected void OnStartFadingIn(StartFadingInEvent info)
+        protected void OnStartFadingIn(StartFadingInEvent _)
         {
             SetFadingMaterialAlpha(1.0f);
             this.Enabled = true;
         }
 
-        protected void OnStartFadingOut(StartFadingOutEvent info)
+        protected void OnStartFadingOut(StartFadingOutEvent _)
         {
             SetFadingMaterialAlpha(0.0f);
             this.Enabled = true;
+        }
+
+        private void OnFadeInEnded(OnFadingInEndedEvent _)
+        {
+            this.Enabled = false;
         }
 
         private void SetFadingMaterialAlpha(float newAlpha)

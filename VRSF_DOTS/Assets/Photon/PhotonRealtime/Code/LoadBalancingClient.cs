@@ -124,6 +124,8 @@ namespace Photon.Realtime
         JoinRoom,
         /// <summary>Done on Master Server and (if successful) followed by a Join on Game Server.</summary>
         JoinRandomRoom,
+        /// <summary>Done on Master Server and (if successful) followed by a Join or Create on Game Server.</summary>
+        JoinRandomOrCreateRoom,
         /// <summary>Client is either joining or creating a room. On Master- and Game-Server.</summary>
         JoinOrCreateRoom
     }
@@ -283,7 +285,7 @@ namespace Photon.Realtime
 
 
         /// <summary>True if this client uses a NameServer to get the Master Server address.</summary>
-        /// <remarks>This value is public, despite being an internal value, which should only be set by this client or PUN.</remarks>
+        /// <remarks>This value is public, despite being an internal value, which should only be set by this client.</remarks>
         public bool IsUsingNameServer { get; set; }
 
         /// <summary>Name Server Host Name for Photon Cloud. Without port and without any prefix.</summary>
@@ -371,7 +373,7 @@ namespace Photon.Realtime
         /// Examples: The NameServer allows OpGetRegions which is not available anywhere else.
         /// The MasterServer does not allow you to send events (OpRaiseEvent) and on the GameServer you are unable to join a lobby (OpJoinLobby).
         ///
-        /// To check which server you are on, use: PhotonNetwork.Server.
+        /// To check which server you are on, use: <see cref="Server"/>.
         /// </remarks>
         public bool IsConnectedAndReady
         {
@@ -556,8 +558,7 @@ namespace Photon.Realtime
         /// <remarks>
         /// Aside from polling this value, game logic should implement IMatchmakingCallbacks in some class
         /// and react when that gets called.<br/>
-        /// OpRaiseEvent, OpLeave and some other operations can only be used (successfully) when the client is in a room.
-        /// PUN's PhotonNetwork.InRoom will support being InRoom in it's offline mode (by providing it's own property).
+        /// OpRaiseEvent, OpLeave and some other operations can only be used (successfully) when the client is in a room..
         /// </remarks>
         public bool InRoom
         {
@@ -599,6 +600,13 @@ namespace Photon.Realtime
 
         /// <summary>The cloud region this client connects to. Set by ConnectToRegionMaster(). Not set if you don't use a NameServer!</summary>
         public string CloudRegion { get; private set; }
+
+        /// <summary>The cluster name provided by the Name Server.</summary>
+        /// <remarks>
+        /// The value is provided by the OpResponse for OpAuthenticate/OpAuthenticateOnce.
+        /// Default: null. This value only ever updates from the Name Server authenticate response.
+        /// </remarks>
+        public string CurrentCluster { get; private set; }
 
         /// <summary>Contains the list if enabled regions this client may use. Null, unless the client got a response to OpGetRegions.</summary>
         public RegionHandler RegionHandler;
@@ -716,6 +724,12 @@ namespace Photon.Realtime
         /// </remarks>
         public virtual bool Connect()
         {
+            // we check if try to connect to a self-hosted Photon Server
+            if (string.IsNullOrEmpty(this.AppId) || !this.IsUsingNameServer)
+            {
+                // this is a workaround to use with version v4.0.29.11263 or lower, which doesn't support GpBinaryV18 yet.
+                this.LoadBalancingPeer.SerializationProtocolType = SerializationProtocol.GpBinaryV16;
+            }
             #if UNITY_WEBGL
             SocketWebTcp.SerializationProtocol = Enum.GetName(typeof(SerializationProtocol), this.LoadBalancingPeer.SerializationProtocolType);
             #endif
@@ -758,6 +772,11 @@ namespace Photon.Realtime
                 this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
                 this.LoadBalancingPeer.TransportProtocol = ConnectionProtocol.WebSocketSecure;
             }
+            else if (this.AuthMode == AuthModeOption.AuthOnce)
+            {
+                //Debug.LogWarning("Setting expected to current: "+this.LoadBalancingPeer.TransportProtocol);
+                this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
+            }
 
             this.DisconnectedCause = DisconnectCause.None;
             if (!this.LoadBalancingPeer.Connect(this.NameServerAddress, "NameServer", this.TokenForInit))
@@ -772,6 +791,10 @@ namespace Photon.Realtime
         /// <summary>
         /// Connects you to a specific region's Master Server, using the Name Server to find the IP.
         /// </summary>
+        /// <remarks>
+        /// If the region string does not contain a "/", this means no specific cluster is requested.
+        /// To support "Sharding", the region gets a "/*" postfix in this case, to select a random cluster.
+        /// </remarks>
         /// <returns>If the operation could be sent. If false, no operation was sent.</returns>
         public bool ConnectToRegionMaster(string region)
         {
@@ -784,6 +807,11 @@ namespace Photon.Realtime
             }
 
             this.LoadBalancingPeer.Disconnect();
+
+            if (!string.IsNullOrEmpty(region) && !region.Contains("/"))
+            {
+                region = region + "/*";
+            }
             this.CloudRegion = region;
 
             #if UNITY_WEBGL
@@ -794,6 +822,10 @@ namespace Photon.Realtime
             {
                 this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
                 this.LoadBalancingPeer.TransportProtocol = ConnectionProtocol.WebSocketSecure;
+            }
+            else if (this.AuthMode == AuthModeOption.AuthOnce)
+            {
+                this.ExpectedProtocol = this.LoadBalancingPeer.TransportProtocol;
             }
 
             this.DisconnectedCause = DisconnectCause.None;
@@ -1258,6 +1290,39 @@ namespace Photon.Realtime
             }
             return sending;
         }
+
+
+        public bool OpJoinRandomOrCreateRoom(OpJoinRandomRoomParams opJoinRandomRoomParams, EnterRoomParams createRoomParams)
+        {
+            if (!this.CheckIfOpCanBeSent(OperationCode.JoinRandomGame, this.Server, "OpJoinRandomOrCreateRoom"))
+            {
+                return false;
+            }
+
+            if (opJoinRandomRoomParams == null)
+            {
+                opJoinRandomRoomParams = new OpJoinRandomRoomParams();
+            }
+            if (createRoomParams == null)
+            {
+                createRoomParams = new EnterRoomParams();
+            }
+
+            createRoomParams.CreateIfNotExists = true;
+            this.enterRoomParamsCache = createRoomParams;
+            this.enterRoomParamsCache.Lobby = opJoinRandomRoomParams.TypedLobby;
+            this.enterRoomParamsCache.ExpectedUsers = opJoinRandomRoomParams.ExpectedUsers;
+
+
+            bool sending = this.LoadBalancingPeer.OpJoinRandomOrCreateRoom(opJoinRandomRoomParams, createRoomParams);
+            if (sending)
+            {
+                this.lastJoinType = JoinType.JoinRandomOrCreateRoom;
+                this.State = ClientState.Joining;
+            }
+            return sending;
+        }
+
 
 
         /// <summary>
@@ -2187,6 +2252,12 @@ namespace Photon.Realtime
 
                         if (this.Server == ServerConnection.NameServer)
                         {
+                            string receivedCluster = operationResponse[ParameterCode.Cluster] as string;
+                            if (!string.IsNullOrEmpty(receivedCluster))
+                            {
+                                this.CurrentCluster = receivedCluster;
+                            }
+
                             // on the NameServer, authenticate returns the MasterServer address for a region and we hop off to there
                             this.MasterServerAddress = operationResponse[ParameterCode.Address] as string;
                             if (this.LoadBalancingPeer.TransportProtocol == ConnectionProtocol.Udp && this.UseAlternativeUdpPorts)
@@ -2239,7 +2310,7 @@ namespace Photon.Realtime
 
                             this.enterRoomParamsCache.OnGameServer = true;
 
-                            if (this.lastJoinType == JoinType.JoinRoom || this.lastJoinType == JoinType.JoinRandomRoom || this.lastJoinType == JoinType.JoinOrCreateRoom)
+                            if (this.lastJoinType == JoinType.JoinRoom || this.lastJoinType == JoinType.JoinRandomRoom  || this.lastJoinType == JoinType.JoinRandomOrCreateRoom || this.lastJoinType == JoinType.JoinOrCreateRoom)
                             {
                                 this.LoadBalancingPeer.OpJoinRoom(this.enterRoomParamsCache);
                             }
@@ -2653,19 +2724,22 @@ namespace Photon.Realtime
                     break;
 
                 case EventCode.Leave:
-                    bool isInactive = false;
-                    if (photonEvent.Parameters.ContainsKey(ParameterCode.IsInactive))
+                    if (originatingPlayer != null)
                     {
-                        isInactive = (bool)photonEvent.Parameters[ParameterCode.IsInactive];
-                    }
+                        bool isInactive = false;
+                        if (photonEvent.Parameters.ContainsKey(ParameterCode.IsInactive))
+                        {
+                            isInactive = (bool)photonEvent.Parameters[ParameterCode.IsInactive];
+                        }
 
-                    if (isInactive)
-                    {
-                        originatingPlayer.IsInactive = true;
-                    }
-                    else
-                    {
-                        this.CurrentRoom.RemovePlayer(actorNr);
+                        if (isInactive)
+                        {
+                            originatingPlayer.IsInactive = true;
+                        }
+                        else
+                        {
+                            this.CurrentRoom.RemovePlayer(actorNr);
+                        }
                     }
 
                     if (photonEvent.Parameters.ContainsKey(ParameterCode.MasterClientId))
@@ -2867,11 +2941,11 @@ namespace Photon.Realtime
         /// Adding and removing callback targets is queued to not mess with callbacks in execution.
         /// Internally, this means that the addition/removal is done before the LoadBalancingClient
         /// calls the next callbacks. This detail should not affect a game's workflow.
-        /// 
+        ///
         /// The covered callback interfaces are: IConnectionCallbacks, IMatchmakingCallbacks,
         /// ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback and IWebRpcCallback.
         ///
-        /// See: <a href="https://doc.photonengine.com/en-us/pun/v2/getting-started/dotnet-callbacks"/>
+        /// See: <a href="https://doc.photonengine.com/en-us/realtime/current/reference/dotnet-callbacks"/>
         /// </remarks>
         /// <param name="target">The object that registers to get callbacks from this client.</param>
         public void AddCallbackTarget(object target)
@@ -2886,11 +2960,11 @@ namespace Photon.Realtime
         /// Adding and removing callback targets is queued to not mess with callbacks in execution.
         /// Internally, this means that the addition/removal is done before the LoadBalancingClient
         /// calls the next callbacks. This detail should not affect a game's workflow.
-        /// 
+        ///
         /// The covered callback interfaces are: IConnectionCallbacks, IMatchmakingCallbacks,
         /// ILobbyCallbacks, IInRoomCallbacks, IOnEventCallback and IWebRpcCallback.
         ///
-        /// See: <a href="https://doc.photonengine.com/en-us/pun/v2/getting-started/dotnet-callbacks">.Net Callbacks</a>
+        /// See: <a href="https://doc.photonengine.com/en-us/realtime/current/reference/dotnet-callbacks"></a>
         /// </remarks>
         /// <param name="target">The object that unregisters from getting callbacks.</param>
         public void RemoveCallbackTarget(object target)
@@ -2931,7 +3005,7 @@ namespace Photon.Realtime
 
                     this.callbackTargets.Remove(change.Target);
                 }
-                
+
                 this.UpdateCallbackTarget<IInRoomCallbacks>(change, this.InRoomCallbackTargets);
                 this.UpdateCallbackTarget<IConnectionCallbacks>(change, this.ConnectionCallbackTargets);
                 this.UpdateCallbackTarget<IMatchmakingCallbacks>(change, this.MatchMakingCallbackTargets);
@@ -2952,7 +3026,7 @@ namespace Photon.Realtime
                 }
             }
         }
-        
+
         /// <summary>Helper method to cast and apply a target per (interface) type.</summary>
         /// <typeparam name="T">Either of the interfaces for callbacks.</typeparam>
         /// <param name="change">The queued change to apply (add or remove) some target.</param>
@@ -2981,10 +3055,9 @@ namespace Photon.Realtime
     /// <remarks>
     /// Classes that implement this interface must be registered to get callbacks for various situations.
     ///
-    /// To register for callbacks, PhotonNetwork.AddCallbackTarget(&lt;Your Component implementing this interface&gt;);
-    /// To stop getting callbacks, PhotonNetwork.RemoveCallbackTarget(&lt;Your Component implementing this interface&gt;);
+    /// To register for callbacks, call <see cref="LoadBalancingClient.AddCallbackTarget"/> and pass the class implementing this interface
+    /// To stop getting callbacks, call <see cref="LoadBalancingClient.RemoveCallbackTarget"/> and pass the class implementing this interface
     ///
-    /// You can also simply override MonoBehaviourPunCallbacks which will provide you with Magic Callbacks ( like Unity would call Start(), Update() on a MonoBehaviour)
     /// </remarks>
     /// \ingroup callbacks
     public interface IConnectionCallbacks
@@ -3069,10 +3142,9 @@ namespace Photon.Realtime
     /// <remarks>
     /// Classes that implement this interface must be registered to get callbacks for various situations.
     ///
-    /// To register for callbacks, PhotonNetwork.AddCallbackTarget(&lt;Your Component implementing this interface&gt;);
-    /// To stop getting callbacks, PhotonNetwork.RemoveCallbackTarget(&lt;Your Component implementing this interface&gt;);
+    /// To register for callbacks, call <see cref="LoadBalancingClient.AddCallbackTarget"/> and pass the class implementing this interface
+    /// To stop getting callbacks, call <see cref="LoadBalancingClient.RemoveCallbackTarget"/> and pass the class implementing this interface
     ///
-    /// You can also simply override MonoBehaviourPunCallbacks which will provide you with Magic Callbacks ( like Unity would call Start(), Update() on a MonoBehaviour)
     /// </remarks>
     /// \ingroup callbacks
     public interface ILobbyCallbacks
@@ -3106,7 +3178,7 @@ namespace Photon.Realtime
         void OnRoomListUpdate(List<RoomInfo> roomList);
 
         /// <summary>
-        /// Called when the Master Server sent an update for the Lobby Statistics, updating PhotonNetwork.LobbyStatistics.
+        /// Called when the Master Server sent an update for the Lobby Statistics.
         /// </summary>
         /// <remarks>
         /// This callback has two preconditions:
@@ -3123,10 +3195,9 @@ namespace Photon.Realtime
     /// <remarks>
     /// Classes that implement this interface must be registered to get callbacks for various situations.
     ///
-    /// To register for callbacks, PhotonNetwork.AddCallbackTarget(&lt;Your Component implementing this interface&gt;);
-    /// To stop getting callbacks, PhotonNetwork.RemoveCallbackTarget(&lt;Your Component implementing this interface&gt;);
+    /// To register for callbacks, call <see cref="LoadBalancingClient.AddCallbackTarget"/> and pass the class implementing this interface
+    /// To stop getting callbacks, call <see cref="LoadBalancingClient.RemoveCallbackTarget"/> and pass the class implementing this interface
     ///
-    /// You can also simply override MonoBehaviourPunCallbacks which will provide you with Magic Callbacks ( like Unity would call Start(), Update() on a MonoBehaviour)
     /// </remarks>
     /// \ingroup callbacks
     public interface IMatchmakingCallbacks
@@ -3234,12 +3305,11 @@ namespace Photon.Realtime
     /// Collection of "in room" callbacks for the Realtime Api to cover: Players entering or leaving, property updates and Master Client switching.
     /// </summary>
     /// <remarks>
-    /// The callback to get events is in a separate interface: IOnEventCallback.
+    /// Classes that implement this interface must be registered to get callbacks for various situations.
     ///
-    /// To register for callbacks, PhotonNetwork.AddCallbackTarget(&lt;Your Component implementing this interface&gt;);
-    /// To stop getting callbacks, PhotonNetwork.RemoveCallbackTarget(&lt;Your Component implementing this interface&gt;);
+    /// To register for callbacks, call <see cref="LoadBalancingClient.AddCallbackTarget"/> and pass the class implementing this interface
+    /// To stop getting callbacks, call <see cref="LoadBalancingClient.RemoveCallbackTarget"/> and pass the class implementing this interface
     ///
-    /// You can also simply override MonoBehaviourPunCallbacks which will provide you with Magic Callbacks ( like Unity would call Start(), Update() on a MonoBehaviour)
     /// </remarks>
     /// \ingroup callbacks
     public interface IInRoomCallbacks
@@ -3306,8 +3376,9 @@ namespace Photon.Realtime
     /// <remarks>
     /// Classes that implement this interface must be registered to get callbacks for various situations.
     ///
-    /// To register for callbacks, register the instance via: LoadBalancingClient.EventReceived += instance.
-    /// To stop getting callbacks, remove the instance via: -=.
+    /// To register for callbacks, call <see cref="LoadBalancingClient.AddCallbackTarget"/> and pass the class implementing this interface
+    /// To stop getting callbacks, call <see cref="LoadBalancingClient.RemoveCallbackTarget"/> and pass the class implementing this interface
+    ///
     /// </remarks>
     /// \ingroup callbacks
     public interface IOnEventCallback
@@ -3331,14 +3402,15 @@ namespace Photon.Realtime
     /// <remarks>
     /// Classes that implement this interface must be registered to get callbacks for various situations.
     ///
-    /// To register for callbacks, use the LoadBalancingClient.WebRpcCallbackTargets and Add() the instance.
-    /// To stop getting callbacks, Remove() the instance.
+    /// To register for callbacks, call <see cref="LoadBalancingClient.AddCallbackTarget"/> and pass the class implementing this interface
+    /// To stop getting callbacks, call <see cref="LoadBalancingClient.RemoveCallbackTarget"/> and pass the class implementing this interface
+    ///
     /// </remarks>
     /// \ingroup callbacks
     public interface IWebRpcCallback
     {
         /// <summary>
-        /// Called by PUN when the response to a WebRPC is available. See PhotonNetwork.WebRPC.
+        /// Called when the response to a WebRPC is available. See <see cref="LoadBalancingClient.OpWebRpc"/>.
         /// </summary>
         /// <remarks>
         /// Important: The response.ReturnCode is 0 if Photon was able to reach your web-service.<br/>
@@ -3599,7 +3671,7 @@ namespace Photon.Realtime
         {
             this.client = client;
         }
-        
+
         public void OnJoinedLobby()
         {
             this.client.UpdateCallbackTargets();
