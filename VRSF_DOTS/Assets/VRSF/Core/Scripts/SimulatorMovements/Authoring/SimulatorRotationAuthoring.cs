@@ -1,6 +1,5 @@
 ﻿using Unity.Entities;
 using UnityEngine;
-using VRSF.Core.Utils;
 
 namespace VRSF.Core.Simulator
 {
@@ -9,6 +8,10 @@ namespace VRSF.Core.Simulator
         [Header("Base speed for rotating")]
         [SerializeField]
         private float _rotationSpeed = 1.0f;
+
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -38,7 +41,8 @@ namespace VRSF.Core.Simulator
                 RotationSpeed = _rotationSpeed
             });
 
-            entityManager.SetComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+            if (_destroyOnSceneUnloaded)
+                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "SimulatorMovementsAuthoring");
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window

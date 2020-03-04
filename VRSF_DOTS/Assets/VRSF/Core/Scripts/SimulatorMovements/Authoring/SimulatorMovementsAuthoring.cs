@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Unity.Entities;
-using VRSF.Core.Utils;
 
 namespace VRSF.Core.Simulator
 {
@@ -19,6 +18,10 @@ namespace VRSF.Core.Simulator
         [Tooltip("How long the acceleration effect nees to go full speed. The higher the number is, the slower you gonna accelerate.")]
         [SerializeField]
         private float _accelerationSpeed = 3.0f;
+
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -57,7 +60,8 @@ namespace VRSF.Core.Simulator
                 AccelerationTimer = 0.0f
             });
 
-            entityManager.SetComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+            if (_destroyOnSceneUnloaded)
+                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "SimulatorMovementsAuthoring");
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window

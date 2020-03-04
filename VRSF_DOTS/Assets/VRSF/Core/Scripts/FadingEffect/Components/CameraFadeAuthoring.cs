@@ -1,6 +1,5 @@
 ﻿using Unity.Entities;
 using UnityEngine;
-using VRSF.Core.Utils;
 
 namespace VRSF.Core.FadingEffect
 {
@@ -21,11 +20,8 @@ namespace VRSF.Core.FadingEffect
         [Tooltip("Whether a Fade In effect should take place when the OnSetupVRReady is called.")]
         [SerializeField] private bool _fadeInOnSetupVRReady = true;
 
-        /// <summary>
-        ///  How long, in seconds, the fade-in/fade-out animation should take
-        /// </summary>
-        [Tooltip("Should we destroy the object when done with it ?")]
-        [SerializeField] private bool _destroyOnNewScene = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
 
         [Header("Required Fading Components")]
         [Tooltip("Plane Mesh used to fade")]
@@ -47,8 +43,8 @@ namespace VRSF.Core.FadingEffect
                 FadeInOnSceneLoaded = _fadeInOnSetupVRReady
             });
 
-            if (_destroyOnNewScene)
-                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+            if (_destroyOnSceneUnloaded)
+                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "CameraFadeAuthoring");
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window

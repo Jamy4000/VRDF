@@ -4,7 +4,7 @@ using VRSF.Core.Inputs;
 namespace VRSF.Core.CBRA
 {
     /// <summary>
-    /// TODO
+    /// Handle the Start Clicking events for CBRAs Entities
     /// </summary>
     [UpdateAfter(typeof(VRInteractions.PointerUnclickingSystem))]
     public class CBRAStopClickingSystem : ComponentSystem
@@ -25,6 +25,7 @@ namespace VRSF.Core.CBRA
                     action.Invoke();
             });
 
+            // As StopClickingEventComp is only used by this system to raise the event one time, we remove it as soon as we're done raising the event.
             Entities.ForEach((Entity entity, ref StopClickingEventComp stopClickingEvent) =>
             {
                 PostUpdateCommands.RemoveComponent(entity, typeof(StopClickingEventComp));

@@ -4,7 +4,7 @@ using VRSF.Core.Inputs;
 namespace VRSF.Core.CBRA
 {
     /// <summary>
-    /// TODO
+    /// Handle the Start Touching events for CBRAs Entities
     /// </summary>
     public class CBRAStartTouchingSystem : ComponentSystem
     {
@@ -24,6 +24,7 @@ namespace VRSF.Core.CBRA
                     action.Invoke();
             });
 
+            // As StartTouchingEventComp is only used by this system to raise the event one time, we remove it as soon as we're done raising the event.
             Entities.ForEach((Entity entity, ref StartTouchingEventComp startTouchingEvent) =>
             {
                 PostUpdateCommands.RemoveComponent(entity, typeof(StartTouchingEventComp));

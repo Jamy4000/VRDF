@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
-using VRSF.Core.SetupVR;
 
-namespace VRSF.Core.Utils
+namespace VRSF.Core
 {
     /// <summary>
     /// Destroy the gameobject attached to this object one frame after SetupVR is ready

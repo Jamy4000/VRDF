@@ -10,6 +10,7 @@ namespace VRSF.Core.CBRA
     {
         protected override void OnUpdate()
         {
+            // Not checking the TouchpadInputCapture as it has its own dedicated system
             Entities.WithAll<CBRATag>().WithNone<TouchpadInputCapture>().ForEach((Entity entity, ref BaseInputCapture baseInput) =>
             {
                 if (baseInput.IsClicking && CBRADelegatesHolder.IsClickingEvents.TryGetValue(entity, out System.Action action))

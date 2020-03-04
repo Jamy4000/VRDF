@@ -1,6 +1,5 @@
 ﻿using Unity.Entities;
 using UnityEngine;
-using VRSF.Core.Utils;
 
 namespace VRSF.Core.Raycast
 {
@@ -29,6 +28,10 @@ namespace VRSF.Core.Raycast
         [Tooltip("If you want to apply an offset to the end point of the raycast. This will as well be applied to the laser if you use one.")]
         [SerializeField] private Vector3 _endPointOffset = Vector3.zero;
 
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             // We add the VRRaycastParameters as a struct to the newly created entity
@@ -54,7 +57,8 @@ namespace VRSF.Core.Raycast
             if (_useHoverFeature)
                 dstManager.AddComponentData(entity, new VRHovering());
 
-            dstManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+            if (_destroyOnSceneUnloaded)
+                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(dstManager, entity, gameObject.scene.buildIndex, "VRRaycastAuthoring");
 
             Destroy(this);
         }

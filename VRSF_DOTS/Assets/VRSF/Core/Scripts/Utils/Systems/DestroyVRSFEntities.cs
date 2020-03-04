@@ -3,6 +3,9 @@ using UnityEngine.SceneManagement;
 
 namespace VRSF.Core.Utils
 {
+    /// <summary>
+    /// Destroy entities with the component DestroyOnSceneUnloaded when the Active Scene change.
+    /// </summary>
     public class EntitiesDestroyOnSceneLoaded : ComponentSystem
     {
         protected override void OnCreate()
@@ -21,13 +24,13 @@ namespace VRSF.Core.Utils
 
         private void DestroyEntities(Scene unloadedScene)
         {
-            Entities.ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent) =>
+            Entities.WithNone<CBRA.CBRATag>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent) =>
             {
                 if (unloadedScene.buildIndex == destroyComponent.SceneIndex)
                     EntityManager.DestroyEntity(e);
             });
 
-            Entities.ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent, ref Disabled disabledEntityComp) =>
+            Entities.WithNone<CBRA.CBRATag>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent, ref Disabled disabledEntityComp) =>
             {
                 if (unloadedScene.buildIndex == destroyComponent.SceneIndex)
                     EntityManager.DestroyEntity(e);
