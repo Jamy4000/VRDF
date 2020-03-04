@@ -2,7 +2,6 @@
 using UnityEngine.Events;
 using VRSF.Core.Inputs;
 using Unity.Entities;
-using VRSF.Core.Utils;
 using System;
 using VRSF.Core.VRInteractions;
 

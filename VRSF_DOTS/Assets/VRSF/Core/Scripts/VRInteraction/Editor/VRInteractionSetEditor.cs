@@ -80,7 +80,7 @@ namespace VRSF.Core.VRInteractions
             EditorGUILayout.Space();
 
             // We add the boolean for touch using thumb position if relevant
-            if (Utils.InteractionSetupHelper.FlagHasOculusDevice(_interactionSet.DeviceUsingFeature) && _interactionSet.InteractionType.HasFlag(EControllerInteractionType.TOUCH))
+            if (InteractionSetupHelper.FlagHasOculusDevice(_interactionSet.DeviceUsingFeature) && _interactionSet.InteractionType.HasFlag(EControllerInteractionType.TOUCH))
             {
                 DisplayUseThumbPosBool();
                 EditorGUILayout.Space();

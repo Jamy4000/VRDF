@@ -3,7 +3,7 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 
-namespace VRSF.Core.Utils
+namespace VRSF.Core
 {
     /// <summary>
     /// Helper class to translate an object to JSON file and vice versa

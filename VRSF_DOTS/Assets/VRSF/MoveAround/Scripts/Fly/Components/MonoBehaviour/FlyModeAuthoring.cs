@@ -1,11 +1,8 @@
-﻿using System;
-using Unity.Entities;
+﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
-using VRSF.Core.Utils;
 using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.Fly
@@ -25,6 +22,10 @@ namespace VRSF.MoveAround.Fly
 
         [Tooltip("Is the user decelerating before stopping ? Set to 0.0f if going stopping on stop interacting.")]
         public float DecelerationFactor = 0.0f;
+
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -72,7 +73,7 @@ namespace VRSF.MoveAround.Fly
                 var flyModeEntity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!Core.Utils.InteractionSetupHelper.SetupInteractions(ref entityManager, ref flyModeEntity, interactionParameters))
+                if (!Core.InteractionSetupHelper.SetupInteractions(ref entityManager, ref flyModeEntity, interactionParameters))
                 {
                     entityManager.DestroyEntity(flyModeEntity);
                     Destroy(gameObject);
@@ -121,7 +122,8 @@ namespace VRSF.MoveAround.Fly
                     });
                 }
 
-                entityManager.AddComponentData(flyModeEntity, new DestroyOnSceneUnloaded());
+                if (_destroyOnSceneUnloaded)
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, flyModeEntity, gameObject.scene.buildIndex, "FlyModeAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

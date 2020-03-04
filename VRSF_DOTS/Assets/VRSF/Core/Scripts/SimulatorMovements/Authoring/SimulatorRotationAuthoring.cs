@@ -42,7 +42,7 @@ namespace VRSF.Core.Simulator
             });
 
             if (_destroyOnSceneUnloaded)
-                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "SimulatorMovementsAuthoring");
+                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "SimulatorRotationAuthoring");
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window

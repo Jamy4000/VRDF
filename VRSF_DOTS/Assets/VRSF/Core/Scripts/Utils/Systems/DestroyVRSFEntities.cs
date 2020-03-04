@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 using UnityEngine.SceneManagement;
 
-namespace VRSF.Core.Utils
+namespace VRSF.Core
 {
     /// <summary>
     /// Destroy entities with the component DestroyOnSceneUnloaded when the Active Scene change.

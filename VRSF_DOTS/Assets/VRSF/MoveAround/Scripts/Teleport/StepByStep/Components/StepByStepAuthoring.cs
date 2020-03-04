@@ -3,9 +3,7 @@ using UnityEngine;
 using VRSF.Core.Inputs;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
-using VRSF.Core.Utils;
-using System;
+using VRSF.Core;
 
 namespace VRSF.MoveAround.Teleport
 {
@@ -88,7 +86,7 @@ namespace VRSF.MoveAround.Teleport
                 });
 
                 if (_destroyOnSceneUnloaded)
-                    entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObject.scene.buildIndex });
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "StepByStepAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

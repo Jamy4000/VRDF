@@ -1,8 +1,6 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Inputs;
-using VRSF.Core.SetupVR;
-using VRSF.Core.Utils;
 using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.VRRotation
@@ -27,6 +25,10 @@ namespace VRSF.MoveAround.VRRotation
         [SerializeField]
         [HideInInspector] public float DecelerationFactor = 3.0f;
 
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+
         private void Awake()
         {
             OnSetupVRReady.RegisterSetupVRResponse(Init);
@@ -48,7 +50,7 @@ namespace VRSF.MoveAround.VRRotation
 
                 var entity = entityManager.CreateEntity(archetype);
 
-                InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring);
+                Core.InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring);
 
                 entityManager.AddComponentData(entity, new LinearUserRotation
                 {
@@ -66,8 +68,9 @@ namespace VRSF.MoveAround.VRRotation
                 }
 
                 entityManager.SetComponentData(entity, new BaseInputCapture());
-                entityManager.SetComponentData(entity, new TouchpadInputCapture());
-                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
+                entityManager.SetComponentData(entity, new TouchpadInputCapture()); 
+                if (_destroyOnSceneUnloaded)
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "LinearRotationAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

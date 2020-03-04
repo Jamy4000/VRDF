@@ -7,7 +7,7 @@ using UnityEditor;
 using System.IO;
 #endif
 
-namespace VRSF.Core.Utils
+namespace VRSF.Core
 {
     /// <summary>
     ///  Utility class for handling singleton ScriptableObjects for data management

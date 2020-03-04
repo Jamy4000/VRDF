@@ -5,7 +5,7 @@ using VRSF.Core.Inputs;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.SetupVR;
 
-namespace VRSF.Core.Utils
+namespace VRSF.Core
 {
     public static class InteractionSetupHelper
     {

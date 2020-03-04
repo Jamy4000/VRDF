@@ -1,8 +1,7 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Inputs;
-using VRSF.Core.SetupVR;
-using VRSF.Core.Utils;
+using VRSF.Core;
 using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.VRRotation
@@ -15,6 +14,10 @@ namespace VRSF.MoveAround.VRRotation
     {
         [Tooltip("Amount of degrees to rotate when UseSmoothRotation is at false")]
         [SerializeField] private float _degreesToRotate = 30.0f;
+
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
+        [SerializeField] private bool _destroyOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -41,7 +44,8 @@ namespace VRSF.MoveAround.VRRotation
 
                 entityManager.AddComponentData(entity, new NonLinearUserRotation { DegreesToRotate = this._degreesToRotate });
 
-                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded());
+                if (_destroyOnSceneUnloaded)
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "NonLinearRotationAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window
