@@ -2,6 +2,9 @@
 
 namespace VRSF.Core.FadingEffect
 {
+    /// <summary>
+    /// Handle the callbacks linked to the Fade In event (Start and End)
+    /// </summary>
     public class CameraFadeInSystem : ComponentSystem
     {
         protected override void OnCreate()
@@ -21,6 +24,9 @@ namespace VRSF.Core.FadingEffect
             OnFadingInEndedEvent.Listeners -= OnFadeInEnded;
         }
 
+        /// <summary>
+        /// When a new FadeIn effect is called, we add a CameraFadeIn component to help the CameraFadeSystem know what it needs to do
+        /// </summary>
         private void StartFadeIn(StartFadingInEvent info)
         {
             Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
@@ -34,7 +40,10 @@ namespace VRSF.Core.FadingEffect
             });
         }
 
-        private void OnFadeInEnded(OnFadingInEndedEvent info)
+        /// <summary>
+        /// When the Fading In event is done, we remove the CameraFadeIn event and reset the fading effect parameters
+        /// </summary>
+        private void OnFadeInEnded(OnFadingInEndedEvent _)
         {
             Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {

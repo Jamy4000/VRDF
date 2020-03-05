@@ -19,7 +19,6 @@ namespace VRSF.Core.VRInteractions
         // The reference to the target
         private VRInteractionAuthoring _interactionSet;
 
-        // The References for the UnityEvents
         private SerializedProperty _deviceToUse;
         private SerializedProperty _interactionType;
         private SerializedProperty _usePositionForTouch;

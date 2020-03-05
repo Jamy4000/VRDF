@@ -9,6 +9,7 @@ namespace VRSF.Core.CBRA
 {
     /// <summary>
     /// Let you assign a response to one of the button on the Controllers of your choice.
+    /// UnityEvent are displayed from the Editor script
     /// </summary>
     [RequireComponent(typeof(VRInteractionAuthoring))]
     public class ControllersButtonResponseAssigner : MonoBehaviour

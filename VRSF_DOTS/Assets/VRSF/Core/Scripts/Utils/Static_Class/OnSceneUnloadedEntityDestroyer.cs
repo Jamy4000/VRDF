@@ -17,7 +17,7 @@ namespace VRSF.Core
                     "Please consider unchecking the 'Destroy On Scene Unloaded' checkbox or let this {0} component in the Active Scene or one of the Additive Scene.</Color>", componentName);
                 try
                 {
-                    entityManager.SetComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex });
+                    entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex });
                 }
                 catch (System.Exception e)
                 {
@@ -26,7 +26,7 @@ namespace VRSF.Core
             }
             else
             {
-                entityManager.SetComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObjectSceneIndex });
+                entityManager.AddComponentData(entity, new DestroyOnSceneUnloaded { SceneIndex = gameObjectSceneIndex });
             }
         }
     }

@@ -11,7 +11,7 @@ namespace VRSF.Core.FadingEffect
 
         protected override void OnCreate()
         {
-            OnSetupVRReady.Listeners += SetupVrIsReady;
+            OnSetupVRReady.Listeners += CheckFadeInOnStart;
             StartFadingInEvent.Listeners += OnStartFadingIn;
             StartFadingOutEvent.Listeners += OnStartFadingOut;
             OnFadingInEndedEvent.Listeners += OnFadeInEnded;
@@ -51,7 +51,7 @@ namespace VRSF.Core.FadingEffect
 
         protected override void OnDestroy()
         {
-            OnSetupVRReady.Listeners -= SetupVrIsReady;
+            OnSetupVRReady.Listeners -= CheckFadeInOnStart;
             StartFadingInEvent.Listeners -= OnStartFadingIn;
             StartFadingOutEvent.Listeners -= OnStartFadingOut;
             OnFadingInEndedEvent.Listeners -= OnFadeInEnded;
@@ -101,18 +101,6 @@ namespace VRSF.Core.FadingEffect
             cameraFade.FadingSpeed = cameraFade.OldFadingSpeedFactor;
         }
 
-        protected void SetupVrIsReady(OnSetupVRReady _)
-        {
-            bool fadingOnStart = false;
-            Entities.WithAny(typeof(CameraFadeOut), typeof(CameraFadeIn)).ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
-            {
-                if (cameraFade.FadeInOnSceneLoaded)
-                    fadingOnStart = true;
-            });
-            SetFadingMaterialAlpha(fadingOnStart ? 1.0f : 0.0f);
-            this.Enabled = fadingOnStart;
-        }
-
         protected void OnStartFadingIn(StartFadingInEvent _)
         {
             SetFadingMaterialAlpha(1.0f);
@@ -130,9 +118,25 @@ namespace VRSF.Core.FadingEffect
             this.Enabled = false;
         }
 
+        /// <summary>
+        /// Check if we want a fade in effect on start. If so, we reset the material alpha to one.
+        /// </summary>
+        /// <param name="_"></param>
+        private void CheckFadeInOnStart(OnSetupVRReady _)
+        {
+            Entities.WithAll(typeof(CameraFadeOnStart)).ForEach((Entity e, ref CameraFadeParameters fadeParameters) =>
+            {
+                SetFadingMaterialAlpha(1.0f);
+            });
+        }
+
+        /// <summary>
+        /// Set the fading material's alpha to the value passed as parameter
+        /// </summary>
+        /// <param name="newAlpha">the new value for the fade material's alpha</param>
         private void SetFadingMaterialAlpha(float newAlpha)
         {
-            Entities.WithAny(typeof(CameraFadeOut), typeof(CameraFadeIn)).ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
+            Entities.ForEach((Entity e, ref CameraFadeParameters cameraFade) =>
             {
                 _renderMesh = _entityManager.GetSharedComponentData<RenderMesh>(e);
                 RenderMesh newRend = _renderMesh;

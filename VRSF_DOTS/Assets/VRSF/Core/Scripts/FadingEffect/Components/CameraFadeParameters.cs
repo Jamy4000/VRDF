@@ -9,16 +9,14 @@ namespace VRSF.Core.FadingEffect
         /// </summary>
         public float FadingSpeed;
 
+        /// <summary>
+        /// Used for whe we override the fading speed factor
+        /// </summary>
         public float OldFadingSpeedFactor;
 
         /// <summary>
         /// Set via the StartFadingOutEvent Listeners and its ShouldFadeInWhenDone boolean
         /// </summary>
         public bool ShouldImmediatlyFadeIn;
-
-        /// <summary>
-        /// Whether the fading effect should take place OnSetupVRReady
-        /// </summary>
-        public bool FadeInOnSceneLoaded;
     }
 }

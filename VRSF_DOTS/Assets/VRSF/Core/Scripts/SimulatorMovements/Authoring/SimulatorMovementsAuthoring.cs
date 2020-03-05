@@ -42,8 +42,7 @@ namespace VRSF.Core.Simulator
             var entity = entityManager.CreateEntity
             (
                 typeof(SimulatorMovements),
-                typeof(SimulatorAcceleration),
-                typeof(DestroyOnSceneUnloaded)
+                typeof(SimulatorAcceleration)
             );
 
             entityManager.SetComponentData(entity, new SimulatorMovements

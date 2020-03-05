@@ -31,8 +31,7 @@ namespace VRSF.Core.Simulator
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var entity = entityManager.CreateEntity
             (
-                typeof(SimulatorRotation),
-                typeof(DestroyOnSceneUnloaded)
+                typeof(SimulatorRotation)
             );
 
             entityManager.SetComponentData(entity, new SimulatorRotation
