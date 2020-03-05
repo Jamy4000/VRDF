@@ -45,13 +45,12 @@ namespace VRSF.MoveAround.Teleport
 
         private void Awake()
         {
-            OnSetupVRReady.RegisterSetupVRResponse(Init);
+            OnSetupVRReady.RegisterSetupVRCallback(Init);
         }
 
         private void Init(OnSetupVRReady _)
         {
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
-                OnSetupVRReady.Listeners -= Init;
+            OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
             VRInteractionAuthoring interactionParameters = GetComponent<VRInteractionAuthoring>();
 

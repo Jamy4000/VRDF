@@ -43,7 +43,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                OnSetupVRReady.RegisterSetupVRResponse(Init);
+                OnSetupVRReady.RegisterSetupVRCallback(Init);
 
                 // We setup the BoxCollider size and center
                 StartCoroutine(SetupBoxCollider());
@@ -53,8 +53,7 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
-                OnSetupVRReady.Listeners -= Init;
+            OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
                 ObjectWasClickedEvent.Listeners -= CheckObjectClick;

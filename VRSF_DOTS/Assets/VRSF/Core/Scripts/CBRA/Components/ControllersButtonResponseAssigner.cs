@@ -29,13 +29,12 @@ namespace VRSF.Core.CBRA
 
         public virtual void Awake()
         {
-            OnSetupVRReady.RegisterSetupVRResponse(CreateEntity);
+            OnSetupVRReady.RegisterSetupVRCallback(CreateEntity);
         }
 
-        public void CreateEntity(OnSetupVRReady info)
+        public void CreateEntity(OnSetupVRReady _)
         {
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(CreateEntity))
-                OnSetupVRReady.Listeners -= CreateEntity;
+            OnSetupVRReady.UnregisterSetupVRCallback(CreateEntity);
 
             var interactionParameters = GetComponent<VRInteractionAuthoring>();
 

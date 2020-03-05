@@ -16,13 +16,12 @@ namespace VRSF.Multiplayer
 
         public void Awake()
         {
-            OnSetupVRReady.RegisterSetupVRResponse(LocalPlayerSetup);
+            OnSetupVRReady.RegisterSetupVRCallback(LocalPlayerSetup);
         }
 
         public void OnDestroy()
         {
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(LocalPlayerSetup))
-                OnSetupVRReady.Listeners -= LocalPlayerSetup;
+            OnSetupVRReady.UnregisterSetupVRCallback(LocalPlayerSetup);
         }
 
         /// <summary>

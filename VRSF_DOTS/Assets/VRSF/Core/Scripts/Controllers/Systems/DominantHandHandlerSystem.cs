@@ -42,7 +42,7 @@ namespace VRSF.Core.Controllers
             });
         }
 
-        private void Setup(OnSetupVRReady info)
+        private void Setup(OnSetupVRReady _)
         {
             if (VRSF_Components.DeviceLoaded != EDevice.GEAR_VR && VRSF_Components.DeviceLoaded != EDevice.OCULUS_GO)
                 return;

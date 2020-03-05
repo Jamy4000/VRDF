@@ -10,16 +10,15 @@ namespace VRSF.Core
     {
         private void Awake()
         {
-            OnSetupVRReady.RegisterSetupVRResponse(DestroyThisObject);
+            OnSetupVRReady.RegisterSetupVRCallback(DestroyThisObject);
         }
 
         private void OnDestroy()
         {
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(DestroyThisObject))
-                OnSetupVRReady.Listeners -= DestroyThisObject;
+            OnSetupVRReady.UnregisterSetupVRCallback(DestroyThisObject);
         }
 
-        private void DestroyThisObject(OnSetupVRReady info)
+        private void DestroyThisObject(OnSetupVRReady _)
         {
             StartCoroutine(Destroying());
 

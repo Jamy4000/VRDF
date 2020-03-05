@@ -19,14 +19,12 @@ namespace VRSF.Core.LaserPointer
             // VRRaycastAuthoring is necessaraly on this GameObject; as the LaserPointerStateAuthoring needs it.
             _rayOrigin = GetComponent<VRRaycastAuthoring>().RayOrigin;
             OnLaserLengthChanged.Listeners += UpdateLineRender;
-            OnSetupVRReady.RegisterSetupVRResponse(InitPos);
+            OnSetupVRReady.RegisterSetupVRCallback(InitPos);
         }
 
         void OnDestroy()
         {
             OnLaserLengthChanged.Listeners -= UpdateLineRender;
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(InitPos))
-                OnSetupVRReady.Listeners -= InitPos;
         }
 
         private void UpdateLineRender(OnLaserLengthChanged info)
@@ -41,8 +39,9 @@ namespace VRSF.Core.LaserPointer
             }
         }
 
-        private void InitPos(OnSetupVRReady info)
+        private void InitPos(OnSetupVRReady _)
         {
+            OnSetupVRReady.UnregisterSetupVRCallback(InitPos);
             transform.localPosition = _raycastStartPosOffset + ControllersRaycastOffset.RaycastPositionOffset[VRSF_Components.DeviceLoaded];
         }
     }

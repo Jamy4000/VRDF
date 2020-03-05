@@ -13,7 +13,7 @@ public class OnSetupVRReady : EventCallbacks.Event<OnSetupVRReady>
     /// </summary>
     /// <param name="listener">The listener to add to OnSetupVRReady Listeners, or to call if SetupVR is already ready</param>
     /// <param name="shouldStillRegister">Should we still register the listener if SetupVR is Ready</param>
-    public static void RegisterSetupVRResponse(EventListener listener, bool shouldStillRegister = false)
+    public static void RegisterSetupVRCallback(EventListener listener, bool shouldStillRegister = false)
     {
         if (VRSF_Components.SetupVRIsReady)
         {
@@ -25,5 +25,15 @@ public class OnSetupVRReady : EventCallbacks.Event<OnSetupVRReady>
         {
             Listeners += listener;
         }
+    }
+
+    /// <summary>
+    /// Used to chekc if SetupVR Response was registered. If so, unregister the listener.
+    /// </summary>
+    /// <param name="listener">The listener to remove from OnSetupVRReady Listeners</param>
+    public static void UnregisterSetupVRCallback(EventListener listener)
+    {
+        if (IsMethodAlreadyRegistered(listener))
+            Listeners -= listener;
     }
 }

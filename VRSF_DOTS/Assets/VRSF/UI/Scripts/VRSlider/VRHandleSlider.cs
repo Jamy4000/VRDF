@@ -49,7 +49,7 @@ namespace VRSF.UI
                 if (!UnityEngine.XR.XRSettings.enabled || !VRSF_Components.SetupVRIsReady)
                     Init(null);
                 else
-                    OnSetupVRReady.RegisterSetupVRResponse(Init);
+                    OnSetupVRReady.RegisterSetupVRCallback(Init);
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
@@ -67,8 +67,7 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(Init))
-                OnSetupVRReady.Listeners -= Init;
+            OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
             if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
                 ObjectWasClickedEvent.Listeners -= CheckObjectClick;

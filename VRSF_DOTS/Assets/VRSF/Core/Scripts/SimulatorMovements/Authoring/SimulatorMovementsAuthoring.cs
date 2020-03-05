@@ -25,13 +25,12 @@ namespace VRSF.Core.Simulator
 
         private void Awake()
         {
-            OnSetupVRReady.RegisterSetupVRResponse(ConvertToEntity);
+            OnSetupVRReady.RegisterSetupVRCallback(ConvertToEntity);
         }
 
         private void ConvertToEntity(OnSetupVRReady _)
         {
-            if (OnSetupVRReady.IsMethodAlreadyRegistered(ConvertToEntity))
-                OnSetupVRReady.Listeners -= ConvertToEntity;
+            OnSetupVRReady.UnregisterSetupVRCallback(ConvertToEntity);
 
             if (VRSF_Components.DeviceLoaded != SetupVR.EDevice.SIMULATOR)
             {
