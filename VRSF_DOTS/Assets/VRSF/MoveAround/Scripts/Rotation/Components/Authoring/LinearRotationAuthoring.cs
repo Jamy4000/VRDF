@@ -26,8 +26,8 @@ namespace VRSF.MoveAround.VRRotation
         [HideInInspector] public float DecelerationFactor = 3.0f;
 
         [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -69,7 +69,7 @@ namespace VRSF.MoveAround.VRRotation
 
                 entityManager.SetComponentData(entity, new BaseInputCapture());
                 entityManager.SetComponentData(entity, new TouchpadInputCapture()); 
-                if (_destroyOnSceneUnloaded)
+                if (_destroyEntityOnSceneUnloaded)
                     Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "LinearRotationAuthoring");
 
 #if UNITY_EDITOR

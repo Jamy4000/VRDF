@@ -20,8 +20,8 @@ namespace VRSF.Core.FadingEffect
         [Tooltip("Whether a Fade In effect should take place when the OnSetupVRReady is called.")]
         [SerializeField] private bool _fadeInOnSetupVRReady = true;
 
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         [Header("Required Fading Components")]
         [Tooltip("Plane Mesh used to fade")]
@@ -43,7 +43,7 @@ namespace VRSF.Core.FadingEffect
                 FadeInOnSceneLoaded = _fadeInOnSetupVRReady
             });
 
-            if (_destroyOnSceneUnloaded)
+            if (_destroyEntityOnSceneUnloaded)
                 OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "CameraFadeAuthoring");
 
 #if UNITY_EDITOR

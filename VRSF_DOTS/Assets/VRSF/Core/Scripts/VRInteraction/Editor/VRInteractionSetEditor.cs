@@ -43,8 +43,8 @@ namespace VRSF.Core.VRInteractions
 
             _deviceToUse = serializedObject.FindProperty("DeviceUsingFeature");
             _interactionType = serializedObject.FindProperty("InteractionType");
-            _usePositionForTouch = serializedObject.FindProperty("UseThumbPositionForTouch");
             _buttonHand = serializedObject.FindProperty("ButtonHand");
+            _usePositionForTouch = serializedObject.FindProperty("UseThumbPositionForTouch");
             _buttonToUse = serializedObject.FindProperty("ButtonToUse");
 
             _touchThumbPosition = serializedObject.FindProperty("TouchThumbPosition");
@@ -79,13 +79,6 @@ namespace VRSF.Core.VRInteractions
 
             EditorGUILayout.Space();
 
-            // We add the boolean for touch using thumb position if relevant
-            if (InteractionSetupHelper.FlagHasOculusDevice(_interactionSet.DeviceUsingFeature) && _interactionSet.InteractionType.HasFlag(EControllerInteractionType.TOUCH))
-            {
-                DisplayUseThumbPosBool();
-                EditorGUILayout.Space();
-            }
-
             // We check that the user has set a good value for the Interaction Type. if not, we don't display the rest of the parameters.
             if (!DisplayHandParameters()) return;
 
@@ -95,6 +88,13 @@ namespace VRSF.Core.VRInteractions
             if (!DisplayButtonToUseParameter()) return;
 
             EditorGUILayout.Space();
+
+            // We add the boolean for touch using thumb position if relevant
+            if (InteractionSetupHelper.FlagHasOculusDevice(_interactionSet.DeviceUsingFeature) && _interactionSet.InteractionType.HasFlag(EControllerInteractionType.TOUCH) && _interactionSet.ButtonToUse.HasFlag(EControllersButton.TOUCHPAD))
+            {
+                DisplayUseThumbPosBool();
+                EditorGUILayout.Space();
+            }
 
             DisplayInteractionTypesMessages();
 
@@ -398,7 +398,7 @@ namespace VRSF.Core.VRInteractions
         private void DisplaySingleControllerWarning()
         {
             EditorGUILayout.HelpBox("This feature will only be available for the Oculus Go and the Gear VR Controllers, " +
-                "as the Back button doesn't exist on the other type Controllers.", MessageType.Warning);
+                "as the Back button doesn't exist on the other type of Controllers.", MessageType.Warning);
         }
 
         private void DisplayViveWarning()

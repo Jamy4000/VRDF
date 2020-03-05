@@ -24,8 +24,8 @@ namespace VRSF.MoveAround.Fly
         public float DecelerationFactor = 0.0f;
 
         [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -122,7 +122,7 @@ namespace VRSF.MoveAround.Fly
                     });
                 }
 
-                if (_destroyOnSceneUnloaded)
+                if (_destroyEntityOnSceneUnloaded)
                     Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, flyModeEntity, gameObject.scene.buildIndex, "FlyModeAuthoring");
 
 #if UNITY_EDITOR

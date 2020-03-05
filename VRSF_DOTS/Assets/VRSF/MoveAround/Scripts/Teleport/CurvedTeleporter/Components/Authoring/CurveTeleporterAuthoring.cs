@@ -40,8 +40,8 @@ namespace VRSF.MoveAround.Teleport
         public GameObject InvalidPad;
 
         [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -160,7 +160,7 @@ namespace VRSF.MoveAround.Teleport
                     InvalidPadInstance = invalidPad
                 });
 
-                if (_destroyOnSceneUnloaded)
+                if (_destroyEntityOnSceneUnloaded)
                 {
                     Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, selectionPad, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
                     Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, invalidPad, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
@@ -189,7 +189,7 @@ namespace VRSF.MoveAround.Teleport
                 {
                     var parabolPoint = entityManager.CreateEntity(pointArchetype);
                     entityManager.SetSharedComponentData(parabolPoint, new ParabolPointParent { TeleporterEntityIndex = teleporterEntity.Index });
-                    if (_destroyOnSceneUnloaded)
+                    if (_destroyEntityOnSceneUnloaded)
                         Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, parabolPoint, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
 #if UNITY_EDITOR
                     // Set it's name in Editor Mode for the Entity Debugger Window

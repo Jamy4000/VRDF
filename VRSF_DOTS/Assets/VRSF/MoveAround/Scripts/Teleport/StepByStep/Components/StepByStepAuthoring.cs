@@ -22,8 +22,8 @@ namespace VRSF.MoveAround.Teleport
         [SerializeField] private float _stepHeight = 0.5f;
 
         [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
         [Tooltip("Meant for Debug, if true, a red ray will be displayed on your scene view with the directon of the SBS Calculations, and a blue one will be shown to display the Raycast done to check for the teleportable/NavMesh surface. DONT FORGET TO TURN GIZMOS ON !")]
         [SerializeField] private bool _debugCalculationRays;
 
@@ -85,8 +85,8 @@ namespace VRSF.MoveAround.Teleport
                     DebugCalculationsRay = _debugCalculationRays
                 });
 
-                if (_destroyOnSceneUnloaded)
-                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "StepByStepAuthoring");
+                if (_destroyEntityOnSceneUnloaded)
+                    OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "StepByStepAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

@@ -16,8 +16,8 @@ namespace VRSF.MoveAround.VRRotation
         [SerializeField] private float _degreesToRotate = 30.0f;
 
         [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -44,7 +44,7 @@ namespace VRSF.MoveAround.VRRotation
 
                 entityManager.AddComponentData(entity, new NonLinearUserRotation { DegreesToRotate = this._degreesToRotate });
 
-                if (_destroyOnSceneUnloaded)
+                if (_destroyEntityOnSceneUnloaded)
                     Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "NonLinearRotationAuthoring");
 
 #if UNITY_EDITOR

@@ -23,15 +23,17 @@ namespace VRSF.Core.VRInteractions
         [HideInInspector] [SerializeField] public EHand ButtonHand;
 
         /// <summary>
-        /// Used by the Oculus Devices, as the touch feature is only raised when touching the top part of the thumbstick.
-        /// If this is true, the touch event will be raised even if the finger isn't on the touchable part of the thumbstick.
-        /// </summary>
-        [HideInInspector] [SerializeField] public bool UseThumbPositionForTouch = true;
-
-        /// <summary>
         /// The button you wanna use for the Action
         /// </summary>
         [HideInInspector] [SerializeField] public EControllersButton ButtonToUse = EControllersButton.NONE;
+
+        /// <summary>
+        /// Used by the Oculus Devices, as the touch feature is only raised when touching the top part of the thumbstick.
+        /// If this is true, the touch event will be raised even if the finger isn't on the touchable part of the thumbstick.
+        /// </summary>
+        [Tooltip("Used by the Oculus Devices, as the touch feature is only raised when touching the top part of the thumbstick.\n" +
+            "If this is true, the touch event will be raised even if the finger isn't on the touchable part of the thumbstick.")]
+        [HideInInspector] [SerializeField] public bool UseThumbPositionForTouch = true;
 
 
         /// <summary>

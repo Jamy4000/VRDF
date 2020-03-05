@@ -24,9 +24,8 @@ namespace VRSF.Core.CBRA
         [HideInInspector] public UnityEvent OnButtonStopClicking;
         [HideInInspector] public UnityEvent OnButtonIsClicking;
 
-        [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         public virtual void Awake()
         {
@@ -65,40 +64,46 @@ namespace VRSF.Core.CBRA
                 // help us check if this CBRA has at least one event. if false, this entity will be destroy.
                 bool cbraHasEvents = false;
 
-                // If at least one of the unity event for the click has a persistent listener set in the editor
-                // Add the CBRA Click Events component to the ClickEvents dictionary
-                if (EventHasACallback(OnButtonStartClicking))
+                if (interactionParameters.InteractionType.HasFlag(EControllerInteractionType.CLICK))
                 {
-                    cbraHasEvents = true;
-                    CBRADelegatesHolder.StartClickingEvents.Add(entity, new Action(delegate { OnButtonStartClicking.Invoke(); }));
-                }
-                if (EventHasACallback(OnButtonIsClicking))
-                {
-                    cbraHasEvents = true;
-                    CBRADelegatesHolder.IsClickingEvents.Add(entity, new Action(delegate { OnButtonIsClicking.Invoke(); }));
-                }
-                if (EventHasACallback(OnButtonStopClicking))
-                {
-                    cbraHasEvents = true;
-                    CBRADelegatesHolder.StopClickingEvents.Add(entity, new Action(delegate { OnButtonStopClicking.Invoke(); }));
+                    // If at least one of the unity event for the click has a persistent listener set in the editor
+                    // Add the CBRA Click Events component to the ClickEvents dictionary
+                    if (EventHasACallback(OnButtonStartClicking))
+                    {
+                        cbraHasEvents = true;
+                        CBRADelegatesHolder.StartClickingEvents.Add(entity, new Action(delegate { OnButtonStartClicking.Invoke(); }));
+                    }
+                    if (EventHasACallback(OnButtonIsClicking))
+                    {
+                        cbraHasEvents = true;
+                        CBRADelegatesHolder.IsClickingEvents.Add(entity, new Action(delegate { OnButtonIsClicking.Invoke(); }));
+                    }
+                    if (EventHasACallback(OnButtonStopClicking))
+                    {
+                        cbraHasEvents = true;
+                        CBRADelegatesHolder.StopClickingEvents.Add(entity, new Action(delegate { OnButtonStopClicking.Invoke(); }));
+                    }
                 }
 
-                // If at least one of the unity event for the touch has a persistent listener set in the editor
-                // Add the CBRA Click Events component to the ClickEvents dictionary
-                if (EventHasACallback(OnButtonStartTouching))
+                if (interactionParameters.InteractionType.HasFlag(EControllerInteractionType.TOUCH))
                 {
-                    cbraHasEvents = true;
-                    CBRADelegatesHolder.StartTouchingEvents.Add(entity, new Action(delegate { OnButtonStartTouching.Invoke(); }));
-                }
-                if (EventHasACallback(OnButtonIsTouching))
-                {
-                    cbraHasEvents = true;
-                    CBRADelegatesHolder.IsTouchingEvents.Add(entity, new Action(delegate { OnButtonIsTouching.Invoke(); }));
-                }
-                if (EventHasACallback(OnButtonStopTouching))
-                {
-                    cbraHasEvents = true;
-                    CBRADelegatesHolder.StopTouchingEvents.Add(entity, new Action(delegate { OnButtonStopTouching.Invoke(); }));
+                    // If at least one of the unity event for the touch has a persistent listener set in the editor
+                    // Add the CBRA Click Events component to the ClickEvents dictionary
+                    if (EventHasACallback(OnButtonStartTouching))
+                    {
+                        cbraHasEvents = true;
+                        CBRADelegatesHolder.StartTouchingEvents.Add(entity, new Action(delegate { OnButtonStartTouching.Invoke(); }));
+                    }
+                    if (EventHasACallback(OnButtonIsTouching))
+                    {
+                        cbraHasEvents = true;
+                        CBRADelegatesHolder.IsTouchingEvents.Add(entity, new Action(delegate { OnButtonIsTouching.Invoke(); }));
+                    }
+                    if (EventHasACallback(OnButtonStopTouching))
+                    {
+                        cbraHasEvents = true;
+                        CBRADelegatesHolder.StopTouchingEvents.Add(entity, new Action(delegate { OnButtonStopTouching.Invoke(); }));
+                    }
                 }
 
                 // Check if at least one event response was setup
@@ -109,7 +114,7 @@ namespace VRSF.Core.CBRA
                     return;
                 }
 
-                if (_destroyOnSceneUnloaded)
+                if (_destroyEntityOnSceneUnloaded)
                     OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "CBRA");
 
 #if UNITY_EDITOR

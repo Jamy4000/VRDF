@@ -29,8 +29,8 @@ namespace VRSF.Core.Raycast
         [SerializeField] private Vector3 _endPointOffset = Vector3.zero;
 
         [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
@@ -57,7 +57,7 @@ namespace VRSF.Core.Raycast
             if (_useHoverFeature)
                 dstManager.AddComponentData(entity, new VRHovering());
 
-            if (_destroyOnSceneUnloaded)
+            if (_destroyEntityOnSceneUnloaded)
                 OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(dstManager, entity, gameObject.scene.buildIndex, "VRRaycastAuthoring");
 
             Destroy(this);

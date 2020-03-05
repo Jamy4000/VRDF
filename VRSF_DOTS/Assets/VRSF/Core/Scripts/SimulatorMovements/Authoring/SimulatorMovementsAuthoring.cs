@@ -20,8 +20,8 @@ namespace VRSF.Core.Simulator
         private float _accelerationSpeed = 3.0f;
 
         [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -60,7 +60,7 @@ namespace VRSF.Core.Simulator
                 AccelerationTimer = 0.0f
             });
 
-            if (_destroyOnSceneUnloaded)
+            if (_destroyEntityOnSceneUnloaded)
                 OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "SimulatorMovementsAuthoring");
 
 #if UNITY_EDITOR

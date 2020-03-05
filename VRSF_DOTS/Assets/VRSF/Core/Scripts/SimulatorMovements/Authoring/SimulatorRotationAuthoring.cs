@@ -10,8 +10,8 @@ namespace VRSF.Core.Simulator
         private float _rotationSpeed = 1.0f;
 
         [Header("Other Parameters")]
-        [Tooltip("Should we destroy this entity when the active scene is changed ?.")]
-        [SerializeField] private bool _destroyOnSceneUnloaded = true;
+        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         private void Awake()
         {
@@ -41,7 +41,7 @@ namespace VRSF.Core.Simulator
                 RotationSpeed = _rotationSpeed
             });
 
-            if (_destroyOnSceneUnloaded)
+            if (_destroyEntityOnSceneUnloaded)
                 OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "SimulatorRotationAuthoring");
 
 #if UNITY_EDITOR
