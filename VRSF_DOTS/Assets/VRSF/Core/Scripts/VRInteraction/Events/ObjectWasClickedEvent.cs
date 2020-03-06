@@ -1,22 +1,31 @@
 ﻿using UnityEngine;
 using VRSF.Core.Raycast;
 
-namespace VRSF.Core.Events
+/// <summary>
+/// Event raised when an object is clicked with the Trigger
+/// </summary>
+public class ObjectWasClickedEvent : EventCallbacks.Event<ObjectWasClickedEvent>
 {
     /// <summary>
-    /// Event raised when an object is clicked with the Trigger
+    /// The Origin of the ray that just clicked something
     /// </summary>
-    public class ObjectWasClickedEvent : EventCallbacks.Event<ObjectWasClickedEvent>
+    public readonly ERayOrigin RayOrigin;
+
+    /// <summary>
+    /// The GameObject that was just clicked by the user (must have a collider)
+    /// </summary>
+    public readonly GameObject ObjectClicked;
+
+    /// <summary>
+    /// Event raised when an object is clicked with the Trigger.
+    /// </summary>
+    /// <param name="rayOrigin">The Origin of the ray that just clicked something</param>
+    /// <param name="objectClicked">The GameObject that was just clicked by the user (must have a collider)</param>
+    public ObjectWasClickedEvent(ERayOrigin rayOrigin, GameObject objectClicked) : base("Event raised when an object is clicked with the Trigger.")
     {
-        public readonly Transform ObjectClicked;
-        public readonly ERayOrigin RayOrigin;
+        RayOrigin = rayOrigin;
+        ObjectClicked = objectClicked;
 
-        public ObjectWasClickedEvent(ERayOrigin rayOrigin, Transform objectClicked) : base("Event raised when an object is clicked with the Trigger.")
-        {
-            RayOrigin = rayOrigin;
-            ObjectClicked = objectClicked;
-
-            FireEvent(this);
-        }
+        FireEvent(this);
     }
 }

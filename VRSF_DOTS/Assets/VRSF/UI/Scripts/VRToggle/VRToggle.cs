@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VRSF.Core.Controllers;
-using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
@@ -94,7 +93,6 @@ namespace VRSF.UI
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(null);
                 new OnHapticRequestedEvent(info.RaycastOrigin == Core.Raycast.ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.1f, 0.075f);
                 OnHover.Invoke();
             }

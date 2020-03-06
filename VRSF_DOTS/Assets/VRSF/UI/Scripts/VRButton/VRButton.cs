@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
 using VRSF.Core.Controllers;
 
@@ -83,7 +82,7 @@ namespace VRSF.UI
         /// <param name="objectClickEvent">The object that was clicked</param>
         void CheckObjectClicked(ObjectWasClickedEvent objectClickEvent)
         {
-            if (CheckTransform(objectClickEvent.ObjectClicked))
+            if (CheckTransform(objectClickEvent.ObjectClicked.transform))
                 onClick.Invoke();
         }
 
@@ -94,13 +93,12 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            if (CheckTransform(info.ObjectHovered) && _handHovering == Core.Raycast.ERayOrigin.NONE)
+            if (CheckTransform(info.ObjectHovered.transform) && _handHovering == Core.Raycast.ERayOrigin.NONE)
             {
                 _handHovering = info.RaycastOrigin;
-                OnSelect(null);
                 OnHover.Invoke();
             }
-            else if (info.ObjectHovered != transform && _handHovering == info.RaycastOrigin)
+            else if (info.ObjectHovered.transform != transform && _handHovering == info.RaycastOrigin)
             {
                 _handHovering = Core.Raycast.ERayOrigin.NONE;
                 OnDeselect(null);

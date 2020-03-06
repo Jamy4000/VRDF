@@ -1,8 +1,6 @@
 ﻿using Unity.Entities;
-using VRSF.Core.Events;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.VRInteractions
 {
@@ -45,7 +43,7 @@ namespace VRSF.Core.VRInteractions
             else
             {
                 hasClickSomething = true;
-                new ObjectWasClickedEvent(origin, hitVar.Value.collider.transform);
+                new ObjectWasClickedEvent(origin, hitVar.Value.collider.gameObject);
             }
         }
     }

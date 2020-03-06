@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using VRSF.Core.Events;
 using VRSF.Core.Raycast;
 
 namespace VRSF.Core.VRInteractions
@@ -30,7 +29,7 @@ namespace VRSF.Core.VRInteractions
         /// <summary>
         /// Handle the raycastHits to check if one of them touch something
         /// </summary>
-        private void HandleOver(ref Transform currentHit, ref float3 hitPos, ref bool isOverSomething, ref RaycastHitVariable hitVar, ERayOrigin origin)
+        private void HandleOver(ref GameObject currentHit, ref float3 hitPos, ref bool isOverSomething, ref RaycastHitVariable hitVar, ERayOrigin origin)
         {
             //If nothing is hit, we set the isOver value to false
             if (hitVar.IsNull && isOverSomething)
@@ -47,9 +46,9 @@ namespace VRSF.Core.VRInteractions
                 if (hitVar.Value.collider.transform != currentHit)
                 {
                     isOverSomething = true;
-                    var hitTransform = hitVar.Value.collider.transform;
-                    currentHit = hitTransform;
-                    new ObjectWasHoveredEvent(origin, hitTransform);
+                    var objectHit = hitVar.Value.collider.gameObject;
+                    currentHit = objectHit;
+                    new ObjectWasHoveredEvent(origin, objectHit);
                 }
             }
         }

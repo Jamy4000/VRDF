@@ -1,13 +1,10 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using VRSF.Core.VRInteractions;
-using VRSF.Core.Events;
 using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -210,7 +207,7 @@ namespace VRSF.UI
         /// <param name="clickEvent">The event raised when an object is clicked</param>
         private void CheckSliderClick(ObjectWasClickedEvent clickEvent)
         {
-            CheckTransform(clickEvent.ObjectClicked, clickEvent.RayOrigin);
+            CheckTransform(clickEvent.ObjectClicked.transform, clickEvent.RayOrigin);
         }
 
         /// <summary>
@@ -219,7 +216,7 @@ namespace VRSF.UI
         /// <param name="hoverEvent">The event raised when an object is hovered</param>
         private void CheckSliderHovered(ObjectWasHoveredEvent hoverEvent)
         {
-            CheckTransform(hoverEvent.ObjectHovered, hoverEvent.RaycastOrigin);
+            CheckTransform(hoverEvent.ObjectHovered.transform, hoverEvent.RaycastOrigin);
         }
 
         private void CheckTransform(Transform toCheck, ERayOrigin raycastOrigin)

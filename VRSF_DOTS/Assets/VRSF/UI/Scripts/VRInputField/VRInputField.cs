@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VRSF.Core.Controllers;
-using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
@@ -96,11 +95,11 @@ namespace VRSF.UI
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(null);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
+                OnDeselect(null);
             }
         }
 

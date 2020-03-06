@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.UI;
 using VRSF.Core.VRInteractions;
-using VRSF.Core.Events;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
-using System;
 
 namespace VRSF.UI
 {
@@ -112,7 +109,7 @@ namespace VRSF.UI
         /// <param name="clickEvent">The event raised when an object is clicked</param>
         private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
-            CheckTransform(clickEvent.ObjectClicked, clickEvent.RayOrigin);
+            CheckTransform(clickEvent.ObjectClicked.transform, clickEvent.RayOrigin);
         }
 
         private void CheckTransform(Transform toCheck, ERayOrigin raycastOrigin)
@@ -127,14 +124,14 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
         {
-            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            if (info.ObjectHovered.transform == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(null);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
+                OnDeselect(null);
             }
         }
 
@@ -181,30 +178,30 @@ namespace VRSF.UI
 
         private void Check2DInputs()
         {
-#if UNITY_STANDALONE || UNITY_EDITOR
+#if UNITY_IOS || UNITY_ANDROID
+            if (Input.touchCount == 1)
+            {
+                var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+#else
             if (Input.GetMouseButtonDown(0))
             {
                 var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-#elif UNITY_IOS || UNITY_ANDROID
-                    if (Input.touchCount == 1)
-                    {
-                        var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
 #endif
                 if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
                 {
                     CheckTransform(hit.transform, ERayOrigin.CAMERA);
                     if (_rayHoldingHandle == ERayOrigin.CAMERA)
                     {
-                        InteractionVariableContainer.CurrentGazeHit = transform;
+                        InteractionVariableContainer.CurrentGazeHit = gameObject;
                         InteractionVariableContainer.IsClickingSomethingGaze = true;
                         InteractionVariableContainer.CurrentGazeHitPosition = hit.point;
                     }
                 }
             }
-#if UNITY_STANDALONE || UNITY_EDITOR
+#if UNITY_IOS || UNITY_ANDROID
             else if (Input.GetMouseButtonUp(0) && _rayHoldingHandle != ERayOrigin.NONE)
             {
-#elif UNITY_IOS || UNITY_ANDROID
+#else
             else if (Input.touchCount == 0 && _rayHoldingHandle != ERayOrigin.NONE)
             {
 #endif
@@ -212,15 +209,15 @@ namespace VRSF.UI
                 InteractionVariableContainer.IsClickingSomethingGaze = false;
                 InteractionVariableContainer.CurrentGazeHit = null;
             }
-#if UNITY_STANDALONE || UNITY_EDITOR
+#if UNITY_IOS || UNITY_ANDROID
             else if (Input.GetMouseButton(0) && _rayHoldingHandle == ERayOrigin.CAMERA)
             {
                 var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-#elif UNITY_IOS || UNITY_ANDROID
+#else
             else if (Input.touchCount == 1 && _rayHoldingHandle == ERayOrigin.CAMERA)
             {
                 var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-# endif
+#endif
                 if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
                     InteractionVariableContainer.CurrentGazeHitPosition = hit.point;
             }

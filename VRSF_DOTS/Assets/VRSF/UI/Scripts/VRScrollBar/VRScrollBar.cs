@@ -1,12 +1,9 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using VRSF.Core.VRInteractions;
-using VRSF.Core.Events;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
-using UnityEngine.EventSystems;
 using VRSF.Core.Controllers;
 
 namespace VRSF.UI
@@ -106,12 +103,12 @@ namespace VRSF.UI
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
                 _isSelected = true;
-                OnSelect(null);
                 new OnHapticRequestedEvent(info.RaycastOrigin == ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.1f, 0.075f);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {
                 _isSelected = false;
+                OnDeselect(null);
             }
         }
 

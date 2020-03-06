@@ -2,8 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using VRSF.Core.VRInteractions;
-using VRSF.Core.Events;
-
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
 
@@ -109,8 +107,7 @@ namespace VRSF.UI
                 case ERayOrigin.CAMERA:
                     return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
                 default:
-                    // Never happening
-                    return 0.0f;
+                    throw new System.Exception();
             }
         }
 
@@ -122,6 +119,7 @@ namespace VRSF.UI
         {
             if (clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
                 _rayHoldingHandle = clickEvent.RayOrigin;
+            // todo haptic
         }
 
         /// <summary>
