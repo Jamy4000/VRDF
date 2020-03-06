@@ -9,11 +9,8 @@ namespace VRSF.Core.FadingEffect
     public class CameraFadeAuthoring : MonoBehaviour
     {
         [Header("Fading Parameters")]
-        /// <summary>
-        ///  How long, in seconds, the fade-in/fade-out animation should take
-        /// </summary>
-        [Tooltip("Speed of the \"blink\" animation (fading in and out upon teleport).")]
-        [SerializeField] private float _fadingSpeed = 1;
+        [Tooltip("Speed of the fading effect. Higher values provoke faster fading effect.")]
+        [SerializeField] private float _fadingSpeed = 0.7f;
 
         [Tooltip("Should we destroy this entity when the active scene is changed ?")]
         [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
