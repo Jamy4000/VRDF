@@ -50,6 +50,34 @@ public class OnHapticRequestedEvent : EventCallbacks.Event<OnHapticRequestedEven
     }
 
     /// <summary>
+    /// Event to call when you want to launch haptic in the controller of the user.
+    /// </summary>
+    /// <param name="hand">The hand that is gonna receive the Haptic feedback</param>
+    /// <param name="hapticDuration">Time in seconds the haptic impulse should take place</param>
+    /// <param name="hapticAmplitude">The Amplitude of the Haptic impulse. WARNING : Only Supported on OCULUS</param>
+    public OnHapticRequestedEvent(EHand hand, float hapticDuration = 0.5f, EHapticAmplitude hapticAmplitude = EHapticAmplitude.MEDIUM) : base("Event to call when you want to launch haptic in the controller of the user.")
+    {
+        Hand = hand;
+        HapticDuration = hapticDuration;
+        HapticAmplitude = GetBaseAmplitude(hapticAmplitude);
+        FireEvent(this);
+    }
+
+    /// <summary>
+    /// Event to call when you want to launch haptic in the controller of the user.
+    /// </summary>
+    /// <param name="hand">The hand that is gonna receive the Haptic feedback</param>
+    /// <param name="hapticDuration">Time in seconds the haptic impulse should take place</param>
+    /// <param name="hapticAmplitude">The Amplitude of the Haptic impulse. WARNING : Only Supported on OCULUS</param>
+    public OnHapticRequestedEvent(EHand hand, EHapticDuration hapticDuration = EHapticDuration.MEDIUM, float hapticAmplitude = 1.0f) : base("Event to call when you want to launch haptic in the controller of the user.")
+    {
+        Hand = hand;
+        HapticDuration = GetBaseDuration(hapticDuration);
+        HapticAmplitude = hapticAmplitude;
+        FireEvent(this);
+    }
+
+    /// <summary>
     /// Change EHapticAmpitude into its corresponding amplitude level
     /// </summary>
     /// <param name="hapticAmplitude">The EHapticAmplitude we specified in the event and we want as float</param>
