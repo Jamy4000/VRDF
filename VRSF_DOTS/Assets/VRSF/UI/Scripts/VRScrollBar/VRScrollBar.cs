@@ -7,6 +7,7 @@ using VRSF.Core.Events;
 using VRSF.Core.Raycast;
 using VRSF.Core.SetupVR;
 using UnityEngine.EventSystems;
+using VRSF.Core.Controllers;
 
 namespace VRSF.UI
 {
@@ -94,7 +95,10 @@ namespace VRSF.UI
         private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
+            {
                 _rayHoldingHandle = clickEvent.RayOrigin;
+                new OnHapticRequestedEvent(_rayHoldingHandle == ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+            }
         }
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
@@ -103,6 +107,7 @@ namespace VRSF.UI
             {
                 _isSelected = true;
                 OnSelect(null);
+                new OnHapticRequestedEvent(info.RaycastOrigin == ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.1f, 0.075f);
             }
             else if (info.ObjectHovered != transform && _isSelected)
             {

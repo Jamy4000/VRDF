@@ -83,7 +83,10 @@ namespace VRSF.UI
         private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform)
+            {
                 isOn = !isOn;
+                new OnHapticRequestedEvent(clickEvent.RayOrigin == Core.Raycast.ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+            }
         }
 
         private void CheckObjectOvered(ObjectWasHoveredEvent info)
@@ -92,6 +95,7 @@ namespace VRSF.UI
             {
                 _isSelected = true;
                 OnSelect(null);
+                new OnHapticRequestedEvent(info.RaycastOrigin == Core.Raycast.ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.1f, 0.075f);
                 OnHover.Invoke();
             }
             else if (info.ObjectHovered != transform && _isSelected)
