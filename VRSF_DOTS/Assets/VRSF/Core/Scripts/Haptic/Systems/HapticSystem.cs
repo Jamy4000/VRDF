@@ -1,7 +1,8 @@
 ﻿using Unity.Entities;
 using UnityEngine.XR;
+using VRSF.Core.Controllers;
 
-namespace VRSF.Core.Controllers.Haptic
+namespace VRSF.Core.Haptic
 {
     /// <summary>
     /// When raising the OnHapticRequestedEvent, trigger an haptic pulse in the requested controller.

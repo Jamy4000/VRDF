@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
-using VRSF.Core.Controllers.Haptic;
 using VRSF.Core.Controllers;
 
 namespace VRSF.UI

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using VRSF.Core.Controllers;
-using VRSF.Core.Controllers.Haptic;
 using VRSF.Core.Events;
 using VRSF.Core.SetupVR;
 

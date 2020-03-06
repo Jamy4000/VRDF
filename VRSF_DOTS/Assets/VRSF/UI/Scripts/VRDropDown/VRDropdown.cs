@@ -1,11 +1,9 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using VRSF.Core.Events;
 using UnityEngine.Events;
 using VRSF.Core.SetupVR;
-using VRSF.Core.Controllers.Haptic;
 using VRSF.Core.Controllers;
 
 namespace VRSF.UI
