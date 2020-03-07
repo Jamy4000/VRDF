@@ -33,8 +33,6 @@ namespace VRSF.MoveAround.VRRotation
                     PrefabUtility.RecordPrefabInstancePropertyModifications(_lra);
                 }
             }
-
-            _lra.GetComponent<VRInteractionAuthoring>().ButtonToUse = Core.Inputs.EControllersButton.TOUCHPAD;
         }
 
         /// <summary>

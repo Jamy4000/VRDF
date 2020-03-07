@@ -51,8 +51,6 @@ namespace VRSF.Core.CBRA
                     typeof(CBRATag)
                 );
 
-                entityManager.SetComponentData(entity, new CBRATag());
-
                 // Add the corresponding input, Hand and Interaction type component for the selected button. 
                 // If the button wasn't chose correctly or any parameter was wrongly set, we destroy this entity and return.
                 if (!InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, interactionParameters))

@@ -45,11 +45,22 @@ namespace VRSF.MoveAround.VRRotation
             {
                 var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-                var archetype = entityManager.CreateArchetype(typeof(BaseInputCapture), typeof(TouchpadInputCapture), typeof(ControllersInteractionType));
+                var entity = entityManager.CreateEntity
+                (
+                    typeof(BaseInputCapture), 
+                    typeof(TouchpadInputCapture), 
+                    typeof(ControllersInteractionType),
+                    typeof(LinearUserRotation)
+                );
 
-                var entity = entityManager.CreateEntity(archetype);
 
-                Core.InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring);
+                // Add the corresponding input, Hand and Interaction type component for the selected button. 
+                // If the button wasn't chose correctly or any parameter was wrongly set, we destroy this entity and return.
+                if (!Core.InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring))
+                {
+                    entityManager.DestroyEntity(entity);
+                    return;
+                }
 
                 entityManager.AddComponentData(entity, new LinearUserRotation
                 {
@@ -66,8 +77,6 @@ namespace VRSF.MoveAround.VRRotation
                     });
                 }
 
-                entityManager.SetComponentData(entity, new BaseInputCapture());
-                entityManager.SetComponentData(entity, new TouchpadInputCapture()); 
                 if (_destroyEntityOnSceneUnloaded)
                     Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "LinearRotationAuthoring");
 
@@ -88,6 +97,8 @@ namespace VRSF.MoveAround.VRRotation
                 DecelerationFactor = _accelerationFactor + 0.1f;
                 Debug.Log("<b>[VRSF] :</b> Deceleration Factor can't be lower than the acceleration factor, as this can cause Motion Sickness.");
             }
+
+            GetComponent<VRInteractionAuthoring>().ButtonToUse = EControllersButton.TOUCHPAD;
         }
 #endif
     }

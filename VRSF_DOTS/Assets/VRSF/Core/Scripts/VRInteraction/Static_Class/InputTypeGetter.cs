@@ -2,12 +2,12 @@
 using UnityEngine;
 using VRSF.Core.Inputs;
 
-namespace VRSF.Core.CBRA
+namespace VRSF.Core.VRInteractions
 {
     /// <summary>
     /// Helper class to get a type of IComponentData based on a controller button interacting, or EControllersButton
     /// </summary>
-    public static class CBRAInputTypeGetter
+    public static class InputTypeGetter
     {
         /// <summary>
         /// Get a type of IComponentData based on a controller button interacting, or EControllersButton
