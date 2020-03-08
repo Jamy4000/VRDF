@@ -1,5 +1,4 @@
-﻿using Unity.Collections;
-using Unity.Entities;
+﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.SetupVR;
 
@@ -18,28 +17,34 @@ namespace VRSF.Core.Inputs
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref SimulatorButtonProxy proxy, ref VRInteractions.ControllersInteractionType interactionType) =>
+            Entities.ForEach((Entity entity, ref SimulatorButtonProxy proxy, ref VRInteractions.ControllersInteractionType interactionType, ref BaseInputCapture baseInput) =>
             {
                 if (Input.GetKeyDown(proxy.SimulationKeyCode))
                 {
                     if (interactionType.HasClickInteraction)
+                    {
                         EntityManager.AddComponentData(entity, new StartClickingEventComp { ButtonInteracting = proxy.SimulatedButton });
+                        baseInput.IsClicking = true;
+                    }
+
                     if (interactionType.HasTouchInteraction)
+                    {
                         EntityManager.AddComponentData(entity, new StartTouchingEventComp { ButtonInteracting = proxy.SimulatedButton });
-                }
-                else if (Input.GetKey(proxy.SimulationKeyCode))
-                {
-                    if (interactionType.HasClickInteraction)
-                        EntityManager.AddComponentData(entity, new IsClickingComp { ButtonInteracting = proxy.SimulatedButton } );
-                    if (interactionType.HasTouchInteraction)
-                        EntityManager.AddComponentData(entity, new StartTouchingEventComp());
+                        baseInput.IsTouching = true;
+                    }
                 }
                 else if (Input.GetKeyUp(proxy.SimulationKeyCode))
                 {
                     if (interactionType.HasClickInteraction)
-                        EntityManager.AddComponentData(entity, new StartClickingEventComp());
+                    {
+                        EntityManager.AddComponentData(entity, new StopClickingEventComp { ButtonInteracting = proxy.SimulatedButton });
+                        baseInput.IsClicking = false;
+                    }
                     if (interactionType.HasTouchInteraction)
-                        EntityManager.AddComponentData(entity, new StartTouchingEventComp());
+                    {
+                        EntityManager.AddComponentData(entity, new StopTouchingEventComp { ButtonInteracting = proxy.SimulatedButton });
+                        baseInput.IsTouching = false;
+                    }
                 }
             });
         }
@@ -50,27 +55,6 @@ namespace VRSF.Core.Inputs
             base.OnDestroy();
         }
 
-        struct SimulatorInputCaptureJob : IJobForEachWithEntity<MenuInputCapture, BaseInputCapture>
-        {
-            public EntityCommandBuffer.Concurrent Commands;
-
-            public void Execute(Entity entity, int index, ref SimulatorButtonProxy menuInput, ref BaseInputCapture baseInput)
-            {
-                // Check Click Events
-                if (EscapeButtonDown)
-                {
-                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.MENU });
-                    baseInput.IsClicking = true;
-                }
-                else if (EscapeButtonUp)
-                {
-                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.MENU });
-                    baseInput.IsClicking = false;
-                }
-            }
-        }
-
-        #region PRIVATE_METHODS
         /// <summary>
         /// Check if we use the good device
         /// </summary>
@@ -79,6 +63,5 @@ namespace VRSF.Core.Inputs
         {
             this.Enabled = VRSF_Components.DeviceLoaded == EDevice.SIMULATOR;
         }
-        #endregion
     }
 }

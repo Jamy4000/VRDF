@@ -109,11 +109,11 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
-                ObjectWasClickedEvent.Listeners -= CheckSliderClick;
+            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
+                ObjectIsBeingClickedEvent.Listeners -= CheckSliderClick;
 
-            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckSliderHovered))
-                ObjectWasHoveredEvent.Listeners -= CheckSliderHovered;
+            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckSliderHovered))
+                ObjectIsBeingHoveredEvent.Listeners -= CheckSliderHovered;
         }
 
         protected override void Update()
@@ -205,16 +205,16 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckSliderClick(ObjectWasClickedEvent clickEvent)
+        private void CheckSliderClick(ObjectIsBeingClickedEvent clickEvent)
         {
-            CheckTransform(clickEvent.ObjectClicked.transform, clickEvent.RayOrigin);
+            CheckTransform(clickEvent.ObjectClicked.transform, clickEvent.RaycastOrigin);
         }
 
         /// <summary>
         /// Event called when the user is looking or pointing at the Slider
         /// </summary>
         /// <param name="hoverEvent">The event raised when an object is hovered</param>
-        private void CheckSliderHovered(ObjectWasHoveredEvent hoverEvent)
+        private void CheckSliderHovered(ObjectIsBeingHoveredEvent hoverEvent)
         {
             CheckTransform(hoverEvent.ObjectHovered.transform, hoverEvent.RaycastOrigin);
         }
@@ -357,9 +357,9 @@ namespace VRSF.UI
             if (LaserClickable)
             {
                 if (FillWithClick)
-                    ObjectWasClickedEvent.Listeners += CheckSliderClick;
+                    ObjectIsBeingClickedEvent.Listeners += CheckSliderClick;
                 else
-                    ObjectWasHoveredEvent.Listeners += CheckSliderHovered;
+                    ObjectIsBeingHoveredEvent.Listeners += CheckSliderHovered;
             }
 
             if (ControllerClickable)

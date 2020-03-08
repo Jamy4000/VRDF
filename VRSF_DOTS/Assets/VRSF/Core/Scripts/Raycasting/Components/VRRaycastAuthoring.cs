@@ -6,8 +6,7 @@ namespace VRSF.Core.Raycast
     /// <summary>
     /// Only use to setup the Entity you need for Raycasting in VR. This component is then destroy after being converted.
     /// </summary>
-    [RequiresEntityConversion]
-    public class VRRaycastAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+    public class VRRaycastAuthoring : MonoBehaviour
     {
         [Header("The Raycast Origin for this script")]
         public ERayOrigin RayOrigin = ERayOrigin.NONE;
@@ -32,10 +31,23 @@ namespace VRSF.Core.Raycast
         [Tooltip("Should we destroy this entity when the active scene is changed ?")]
         [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
-        public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+        private void Awake()
         {
+            OnSetupVRReady.RegisterSetupVRCallback(ConvertToEntity);
+        }
+
+        public void ConvertToEntity(OnSetupVRReady _)
+        {
+            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            var entity = entityManager.CreateEntity
+            (
+                typeof(VRRaycastParameters),
+                typeof(VRRaycastOrigin),
+                typeof(VRRaycastOutputs)
+            );
+
             // We add the VRRaycastParameters as a struct to the newly created entity
-            dstManager.AddComponentData(entity, new VRRaycastParameters
+            entityManager.SetComponentData(entity, new VRRaycastParameters
             {
                 MaxRaycastDistance = MaxRaycastDistance,
                 ExcludedLayer = ExcludedLayer,
@@ -43,22 +55,32 @@ namespace VRSF.Core.Raycast
                 EndPointOffset = _endPointOffset
             });
 
-            dstManager.AddComponentData(entity, new VRRaycastOrigin
+            entityManager.SetComponentData(entity, new VRRaycastOrigin
             {
                 RayOrigin = RayOrigin
             });
 
-            dstManager.AddComponentData(entity, new VRRaycastOutputs
+            entityManager.SetComponentData(entity, new VRRaycastOutputs
             {
                 RaycastHitVar = new RaycastHitVariable(),
                 RayVar = new Ray()
             });
 
             if (_useHoverFeature)
-                dstManager.AddComponentData(entity, new VRHovering());
+                entityManager.AddComponentData(entity, new VRHovering());
 
             if (_destroyEntityOnSceneUnloaded)
-                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(dstManager, entity, gameObject.scene.buildIndex, "VRRaycastAuthoring");
+                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "VRRaycastAuthoring");
+
+            var pointerClick = GetComponent<VRInteractions.PointerClickAuthoring>();
+            if (pointerClick != null)
+            {
+                pointerClick.AddPointerClickComponents(entity);
+                if (GetComponent<LineRenderer>() != null)
+                    Destroy(this);
+                else
+                    Destroy(gameObject);
+            }
 
             Destroy(this);
         }

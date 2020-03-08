@@ -53,11 +53,11 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
-                ObjectWasClickedEvent.Listeners -= CheckObjectClick;
+            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                ObjectIsBeingClickedEvent.Listeners -= CheckObjectClick;
 
-            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
-                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
+            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
+                ObjectIsBeingHoveredEvent.Listeners -= CheckObjectOvered;
         }
 
         protected override void Update()
@@ -89,16 +89,16 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
+        private void CheckObjectClick(ObjectIsBeingClickedEvent clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
             {
-                _rayHoldingHandle = clickEvent.RayOrigin;
+                _rayHoldingHandle = clickEvent.RaycastOrigin;
                 new OnHapticRequestedEvent(_rayHoldingHandle == ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
             }
         }
 
-        private void CheckObjectOvered(ObjectWasHoveredEvent info)
+        private void CheckObjectOvered(ObjectIsBeingHoveredEvent info)
         {
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
@@ -169,8 +169,8 @@ namespace VRSF.UI
             // We register the Listener
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
-                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
-                ObjectWasClickedEvent.Listeners += CheckObjectClick;
+                ObjectIsBeingHoveredEvent.Listeners += CheckObjectOvered;
+                ObjectIsBeingClickedEvent.Listeners += CheckObjectClick;
             }
 
             _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));

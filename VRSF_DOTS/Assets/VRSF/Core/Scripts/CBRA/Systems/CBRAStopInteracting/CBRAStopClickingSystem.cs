@@ -21,7 +21,7 @@ namespace VRSF.Core.CBRA
         {
             Entities.WithAll<CBRATag>().ForEach((Entity entity, ref StopClickingEventComp stopClickingEvent) =>
             {
-                if (_entityManager.HasComponent(entity, InputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopClickingEvents.TryGetValue(entity, out System.Action action))
+                if (_entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopClickingEvents.TryGetValue(entity, out System.Action action))
                     action.Invoke();
             });
 

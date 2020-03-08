@@ -37,7 +37,7 @@ namespace VRSF.Core.VRInteractions
                 currentHit = null;
                 hitPos = float3.zero;
                 isOverSomething = false;
-                new ObjectWasHoveredEvent(origin, null);
+                new ObjectIsBeingHoveredEvent(origin, null);
             }
             //If something is hit, we check that the collider is still "alive", and we check that the new transform hit is not the same as the previous one
             else if (!hitVar.IsNull && hitVar.Value.collider != null)
@@ -48,7 +48,7 @@ namespace VRSF.Core.VRInteractions
                     isOverSomething = true;
                     var objectHit = hitVar.Value.collider.gameObject;
                     currentHit = objectHit;
-                    new ObjectWasHoveredEvent(origin, objectHit);
+                    new ObjectIsBeingHoveredEvent(origin, objectHit);
                 }
             }
         }

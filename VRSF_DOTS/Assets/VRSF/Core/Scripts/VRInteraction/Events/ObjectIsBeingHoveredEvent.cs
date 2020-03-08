@@ -5,7 +5,7 @@ using VRSF.Core.Raycast;
 /// <summary>
 /// Event raised when an object is hovered by the laser
 /// </summary>
-public class ObjectWasHoveredEvent : EventCallbacks.Event<ObjectWasHoveredEvent>
+public class ObjectIsBeingHoveredEvent : EventCallbacks.Event<ObjectIsBeingHoveredEvent>
 {
     /// <summary>
     /// The Origin of the ray that just hovered something
@@ -22,7 +22,7 @@ public class ObjectWasHoveredEvent : EventCallbacks.Event<ObjectWasHoveredEvent>
     /// </summary>
     /// <param name="raycastOrigin">The Origin of the ray that just hovered something</param>
     /// <param name="objectHovered">The GameObject that was just hovered by the user (must have a collider)</param>
-    public ObjectWasHoveredEvent(ERayOrigin raycastOrigin, GameObject objectHovered) : base("Event raised when an object is hovered by the laser.")
+    public ObjectIsBeingHoveredEvent(ERayOrigin raycastOrigin, GameObject objectHovered) : base("Event raised when an object is hovered by the laser.")
     {
         // We set the object that was Hovered as the selected gameObject
         if (objectHovered != null && objectHovered.GetComponent<UnityEngine.UI.Selectable>() != null)

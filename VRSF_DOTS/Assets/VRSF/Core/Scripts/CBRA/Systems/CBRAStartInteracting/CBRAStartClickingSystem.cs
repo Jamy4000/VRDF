@@ -26,7 +26,7 @@ namespace VRSF.Core.CBRA
             });
 
             // As StartClickingEventComp is only used by this system to raise the event one time, we remove it as soon as we're done raising the event.
-            Entities.WithAll<CBRATag>().ForEach((Entity entity, ref StartClickingEventComp startClickingEvent) =>
+            Entities.WithAll<CBRATag, StartClickingEventComp>().ForEach((Entity entity) =>
             {
                 PostUpdateCommands.RemoveComponent(entity, typeof(StartClickingEventComp));
             });

@@ -12,9 +12,9 @@ namespace VRSF.Core.VRInteractions
     {
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref PointerClick pointerClick, ref StartClickingEventComp startClickingEvent, ref BaseInputCapture baseInput, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
+            Entities.ForEach((ref PointerClick pointerClick, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin, ref BaseInputCapture bic) =>
             {
-                if (pointerClick.CanClick)
+                if (pointerClick.CanClick && bic.IsClicking)
                 {
                     switch (raycastOrigin.RayOrigin)
                     {
@@ -30,9 +30,20 @@ namespace VRSF.Core.VRInteractions
                     }
                 }
             });
+
+            // As StartClickingEventComp is only used by this system to raise the event one time, we remove it as soon as we're done raising the event.
+            Entities.WithAll<StartClickingEventComp, PointerClick>().ForEach((Entity entity, ref StartClickingEventComp startClickingEvent) =>
+            {
+                PostUpdateCommands.RemoveComponent(entity, typeof(StartClickingEventComp));
+            });
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hitVar"></param>
+        /// <param name="hasClickSomething"></param>
+        /// <param name="origin"></param>
         private void CheckHit(RaycastHitVariable hitVar, out bool hasClickSomething, ERayOrigin origin)
         {
             //If nothing is hit, we set the hasClickSomething value to false
@@ -43,7 +54,7 @@ namespace VRSF.Core.VRInteractions
             else
             {
                 hasClickSomething = true;
-                new ObjectWasClickedEvent(origin, hitVar.Value.collider.gameObject);
+                new ObjectIsBeingClickedEvent(origin, hitVar.Value.collider.gameObject);
             }
         }
     }

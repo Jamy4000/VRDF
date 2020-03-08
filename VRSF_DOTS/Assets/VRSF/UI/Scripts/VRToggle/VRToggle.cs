@@ -51,11 +51,11 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
-                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
+            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
+                ObjectIsBeingHoveredEvent.Listeners -= CheckObjectOvered;
 
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
-                ObjectWasClickedEvent.Listeners -= CheckObjectClick;
+            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                ObjectIsBeingClickedEvent.Listeners -= CheckObjectClick;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -79,16 +79,16 @@ namespace VRSF.UI
         /// Event called when the button is clicked
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckObjectClick(ObjectWasClickedEvent clickEvent)
+        private void CheckObjectClick(ObjectIsBeingClickedEvent clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform)
             {
                 isOn = !isOn;
-                new OnHapticRequestedEvent(clickEvent.RayOrigin == Core.Raycast.ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+                new OnHapticRequestedEvent(clickEvent.RaycastOrigin == Core.Raycast.ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
             }
         }
 
-        private void CheckObjectOvered(ObjectWasHoveredEvent info)
+        private void CheckObjectOvered(ObjectIsBeingHoveredEvent info)
         {
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
@@ -121,8 +121,8 @@ namespace VRSF.UI
         {
             if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
-                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
-                ObjectWasClickedEvent.Listeners += CheckObjectClick;
+                ObjectIsBeingHoveredEvent.Listeners += CheckObjectOvered;
+                ObjectIsBeingClickedEvent.Listeners += CheckObjectClick;
             }
 
             if (ControllerClickable)

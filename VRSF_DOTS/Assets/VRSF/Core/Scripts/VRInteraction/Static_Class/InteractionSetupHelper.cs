@@ -138,7 +138,7 @@ namespace VRSF.Core
             else
             {
                 // set the CBRA Interaction Type component to the entity
-                entityManager.SetComponentData(entity, new ControllersInteractionType
+                entityManager.AddComponentData(entity, new ControllersInteractionType
                 {
                     InteractionType = interactionType,
                     HasTouchInteraction = (interactionType & EControllerInteractionType.TOUCH) == EControllerInteractionType.TOUCH,

@@ -69,8 +69,8 @@ namespace VRSF.UI
                 if (horizontalScrollbar != null)
                     horizontalScrollbar.onValueChanged.RemoveAllListeners();
 
-                if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
-                    ObjectWasClickedEvent.Listeners -= CheckObjectClick;
+                if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                    ObjectIsBeingClickedEvent.Listeners -= CheckObjectClick;
 
                 _eventWereRegistered = false;
             }
@@ -115,10 +115,10 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when something is clicked</param>
-        void CheckObjectClick(ObjectWasClickedEvent clickEvent)
+        void CheckObjectClick(ObjectIsBeingClickedEvent clickEvent)
         {
             if (clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
-                _rayHoldingHandle = clickEvent.RayOrigin;
+                _rayHoldingHandle = clickEvent.RaycastOrigin;
             // todo haptic
         }
 
@@ -196,7 +196,7 @@ namespace VRSF.UI
             }
 
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-                ObjectWasClickedEvent.Listeners += CheckObjectClick;
+                ObjectIsBeingClickedEvent.Listeners += CheckObjectClick;
 
             _eventWereRegistered = true;
 

@@ -51,11 +51,11 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
-                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
+            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
+                ObjectIsBeingHoveredEvent.Listeners -= CheckObjectOvered;
 
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
-                ObjectWasClickedEvent.Listeners -= CheckObjectClicked;
+            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
+                ObjectIsBeingClickedEvent.Listeners -= CheckObjectClicked;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -80,7 +80,7 @@ namespace VRSF.UI
         /// Event called when the button is clicked
         /// </summary>
         /// <param name="objectClickEvent">The object that was clicked</param>
-        void CheckObjectClicked(ObjectWasClickedEvent objectClickEvent)
+        void CheckObjectClicked(ObjectIsBeingClickedEvent objectClickEvent)
         {
             if (CheckTransform(objectClickEvent.ObjectClicked.transform))
                 onClick.Invoke();
@@ -91,7 +91,7 @@ namespace VRSF.UI
             return interactable && toCheck == transform;
         }
 
-        private void CheckObjectOvered(ObjectWasHoveredEvent info)
+        private void CheckObjectOvered(ObjectIsBeingHoveredEvent info)
         {
             if (CheckTransform(info.ObjectHovered.transform) && _handHovering == Core.Raycast.ERayOrigin.NONE)
             {
@@ -126,8 +126,8 @@ namespace VRSF.UI
         {
             if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
-                ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
-                ObjectWasClickedEvent.Listeners += CheckObjectClicked;
+                ObjectIsBeingHoveredEvent.Listeners += CheckObjectOvered;
+                ObjectIsBeingClickedEvent.Listeners += CheckObjectClicked;
             }
 
             var boxCollider = GetComponent<BoxCollider>();

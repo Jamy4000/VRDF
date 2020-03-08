@@ -2,8 +2,14 @@
 
 namespace VRSF.Core.Inputs
 {
+    /// <summary>
+    /// TODO
+    /// </summary>
     public struct StartClickingEventComp : IComponentData
     {
+        /// <summary>
+        /// TODO
+        /// </summary>
         public EControllersButton ButtonInteracting;
     }
 }

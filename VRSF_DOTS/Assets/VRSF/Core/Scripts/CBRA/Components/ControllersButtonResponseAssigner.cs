@@ -25,7 +25,8 @@ namespace VRSF.Core.CBRA
         [HideInInspector] public UnityEvent OnButtonStopClicking;
         [HideInInspector] public UnityEvent OnButtonIsClicking;
 
-        [Tooltip("Should we destroy this entity when the active scene is changed ?")]
+        [Header("Other Parameters")]
+        [Tooltip("Should we destroy the created entity when the active scene is changed ?")]
         [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
         public virtual void Awake()
@@ -43,7 +44,6 @@ namespace VRSF.Core.CBRA
             if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
                 var entity = entityManager.CreateEntity
                 (
                     typeof(BaseInputCapture),
@@ -114,6 +114,10 @@ namespace VRSF.Core.CBRA
 
                 if (_destroyEntityOnSceneUnloaded)
                     OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "CBRA");
+
+                // If we use the simulator, we check for a SimulatorButtonProxy. if not null, we add the simulatorButtonProxy script
+                if (VRSF_Components.DeviceLoaded == SetupVR.EDevice.SIMULATOR)
+                    GetComponent<SimulatorButtonProxyAuthoring>()?.AddSimulatorButtonProxy(entityManager, entity, interactionParameters);
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

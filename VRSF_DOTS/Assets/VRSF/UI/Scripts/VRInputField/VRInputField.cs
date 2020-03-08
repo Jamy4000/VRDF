@@ -39,8 +39,8 @@ namespace VRSF.UI
             {
                 if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
                 {
-                    ObjectWasHoveredEvent.Listeners += CheckObjectOvered;
-                    ObjectWasClickedEvent.Listeners += CheckObjectClick;
+                    ObjectIsBeingHoveredEvent.Listeners += CheckObjectOvered;
+                    ObjectIsBeingClickedEvent.Listeners += CheckObjectClick;
                 }
 
                 if (ControllerClickable)
@@ -57,10 +57,10 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (ObjectWasClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
-                ObjectWasClickedEvent.Listeners -= CheckObjectClick;
-            if (ObjectWasHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
-                ObjectWasHoveredEvent.Listeners -= CheckObjectOvered;
+            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
+                ObjectIsBeingClickedEvent.Listeners -= CheckObjectClick;
+            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
+                ObjectIsBeingHoveredEvent.Listeners -= CheckObjectOvered;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -84,13 +84,13 @@ namespace VRSF.UI
         /// Method called when the user is clicking
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        void CheckObjectClick(ObjectWasClickedEvent clickEvent)
+        void CheckObjectClick(ObjectIsBeingClickedEvent clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform)
                 StartTyping();
         }
 
-        private void CheckObjectOvered(ObjectWasHoveredEvent info)
+        private void CheckObjectOvered(ObjectIsBeingHoveredEvent info)
         {
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
