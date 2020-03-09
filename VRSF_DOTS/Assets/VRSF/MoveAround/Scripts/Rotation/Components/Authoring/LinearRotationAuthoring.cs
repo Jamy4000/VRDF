@@ -31,6 +31,7 @@ namespace VRSF.MoveAround.VRRotation
 
         private void Awake()
         {
+            // TODO Remove Simulator from this VRInteractionAuthoring and display a HelpBox telling that, to rotate with simulator, it's better to use the Simulator Rotation Scripts
             OnSetupVRReady.RegisterSetupVRCallback(Init);
         }
 

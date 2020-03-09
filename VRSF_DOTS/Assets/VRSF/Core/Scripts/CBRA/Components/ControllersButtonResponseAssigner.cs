@@ -117,7 +117,7 @@ namespace VRSF.Core.CBRA
 
                 // If we use the simulator, we check for a SimulatorButtonProxy. if not null, we add the simulatorButtonProxy script
                 if (VRSF_Components.DeviceLoaded == SetupVR.EDevice.SIMULATOR)
-                    GetComponent<SimulatorButtonProxyAuthoring>()?.AddSimulatorButtonProxy(entityManager, entity, interactionParameters);
+                    GetComponent<Simulator.SimulatorButtonProxyAuthoring>()?.AddSimulatorButtonProxy(entityManager, entity, interactionParameters);
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

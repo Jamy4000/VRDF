@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Controllers;
-using VRSF.Core.Inputs;
 
 namespace VRSF.Core.VRInteractions
 {
@@ -44,7 +43,7 @@ namespace VRSF.Core.VRInteractions
 
                 // If we use the simulator, we check for a SimulatorButtonProxy. if not null, we add the simulatorButtonProxy script
                 if (VRSF_Components.DeviceLoaded == SetupVR.EDevice.SIMULATOR)
-                    GetComponent<SimulatorButtonProxyAuthoring>()?.AddSimulatorButtonProxy(entityManager, entity, interactionParameters);
+                    GetComponent<Simulator.SimulatorButtonProxyAuthoring>()?.AddSimulatorButtonProxy(entityManager, entity, interactionParameters);
 
                 Destroy(this);
             }

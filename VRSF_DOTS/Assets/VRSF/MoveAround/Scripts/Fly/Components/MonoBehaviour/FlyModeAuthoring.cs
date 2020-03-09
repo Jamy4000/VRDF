@@ -29,6 +29,7 @@ namespace VRSF.MoveAround.Fly
 
         private void Awake()
         {
+            // TODO Remove Simulator from this VRInteractionAuthoring and display a HelpBox telling that, to fly with simulator, it's better to use the Simulator Movements Scripts
             OnSetupVRReady.RegisterSetupVRCallback(Init);
         }
 

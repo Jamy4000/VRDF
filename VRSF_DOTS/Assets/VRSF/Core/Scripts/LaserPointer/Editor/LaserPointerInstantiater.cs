@@ -9,8 +9,8 @@ namespace VRSF.Core.LaserPointer
         /// 
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Laser Pointer/Add Pointer (Without Laser)", priority = 1)]
-        [MenuItem("VRSF/Laser Pointer/Add Pointer (Without Laser)", priority = 1)]
+        [MenuItem("GameObject/VRSF/Raycast/Add Basic Raycaster", priority = 1)]
+        [MenuItem("VRSF/Raycast/Add Basic Raycaster", priority = 1)]
         private static void AddBasicPointer(MenuCommand menuCommand)
         {
             var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("BasicRaycastPointer");
@@ -21,8 +21,8 @@ namespace VRSF.Core.LaserPointer
         /// 
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Laser Pointer/Add Laser Pointer", priority = 1)]
-        [MenuItem("VRSF/Laser Pointer/Add Laser Pointer", priority = 1)]
+        [MenuItem("GameObject/VRSF/Raycast/Add Raycaster with Laser Pointer", priority = 1)]
+        [MenuItem("VRSF/Raycast/Add Raycaster with Laser Pointer", priority = 1)]
         private static void AddLaserPointer(MenuCommand menuCommand)
         {
             var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("LaserPointer");
@@ -33,15 +33,21 @@ namespace VRSF.Core.LaserPointer
         ///
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Laser Pointer/Add Laser Pointer With Click", priority = 1)]
-        [MenuItem("VRSF/Laser Pointer/Add Laser Pointer With Click", priority = 1)]
+        [MenuItem("GameObject/VRSF/Raycast/Add Raycaster with Laser and Click Feature", priority = 1)]
+        [MenuItem("VRSF/Raycast/Add Raycaster with Laser and Click Feature", priority = 1)]
         private static void AddLaserPointerWithClick(MenuCommand menuCommand)
         {
             var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("LaserPointerWithClick");
-            CreateGameObject(pointerPrefab, menuCommand);
+            var newGameObject = CreateGameObject(pointerPrefab, menuCommand);
+            var simulatorProxy = newGameObject.GetComponent<Simulator.SimulatorButtonProxyAuthoring>();
+            if (simulatorProxy != null)
+            {
+                simulatorProxy.UseMouseButton = true;
+                simulatorProxy.SimulationMouseButton = Simulator.EMouseButton.LEFT_CLICK;
+            }
         }
 
-        private static void CreateGameObject(GameObject pointerPrefab, MenuCommand menuCommand)
+        private static GameObject CreateGameObject(GameObject pointerPrefab, MenuCommand menuCommand)
         {
             // Create a custom game object
             GameObject pointer = PrefabUtility.InstantiatePrefab(pointerPrefab) as GameObject;
@@ -53,6 +59,8 @@ namespace VRSF.Core.LaserPointer
             GameObjectUtility.SetParentAndAlign(pointer, menuCommand.context as GameObject);
 
             Selection.activeObject = pointer;
+
+            return pointer;
         }
     }
 }

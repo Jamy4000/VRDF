@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using Unity.Entities;
+﻿using Unity.Entities;
+using VRSF.Core.Inputs;
 
-namespace VRSF.Core.Inputs
+namespace VRSF.Core.Simulator
 {
     /// <summary>
     /// Simulate the click of a button on a controller, but using the Simulator
@@ -12,11 +12,5 @@ namespace VRSF.Core.Inputs
         /// The button that's being simulated
         /// </summary>
         public EControllersButton SimulatedButton;
-
-        /// <summary>
-        /// The button used to simulate a controller's button
-        /// Simply set this KeyCode and the VRInteractionAuthoring next to this component to be able to simulate the controller's button with the simulator" +
-        /// </summary>
-        public KeyCode SimulationKeyCode;
     }
 }

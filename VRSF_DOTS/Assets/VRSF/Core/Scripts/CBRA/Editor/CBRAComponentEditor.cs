@@ -149,6 +149,7 @@ namespace VRSF.Core.CBRA
             Undo.RegisterCreatedObjectUndo(cbraObject, "Adding  new CBRA");
             cbraObject.transform.SetParent(Selection.activeTransform);
             cbraObject.AddComponent<ControllersButtonResponseAssigner>();
+            cbraObject.AddComponent<Simulator.SimulatorButtonProxyAuthoring>();
             Selection.SetActiveObjectWithContext(cbraObject, menuCommand.context);
         }
         #endregion

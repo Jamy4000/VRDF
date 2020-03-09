@@ -1,8 +1,9 @@
 ﻿using Unity.Entities;
 using UnityEngine;
+using VRSF.Core.Inputs;
 using VRSF.Core.SetupVR;
 
-namespace VRSF.Core.Inputs
+namespace VRSF.Core.Simulator
 {
     /// <summary>
     /// System to capture the keyboard keys provided by the SimulatorButtonProxy components
@@ -17,9 +18,9 @@ namespace VRSF.Core.Inputs
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref SimulatorButtonProxy proxy, ref VRInteractions.ControllersInteractionType interactionType, ref BaseInputCapture baseInput) =>
+            Entities.ForEach((Entity entity, ref SimulatorButtonKeyCode keyCode, ref SimulatorButtonProxy proxy, ref VRInteractions.ControllersInteractionType interactionType, ref BaseInputCapture baseInput) =>
             {
-                if (Input.GetKeyDown(proxy.SimulationKeyCode))
+                if (Input.GetKeyDown(keyCode.SimulationKeyCode))
                 {
                     if (interactionType.HasClickInteraction)
                     {
@@ -33,7 +34,7 @@ namespace VRSF.Core.Inputs
                         baseInput.IsTouching = true;
                     }
                 }
-                else if (Input.GetKeyUp(proxy.SimulationKeyCode))
+                else if (Input.GetKeyUp(keyCode.SimulationKeyCode))
                 {
                     if (interactionType.HasClickInteraction)
                     {

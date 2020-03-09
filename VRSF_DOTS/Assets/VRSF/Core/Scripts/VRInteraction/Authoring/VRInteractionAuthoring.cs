@@ -20,7 +20,7 @@ namespace VRSF.Core.VRInteractions
         /// <summary>
         /// The hand on which the button to use is situated
         /// </summary>
-        [HideInInspector] [SerializeField] public EHand ButtonHand;
+        [HideInInspector] [SerializeField] public EHand ButtonHand = EHand.NONE;
 
         /// <summary>
         /// The button you wanna use for the Action
