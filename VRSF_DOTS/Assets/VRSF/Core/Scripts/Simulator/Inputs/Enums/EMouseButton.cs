@@ -5,6 +5,6 @@
         NONE,
         LEFT_CLICK,
         RIGHT_CLICK,
-        MOUSE_CLICK
+        WHEEL_CLICK
     }
 }

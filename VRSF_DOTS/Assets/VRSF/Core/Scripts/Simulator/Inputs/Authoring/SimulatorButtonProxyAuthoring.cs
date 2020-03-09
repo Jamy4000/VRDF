@@ -24,28 +24,37 @@ namespace VRSF.Core.Simulator
         {
             if (VRSF_Components.DeviceLoaded == SetupVR.EDevice.SIMULATOR)
             {
-                if (UseMouseButton)
+                if (UseMouseButton && SimulationMouseButton != EMouseButton.NONE)
                 {
                     entityManager.AddComponentData(createdEntity, new SimulatorButtonMouse
                     {
                         SimulationMouseButton = SimulationMouseButton
                     });
+
+                    AddSimulatorButtonProxyComp();
                 }
-                else
+                else if (!UseMouseButton && SimulationKeyCode != KeyCode.None)
                 {
                     entityManager.AddComponentData(createdEntity, new SimulatorButtonKeyCode
                     {
                         SimulationKeyCode = SimulationKeyCode
                     });
-                }
 
+                    AddSimulatorButtonProxyComp();
+                }
+            }
+
+            Destroy(this);
+
+
+
+            void AddSimulatorButtonProxyComp()
+            {
                 entityManager.AddComponentData(createdEntity, new SimulatorButtonProxy
                 {
                     SimulatedButton = interactionParameters.ButtonToUse
                 });
             }
-
-            Destroy(this);
         }
     }
 }
