@@ -47,6 +47,8 @@ namespace VRSF.Core.Simulator
 
                 if (_proxyTarget.SimulationMouseButton == EMouseButton.NONE)
                     EditorGUILayout.HelpBox("This VR Interaction won't be used by the Simulator. Consider removing this component if not used.", MessageType.Warning);
+                if (_proxyTarget.SimulationMouseButton == EMouseButton.RIGHT_CLICK)
+                    EditorGUILayout.HelpBox("The Right Click is used by the Simulator Rotation System, are you sure you want to use it as well here ?", MessageType.Warning);
             }
             else
             {
@@ -73,22 +75,6 @@ namespace VRSF.Core.Simulator
                 serializedObject.ApplyModifiedProperties();
                 PrefabUtility.RecordPrefabInstancePropertyModifications(_proxyTarget);
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Utils/Add Simulator Button Proxy", priority = 2)]
-        [MenuItem("VRSF/Utils/Add Simulator Button Proxy", priority = 2)]
-        public static void AddSimulatorButtonProxyObject(MenuCommand menuCommand)
-        {
-            var cbraObject = new GameObject("Simulator Button Proxy");
-            Undo.RegisterCreatedObjectUndo(cbraObject, "Adding new SimulatorButtonProxy");
-            cbraObject.transform.SetParent(Selection.activeTransform);
-            cbraObject.AddComponent<VRInteractions.VRInteractionAuthoring>();
-            cbraObject.AddComponent<SimulatorButtonProxyAuthoring>();
-            Selection.SetActiveObjectWithContext(cbraObject, menuCommand.context);
         }
     }
 }

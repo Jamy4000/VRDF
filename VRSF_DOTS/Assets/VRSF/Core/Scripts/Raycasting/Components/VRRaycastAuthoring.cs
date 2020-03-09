@@ -18,7 +18,7 @@ namespace VRSF.Core.Raycast
         public LayerMask ExcludedLayer = new LayerMask();
 
         [Header("Raycast Hover Feature")]
-        [Tooltip("If you want to raise an event when the pointer is hovering something.")]
+        [Tooltip("If you want to raise the 'ObjectIsBeingHoveredEvent' event when the pointer is hovering something.")]
         [SerializeField] private bool _useHoverFeature = true;
 
         [Header("Raycast Position Offset")]
