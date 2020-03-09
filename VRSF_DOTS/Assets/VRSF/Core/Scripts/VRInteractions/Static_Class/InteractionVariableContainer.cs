@@ -5,7 +5,7 @@ namespace VRSF.Core.VRInteractions
 {
     /// <summary>
     /// Static class containing all variables necessary to handle the interactions in VR.
-    /// TODO Refactor, static classes shouldn't be used in Jobs
+    /// TODO Refactor, static classes shouldn't be used in Jobs 
     /// </summary>
 	public static class InteractionVariableContainer
     {

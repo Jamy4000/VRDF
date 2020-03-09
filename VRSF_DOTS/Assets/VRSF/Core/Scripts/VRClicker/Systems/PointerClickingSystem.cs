@@ -1,8 +1,9 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
+using VRSF.Core.VRInteractions;
 
-namespace VRSF.Core.VRInteractions
+namespace VRSF.Core.VRClicker
 {
     /// <summary>
     /// Handle the Click event in VR. Basically link the Raycast system and the Input System.
@@ -12,7 +13,7 @@ namespace VRSF.Core.VRInteractions
     {
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref PointerClick pointerClick, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin, ref BaseInputCapture bic) =>
+            Entities.ForEach((ref PointerClicker pointerClick, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin, ref BaseInputCapture bic) =>
             {
                 if (pointerClick.CanClick && bic.IsClicking)
                 {
@@ -32,7 +33,7 @@ namespace VRSF.Core.VRInteractions
             });
 
             // As StartClickingEventComp is only used by this system to raise the event one time, we remove it as soon as we're done raising the event.
-            Entities.WithAll<StartClickingEventComp, PointerClick>().ForEach((Entity entity, ref StartClickingEventComp startClickingEvent) =>
+            Entities.WithAll<StartClickingEventComp, PointerClicker>().ForEach((Entity entity, ref StartClickingEventComp startClickingEvent) =>
             {
                 PostUpdateCommands.RemoveComponent(entity, typeof(StartClickingEventComp));
             });
@@ -54,7 +55,7 @@ namespace VRSF.Core.VRInteractions
             else
             {
                 hasClickSomething = true;
-                new ObjectIsBeingClickedEvent(origin, hitVar.Value.collider.gameObject);
+                new OnObjectIsBeingClicked(origin, hitVar.Value.collider.gameObject);
             }
         }
     }

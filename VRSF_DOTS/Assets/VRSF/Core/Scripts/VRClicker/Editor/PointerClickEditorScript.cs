@@ -1,8 +1,8 @@
 ﻿using UnityEditor;
 
-namespace VRSF.Core.VRInteractions
+namespace VRSF.Core.VRClicker
 {
-    [CustomEditor(typeof(PointerClickAuthoring), true)]
+    [CustomEditor(typeof(VRClickerAuthoring), true)]
     public class PointerClickEditorScript : Editor
     {
         public override void OnInspectorGUI()

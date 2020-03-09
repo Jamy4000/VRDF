@@ -27,7 +27,7 @@ namespace VRSF.Core.Simulator
         /// <param name="entityManager">Entity manager to use to add the componentData to the entity</param>
         /// <param name="createdEntity">The entity to which we want to add the SImulator Inputs Support</param>
         /// <param name="interactionParameters">The VRInteractionAuthoring script we want to simulate</param>
-        public void AddSimulatorButtonProxy(EntityManager entityManager, Entity createdEntity, VRInteractionAuthoring interactionParameters)
+        public void AddSimulatorButtonProxy(ref EntityManager entityManager, ref Entity createdEntity, VRInteractionAuthoring interactionParameters)
         {
             // If the device loaded is the Simulator
             if (VRSF_Components.DeviceLoaded == SetupVR.EDevice.SIMULATOR)
@@ -39,7 +39,7 @@ namespace VRSF.Core.Simulator
                         SimulationMouseButton = SimulationMouseButton
                     });
 
-                    AddSimulatorButtonProxyComp();
+                    AddSimulatorButtonProxyComp(ref entityManager, ref createdEntity);
                 }
                 else if (!UseMouseButton && SimulationKeyCode != KeyCode.None)
                 {
@@ -48,7 +48,7 @@ namespace VRSF.Core.Simulator
                         SimulationKeyCode = SimulationKeyCode
                     });
 
-                    AddSimulatorButtonProxyComp();
+                    AddSimulatorButtonProxyComp(ref entityManager, ref createdEntity);
                 }
             }
 
@@ -58,13 +58,13 @@ namespace VRSF.Core.Simulator
             /// <summary>
             /// Add the basic SimulatorButtonProxy component, used in Keyboard and Mouse Input Systems
             /// </summary>
-            void AddSimulatorButtonProxyComp()
+            void AddSimulatorButtonProxyComp(ref EntityManager dstManager, ref Entity entity)
             {
-                entityManager.AddComponentData(createdEntity, new SimulatorButtonProxy
+                dstManager.AddComponentData(entity, new SimulatorButtonProxy
                 {
                     SimulatedButton = interactionParameters.ButtonToUse
                 });
             }
         }
-    }
+    } 
 }

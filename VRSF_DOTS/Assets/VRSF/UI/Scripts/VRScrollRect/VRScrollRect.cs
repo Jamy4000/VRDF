@@ -69,8 +69,8 @@ namespace VRSF.UI
                 if (horizontalScrollbar != null)
                     horizontalScrollbar.onValueChanged.RemoveAllListeners();
 
-                if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
-                    ObjectIsBeingClickedEvent.Listeners -= CheckObjectClick;
+                if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClick))
+                    OnObjectIsBeingClicked.Listeners -= CheckObjectClick;
 
                 _eventWereRegistered = false;
             }
@@ -115,7 +115,7 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when something is clicked</param>
-        void CheckObjectClick(ObjectIsBeingClickedEvent clickEvent)
+        void CheckObjectClick(OnObjectIsBeingClicked clickEvent)
         {
             if (clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
                 _rayHoldingHandle = clickEvent.RaycastOrigin;
@@ -196,7 +196,7 @@ namespace VRSF.UI
             }
 
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-                ObjectIsBeingClickedEvent.Listeners += CheckObjectClick;
+                OnObjectIsBeingClicked.Listeners += CheckObjectClick;
 
             _eventWereRegistered = true;
 

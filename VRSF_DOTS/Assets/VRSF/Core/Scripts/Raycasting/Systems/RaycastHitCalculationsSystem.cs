@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Unity.Entities;
+﻿using Unity.Entities;
 using UnityEngine;
 
 namespace VRSF.Core.Raycast
@@ -19,19 +18,6 @@ namespace VRSF.Core.Raycast
             {
                 var rayHitSomething = Physics.Raycast(raycastOutputs.RayVar, out raycastOutputs.RaycastHitVar.Value, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
                 raycastOutputs.RaycastHitVar.SetIsNull(!rayHitSomething);
-
-                //var hits = Physics.RaycastAll(raycastOutputs.RayVar, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
-
-                //if (hits.Length > 0)
-                //{
-                //    var first3DHit = hits.OrderBy(x => x.distance).First();
-                //    raycastOutputs.RaycastHitVar.Value = first3DHit;
-                //    raycastOutputs.RaycastHitVar.SetIsNull(false);
-                //}
-                //else
-                //{
-                //    raycastOutputs.RaycastHitVar.SetIsNull(true);
-                //}
             });
         }
     }

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
+using VRSF.Core.VRInteractions;
 
 namespace VRSF.UI
 {
@@ -109,11 +109,11 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckSliderClick))
-                ObjectIsBeingClickedEvent.Listeners -= CheckSliderClick;
+            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckSliderClick))
+                OnObjectIsBeingClicked.Listeners -= CheckSliderClick;
 
-            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckSliderHovered))
-                ObjectIsBeingHoveredEvent.Listeners -= CheckSliderHovered;
+            if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckSliderHovered))
+                OnObjectIsBeingHovered.Listeners -= CheckSliderHovered;
         }
 
         protected override void Update()
@@ -205,7 +205,7 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckSliderClick(ObjectIsBeingClickedEvent clickEvent)
+        private void CheckSliderClick(OnObjectIsBeingClicked clickEvent)
         {
             CheckTransform(clickEvent.ObjectClicked.transform, clickEvent.RaycastOrigin);
         }
@@ -214,7 +214,7 @@ namespace VRSF.UI
         /// Event called when the user is looking or pointing at the Slider
         /// </summary>
         /// <param name="hoverEvent">The event raised when an object is hovered</param>
-        private void CheckSliderHovered(ObjectIsBeingHoveredEvent hoverEvent)
+        private void CheckSliderHovered(OnObjectIsBeingHovered hoverEvent)
         {
             CheckTransform(hoverEvent.ObjectHovered.transform, hoverEvent.RaycastOrigin);
         }
@@ -357,9 +357,9 @@ namespace VRSF.UI
             if (LaserClickable)
             {
                 if (FillWithClick)
-                    ObjectIsBeingClickedEvent.Listeners += CheckSliderClick;
+                    OnObjectIsBeingClicked.Listeners += CheckSliderClick;
                 else
-                    ObjectIsBeingHoveredEvent.Listeners += CheckSliderHovered;
+                    OnObjectIsBeingHovered.Listeners += CheckSliderHovered;
             }
 
             if (ControllerClickable)

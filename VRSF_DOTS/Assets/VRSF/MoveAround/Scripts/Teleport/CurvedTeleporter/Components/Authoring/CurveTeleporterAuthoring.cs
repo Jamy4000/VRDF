@@ -80,7 +80,7 @@ namespace VRSF.MoveAround.Teleport
                 var teleporterEntity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!Core.InteractionSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
+                if (!InteractionSetupHelper.SetupInteractions(ref entityManager, ref teleporterEntity, interactionParameters))
                 {
                     entityManager.DestroyEntity(teleporterEntity);
                     Destroy(gameObject);
@@ -161,9 +161,9 @@ namespace VRSF.MoveAround.Teleport
 
                 if (_destroyEntityOnSceneUnloaded)
                 {
-                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, selectionPad, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
-                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, invalidPad, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
-                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, teleporterEntity, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref selectionPad, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref invalidPad, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref teleporterEntity, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
                 }
 
                 Destroy(SelectionPad);
@@ -189,7 +189,7 @@ namespace VRSF.MoveAround.Teleport
                     var parabolPoint = entityManager.CreateEntity(pointArchetype);
                     entityManager.SetSharedComponentData(parabolPoint, new ParabolPointParent { TeleporterEntityIndex = teleporterEntity.Index });
                     if (_destroyEntityOnSceneUnloaded)
-                        Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, parabolPoint, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
+                        Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref parabolPoint, gameObject.scene.buildIndex, "CurveTeleporterAuthoring");
 #if UNITY_EDITOR
                     // Set it's name in Editor Mode for the Entity Debugger Window
                     entityManager.SetName(parabolPoint, "Curve Teleporter Point " + i);

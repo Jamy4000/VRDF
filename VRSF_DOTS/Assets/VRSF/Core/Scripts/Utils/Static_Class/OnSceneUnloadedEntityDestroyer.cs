@@ -8,7 +8,7 @@ namespace VRSF.Core
         /// <summary>
         /// Check if the gameObject using a DestroyOnSceneUnload component isn't place on a gameObject that will be placed on a DontDestroyOnLoad scene
         /// </summary>
-        public static void CheckDestroyOnSceneUnload(EntityManager entityManager, Entity entity, int gameObjectSceneIndex, string componentName)
+        public static void CheckDestroyOnSceneUnload(ref EntityManager entityManager, ref Entity entity, int gameObjectSceneIndex, string componentName)
         {
             // Need to check for index in case the object is placed in a DontDestroyOnLoad scene
             if (gameObjectSceneIndex == -1)

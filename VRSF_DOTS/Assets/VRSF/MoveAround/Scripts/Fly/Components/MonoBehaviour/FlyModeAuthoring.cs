@@ -73,7 +73,7 @@ namespace VRSF.MoveAround.Fly
                 var flyModeEntity = entityManager.CreateEntity(archetype);
 
                 // Setting up Interactions
-                if (!Core.InteractionSetupHelper.SetupInteractions(ref entityManager, ref flyModeEntity, interactionParameters))
+                if (!InteractionSetupHelper.SetupInteractions(ref entityManager, ref flyModeEntity, interactionParameters))
                 {
                     entityManager.DestroyEntity(flyModeEntity);
                     Destroy(gameObject);
@@ -123,7 +123,7 @@ namespace VRSF.MoveAround.Fly
                 }
 
                 if (_destroyEntityOnSceneUnloaded)
-                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, flyModeEntity, gameObject.scene.buildIndex, "FlyModeAuthoring");
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref flyModeEntity, gameObject.scene.buildIndex, "FlyModeAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

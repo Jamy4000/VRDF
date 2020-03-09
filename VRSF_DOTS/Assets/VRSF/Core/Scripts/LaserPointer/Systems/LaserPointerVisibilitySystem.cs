@@ -1,5 +1,4 @@
 ﻿using Unity.Entities;
-using UnityEngine;
 using VRSF.Core.Raycast;
 
 namespace VRSF.Core.LaserPointer
@@ -9,7 +8,6 @@ namespace VRSF.Core.LaserPointer
     /// </summary>
     public class LaserPointerVisibilitySystem : ComponentSystem
     {
-        #region ComponentSystem_Methods
         [Unity.Burst.BurstCompile]
         protected override void OnUpdate()
         {
@@ -44,6 +42,5 @@ namespace VRSF.Core.LaserPointer
                 }
             });
         }
-        #endregion ComponentSystem_Methods
     }
 }

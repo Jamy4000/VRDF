@@ -51,11 +51,11 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
-                ObjectIsBeingHoveredEvent.Listeners -= CheckObjectOvered;
+            if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
+                OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
 
-            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
-                ObjectIsBeingClickedEvent.Listeners -= CheckObjectClick;
+            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClick))
+                OnObjectIsBeingClicked.Listeners -= CheckObjectClick;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -79,7 +79,7 @@ namespace VRSF.UI
         /// Event called when the button is clicked
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckObjectClick(ObjectIsBeingClickedEvent clickEvent)
+        private void CheckObjectClick(OnObjectIsBeingClicked clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform)
             {
@@ -88,7 +88,7 @@ namespace VRSF.UI
             }
         }
 
-        private void CheckObjectOvered(ObjectIsBeingHoveredEvent info)
+        private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {
@@ -121,8 +121,8 @@ namespace VRSF.UI
         {
             if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
-                ObjectIsBeingHoveredEvent.Listeners += CheckObjectOvered;
-                ObjectIsBeingClickedEvent.Listeners += CheckObjectClick;
+                OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
+                OnObjectIsBeingClicked.Listeners += CheckObjectClick;
             }
 
             if (ControllerClickable)

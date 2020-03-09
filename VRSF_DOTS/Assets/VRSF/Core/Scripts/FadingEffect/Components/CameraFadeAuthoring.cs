@@ -51,7 +51,7 @@ namespace VRSF.Core.FadingEffect
             CheckFadeInOnSetupVRReady();
 
             if (_destroyEntityOnSceneUnloaded)
-                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "CameraFadeAuthoring");
+                OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref entity, gameObject.scene.buildIndex, "CameraFadeAuthoring");
 
 #if UNITY_EDITOR
             // Set it's name in Editor Mode for the Entity Debugger Window

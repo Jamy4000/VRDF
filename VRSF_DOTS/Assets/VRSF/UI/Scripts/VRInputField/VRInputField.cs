@@ -39,8 +39,8 @@ namespace VRSF.UI
             {
                 if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
                 {
-                    ObjectIsBeingHoveredEvent.Listeners += CheckObjectOvered;
-                    ObjectIsBeingClickedEvent.Listeners += CheckObjectClick;
+                    OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
+                    OnObjectIsBeingClicked.Listeners += CheckObjectClick;
                 }
 
                 if (ControllerClickable)
@@ -57,10 +57,10 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
-                ObjectIsBeingClickedEvent.Listeners -= CheckObjectClick;
-            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
-                ObjectIsBeingHoveredEvent.Listeners -= CheckObjectOvered;
+            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClick))
+                OnObjectIsBeingClicked.Listeners -= CheckObjectClick;
+            if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
+                OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -84,13 +84,13 @@ namespace VRSF.UI
         /// Method called when the user is clicking
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        void CheckObjectClick(ObjectIsBeingClickedEvent clickEvent)
+        void CheckObjectClick(OnObjectIsBeingClicked clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform)
                 StartTyping();
         }
 
-        private void CheckObjectOvered(ObjectIsBeingHoveredEvent info)
+        private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
             if (info.ObjectHovered == transform && interactable && !_isSelected)
             {

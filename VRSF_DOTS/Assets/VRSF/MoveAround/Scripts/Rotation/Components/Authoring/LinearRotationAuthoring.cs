@@ -57,7 +57,7 @@ namespace VRSF.MoveAround.VRRotation
 
                 // Add the corresponding input, Hand and Interaction type component for the selected button. 
                 // If the button wasn't chose correctly or any parameter was wrongly set, we destroy this entity and return.
-                if (!Core.InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring))
+                if (!InteractionSetupHelper.SetupInteractions(ref entityManager, ref entity, vrInteractionAuthoring))
                 {
                     entityManager.DestroyEntity(entity);
                     return;
@@ -79,7 +79,7 @@ namespace VRSF.MoveAround.VRRotation
                 }
 
                 if (_destroyEntityOnSceneUnloaded)
-                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "LinearRotationAuthoring");
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref entity, gameObject.scene.buildIndex, "LinearRotationAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

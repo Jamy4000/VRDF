@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Inputs;
-using VRSF.Core;
 using VRSF.Core.VRInteractions;
 
 namespace VRSF.MoveAround.VRRotation
@@ -45,7 +44,7 @@ namespace VRSF.MoveAround.VRRotation
                 entityManager.AddComponentData(entity, new NonLinearUserRotation { DegreesToRotate = this._degreesToRotate });
 
                 if (_destroyEntityOnSceneUnloaded)
-                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "NonLinearRotationAuthoring");
+                    Core.OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref entity, gameObject.scene.buildIndex, "NonLinearRotationAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

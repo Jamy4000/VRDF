@@ -1,11 +1,15 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using VRSF.Core.Raycast;
+using VRSF.Core.VRInteractions;
 
-namespace VRSF.Core.VRInteractions
+namespace VRSF.Core.Raycast
 {
-    public class PointerHoveringSystem : ComponentSystem
+    /// <summary>
+    /// If UseHoverFeature is set at true in the VRRaycastAuthoring Inspector, this system will check for RaycastHit and raise 
+    /// the OnObjectIsBeingHovered 
+    /// </summary>
+    public class VRHoveringSystem : ComponentSystem
     {
         protected override void OnUpdate()
         {
@@ -37,18 +41,18 @@ namespace VRSF.Core.VRInteractions
                 currentHit = null;
                 hitPos = float3.zero;
                 isOverSomething = false;
-                new ObjectIsBeingHoveredEvent(origin, null);
+                new OnObjectIsBeingHovered(origin, null);
             }
             //If something is hit, we check that the collider is still "alive", and we check that the new transform hit is not the same as the previous one
             else if (!hitVar.IsNull && hitVar.Value.collider != null)
             {
                 hitPos = hitVar.Value.point;
-                if (hitVar.Value.collider.transform != currentHit)
+                var objectHit = hitVar.Value.collider.gameObject;
+                if (objectHit != currentHit)
                 {
                     isOverSomething = true;
-                    var objectHit = hitVar.Value.collider.gameObject;
                     currentHit = objectHit;
-                    new ObjectIsBeingHoveredEvent(origin, objectHit);
+                    new OnObjectIsBeingHovered(origin, objectHit);
                 }
             }
         }

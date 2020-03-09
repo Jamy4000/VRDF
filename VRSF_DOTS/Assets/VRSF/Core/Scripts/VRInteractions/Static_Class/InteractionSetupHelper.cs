@@ -2,10 +2,9 @@
 using UnityEngine;
 using VRSF.Core.Controllers;
 using VRSF.Core.Inputs;
-using VRSF.Core.VRInteractions;
 using VRSF.Core.SetupVR;
 
-namespace VRSF.Core
+namespace VRSF.Core.VRInteractions
 {
     public static class InteractionSetupHelper
     {

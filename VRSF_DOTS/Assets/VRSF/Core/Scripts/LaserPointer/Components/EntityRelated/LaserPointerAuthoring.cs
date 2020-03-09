@@ -2,10 +2,12 @@
 using UnityEngine;
 using VRSF.Core.Raycast;
 
-
 namespace VRSF.Core.LaserPointer
 {
-    public class LaserPointerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+    /// <summary>
+    /// 
+    /// </summary>
+    public class LaserPointerAuthoring : MonoBehaviour
     {
         [Header("Laser Renderering Parameters")]
         [Tooltip("The base width for this pointer when you are pointing at something.")]
@@ -21,39 +23,59 @@ namespace VRSF.Core.LaserPointer
         [Tooltip("How fast the pointer is disappearing when not hitting something. Set it to zero to stop the fade out of the laser.")]
         [SerializeField] private float _disappearanceSpeed = 1.0f;
 
-        public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+        /// <summary>
+        /// Add all components required to calculate the Laser Pointer position and width
+        /// </summary>
+        /// <param name="entity">the entity to which we want to add the components</param>
+        /// <param name="entityManager">The entity manager, so we don't have to fetch it again</param>
+        /// <param name="raycastAuthoring">The raycast authoring to set the base distance of the line</param>
+        public void AddLaserPointerComponents(ref Entity entity, ref EntityManager entityManager, VRRaycastAuthoring raycastAuthoring)
         {
-            dstManager.AddComponentData(entity, new LaserPointerState
+            entityManager.AddComponentData(entity, new LaserPointerState
             {
                 State = _baseState,
                 StateJustChangedToOn = false
             });
 
-            dstManager.AddComponentData(entity, new LaserPointerVisibility
+            entityManager.AddComponentData(entity, new LaserPointerVisibility
             {
                 DisappearanceSpeed = _disappearanceSpeed
             });
 
-            dstManager.AddComponentData(entity, new LaserPointerWidth
+            entityManager.AddComponentData(entity, new LaserPointerWidth
             {
                 BaseWidth = _pointerWidth
             });
 
-            VRRaycastAuthoring raycastAuthoring = GetComponent<VRRaycastAuthoring>();
-
-            dstManager.AddComponentData(entity, new LaserPointerLength
+            entityManager.AddComponentData(entity, new LaserPointerLength
             {
                 BaseLength = raycastAuthoring.MaxRaycastDistance,
                 ShouldPointTo3DObjectsCenter = _shouldPointTo3DObjectCenter,
                 ShouldPointToUICenter = _shouldPointToUICenter
             });
 
+            // Check that all components are present on the gameObject
+            if (GetComponent<LineRenderer>() == null)
+            {
+                var lineRenderer = gameObject.AddComponent<LineRenderer>();
+                lineRenderer.startWidth = _pointerWidth;
+                lineRenderer.endWidth = _pointerWidth;
+                lineRenderer.startColor = Color.blue;
+                lineRenderer.endColor = Color.white;
+            }
+
+            if (GetComponent<LaserLengthSetter>() == null)
+                gameObject.AddComponent<LaserLengthSetter>();
+
+            if (GetComponent<LaserWidthSetter>() == null)
+                gameObject.AddComponent<LaserWidthSetter>();
+
+
 #if UNITY_EDITOR
             // Set the name of the entity in Editor Mode for the Entity Debugger Window
-            dstManager.SetName(entity, string.Format("Laser Pointer {0}", raycastAuthoring.RayOrigin.ToString()));
+            entityManager.SetName(entity, string.Format("Laser Pointer {0}", raycastAuthoring.RayOrigin.ToString()));
 #endif
 
-            Destroy(GetComponent<ConvertToEntity>());
             Destroy(this);
         }
     }

@@ -81,7 +81,8 @@ namespace VRSF.Multiplayer
             Undo.RegisterCreatedObjectUndo(newMultiObject, "Create " + newMultiObject.name);
             Selection.activeObject = newMultiObject;
 
-            _infoToAddToWindow = "This prefab let you see the laser pointer of the remote users.";
+            _infoToAddToWindow = "This prefab let you see the laser pointer of the remote users. TO use this feature,\n" +
+                "you need to add a Laser Pointer (Hierarchy>VRSF>Raycast>Add Raycaster with Laser Pointer) for the local user in your scene or SetupVR prefab.";
             _window = CreateWindow<MultiplayerPrefabsInstancier>("Laser for Remote Players");
             SetWindowSize();
         }
@@ -135,7 +136,7 @@ namespace VRSF.Multiplayer
         private static void SetWindowSize()
         {
             _window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
-            _window.minSize = new Vector2(500.0f, 120.0f);
+            _window.minSize = new Vector2(800.0f, 120.0f);
         }
     }
 }

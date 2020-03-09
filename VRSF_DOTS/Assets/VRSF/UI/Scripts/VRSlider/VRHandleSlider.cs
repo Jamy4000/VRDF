@@ -66,11 +66,11 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClick))
-                ObjectIsBeingClickedEvent.Listeners -= CheckObjectClick;
+            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClick))
+                OnObjectIsBeingClicked.Listeners -= CheckObjectClick;
 
-            if (ObjectIsBeingHoveredEvent.IsMethodAlreadyRegistered(CheckObjectOvered))
-                ObjectIsBeingHoveredEvent.Listeners -= CheckObjectOvered;
+            if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
+                OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
         }
 
         protected override void Update()
@@ -107,7 +107,7 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckObjectClick(ObjectIsBeingClickedEvent clickEvent)
+        private void CheckObjectClick(OnObjectIsBeingClicked clickEvent)
         {
             CheckTransform(clickEvent.ObjectClicked.transform, clickEvent.RaycastOrigin);
         }
@@ -122,7 +122,7 @@ namespace VRSF.UI
             }
         }
 
-        private void CheckObjectOvered(ObjectIsBeingHoveredEvent info)
+        private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
             if (info.ObjectHovered.transform == transform && interactable && !_isSelected)
             {
@@ -153,8 +153,8 @@ namespace VRSF.UI
         {
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR && VRSF_Components.DeviceLoaded != EDevice.NONE)
             {
-                ObjectIsBeingHoveredEvent.Listeners += CheckObjectOvered;
-                ObjectIsBeingClickedEvent.Listeners += CheckObjectClick;
+                OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
+                OnObjectIsBeingClicked.Listeners += CheckObjectClick;
             }
 
             CheckSliderReferences();

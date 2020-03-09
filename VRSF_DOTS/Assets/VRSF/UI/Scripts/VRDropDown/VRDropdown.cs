@@ -73,8 +73,8 @@ namespace VRSF.UI
             {
                 onValueChanged.RemoveListener(_onValueChangedAction);
 
-                if (ObjectIsBeingClickedEvent.IsMethodAlreadyRegistered(CheckObjectClicked))
-                    ObjectIsBeingClickedEvent.Listeners -= CheckObjectClicked;
+                if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClicked))
+                    OnObjectIsBeingClicked.Listeners -= CheckObjectClicked;
 
                 _eventWereRegistered = false;
             }
@@ -87,7 +87,7 @@ namespace VRSF.UI
         /// Event called when the DropDown or its children is clicked
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        public void CheckObjectClicked(ObjectIsBeingClickedEvent clickEvent)
+        public void CheckObjectClicked(OnObjectIsBeingClicked clickEvent)
         {
             if (interactable && clickEvent.ObjectClicked == transform)
             {
@@ -169,7 +169,7 @@ namespace VRSF.UI
             _onValueChangedAction = delegate { SetDropDownNewState(); };
             onValueChanged.AddListener(_onValueChangedAction);
 
-            ObjectIsBeingClickedEvent.Listeners += CheckObjectClicked;
+            OnObjectIsBeingClicked.Listeners += CheckObjectClicked;
 
             _eventWereRegistered = true;
 

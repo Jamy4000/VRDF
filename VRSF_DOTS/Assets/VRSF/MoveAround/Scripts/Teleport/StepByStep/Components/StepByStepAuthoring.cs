@@ -85,7 +85,7 @@ namespace VRSF.MoveAround.Teleport
                 });
 
                 if (_destroyEntityOnSceneUnloaded)
-                    OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "StepByStepAuthoring");
+                    OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref entity, gameObject.scene.buildIndex, "StepByStepAuthoring");
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

@@ -1,7 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.LaserPointer
 {

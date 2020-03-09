@@ -9,8 +9,8 @@ namespace VRSF.Core.LaserPointer
         /// 
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Raycast/Add Basic Raycaster", priority = 1)]
-        [MenuItem("VRSF/Raycast/Add Basic Raycaster", priority = 1)]
+        [MenuItem("GameObject/VRSF/Raycast, Laser Pointer and VR Clicker/Add Basic Raycaster", priority = 1)]
+        [MenuItem("VRSF/Raycast, Laser Pointer and VR Clicker/Add Basic Raycaster", priority = 1)]
         private static void AddBasicPointer(MenuCommand menuCommand)
         {
             var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("BasicRaycastPointer");
@@ -21,8 +21,8 @@ namespace VRSF.Core.LaserPointer
         /// 
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Raycast/Add Raycaster with Laser Pointer", priority = 1)]
-        [MenuItem("VRSF/Raycast/Add Raycaster with Laser Pointer", priority = 1)]
+        [MenuItem("GameObject/VRSF/Raycast, Laser Pointer and VR Clicker/Add Raycaster with Laser Pointer", priority = 1)]
+        [MenuItem("VRSF/Raycast, Laser Pointer and VR Clicker/Add Raycaster with Laser Pointer", priority = 1)]
         private static void AddLaserPointer(MenuCommand menuCommand)
         {
             var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("LaserPointer");
@@ -33,8 +33,8 @@ namespace VRSF.Core.LaserPointer
         ///
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("GameObject/VRSF/Raycast/Add Raycaster with Laser and Click Feature", priority = 1)]
-        [MenuItem("VRSF/Raycast/Add Raycaster with Laser and Click Feature", priority = 1)]
+        [MenuItem("GameObject/VRSF/Raycast, Laser Pointer and VR Clicker/Add Raycaster with Laser and VR Clicker", priority = 1)]
+        [MenuItem("VRSF/Raycast, Laser Pointer and VR Clicker/Add Raycaster with Laser and VR Clicker", priority = 1)]
         private static void AddLaserPointerWithClick(MenuCommand menuCommand)
         {
             var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("LaserPointerWithClick");

@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Inputs;
 
-namespace VRSF.Core.VRInteractions
+namespace VRSF.Core.VRClicker
 {
     /// <summary>
     /// Handle the Unclick event in VR. Basically link the Raycast system and the Input System.
@@ -10,16 +10,16 @@ namespace VRSF.Core.VRInteractions
     {
         protected override void OnUpdate()
         {
-            Entities.WithAll<LeftHand>().ForEach((ref StopClickingEventComp stopClickingEvent, ref PointerClick pointerClick) =>
+            Entities.WithAll<LeftHand>().ForEach((ref StopClickingEventComp stopClickingEvent, ref PointerClicker pointerClick) =>
             {
                 if (stopClickingEvent.ButtonInteracting == pointerClick.ControllersButton)
-                    InteractionVariableContainer.IsClickingSomethingLeft = false;
+                    VRInteractions.InteractionVariableContainer.IsClickingSomethingLeft = false;
             });
 
-            Entities.WithAll<RightHand>().ForEach((ref StopClickingEventComp stopClickingEvent, ref PointerClick pointerClick) =>
+            Entities.WithAll<RightHand>().ForEach((ref StopClickingEventComp stopClickingEvent, ref PointerClicker pointerClick) =>
             {
                 if (stopClickingEvent.ButtonInteracting == pointerClick.ControllersButton)
-                    InteractionVariableContainer.IsClickingSomethingRight = false;
+                    VRInteractions.InteractionVariableContainer.IsClickingSomethingRight = false;
             });
         }
     }

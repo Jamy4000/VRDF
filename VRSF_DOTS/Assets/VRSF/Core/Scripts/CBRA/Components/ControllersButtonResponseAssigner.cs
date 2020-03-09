@@ -113,11 +113,11 @@ namespace VRSF.Core.CBRA
                 }
 
                 if (_destroyEntityOnSceneUnloaded)
-                    OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(entityManager, entity, gameObject.scene.buildIndex, "CBRA");
+                    OnSceneUnloadedEntityDestroyer.CheckDestroyOnSceneUnload(ref entityManager, ref entity, gameObject.scene.buildIndex, "CBRA");
 
                 // If we use the simulator, we check for a SimulatorButtonProxy. if not null, we add the simulatorButtonProxy script
                 if (VRSF_Components.DeviceLoaded == SetupVR.EDevice.SIMULATOR)
-                    GetComponent<Simulator.SimulatorButtonProxyAuthoring>()?.AddSimulatorButtonProxy(entityManager, entity, interactionParameters);
+                    GetComponent<Simulator.SimulatorButtonProxyAuthoring>()?.AddSimulatorButtonProxy(ref entityManager, ref entity, interactionParameters);
 
 #if UNITY_EDITOR
                 // Set it's name in Editor Mode for the Entity Debugger Window

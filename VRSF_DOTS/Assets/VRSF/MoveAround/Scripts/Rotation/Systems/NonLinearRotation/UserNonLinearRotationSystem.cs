@@ -1,5 +1,4 @@
-﻿using VRSF.Core.SetupVR;
-using VRSF.Core.Inputs;
+﻿using VRSF.Core.Inputs;
 using Unity.Entities;
 using Unity.Mathematics;
 using VRSF.Core.VRInteractions;
