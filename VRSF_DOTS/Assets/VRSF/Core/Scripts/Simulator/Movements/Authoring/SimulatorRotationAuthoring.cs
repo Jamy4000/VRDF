@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace VRSF.Core.Simulator
 {
+    /// <summary>
+    /// Create an entity to rotate the Simulator in the Scene using the Right Click
+    /// </summary>
     public class SimulatorRotationAuthoring : MonoBehaviour
     {
         [Header("Base speed for rotating")]
@@ -22,6 +25,7 @@ namespace VRSF.Core.Simulator
         {
             OnSetupVRReady.UnregisterSetupVRCallback(ConvertToEntity);
 
+            // If we're not using the simulator, no need for a simulator rotation entity
             if (VRSF_Components.DeviceLoaded != SetupVR.EDevice.SIMULATOR)
             {
                 Destroy(this);

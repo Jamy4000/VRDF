@@ -20,8 +20,16 @@ namespace VRSF.Core.Simulator
         [Tooltip("Simply set this KeyCode and the VRInteractionAuthoring next to this component to be able to simulate the controller's button with the simulator")]
         [HideInInspector] public EMouseButton SimulationMouseButton = EMouseButton.NONE;
 
+        /// <summary>
+        /// Check if the device loaded is the Simulator, and if everything is setup correctly in the editor,
+        /// create a new Entity to check the Simulator Inputs.
+        /// </summary>
+        /// <param name="entityManager">Entity manager to use to add the componentData to the entity</param>
+        /// <param name="createdEntity">The entity to which we want to add the SImulator Inputs Support</param>
+        /// <param name="interactionParameters">The VRInteractionAuthoring script we want to simulate</param>
         public void AddSimulatorButtonProxy(EntityManager entityManager, Entity createdEntity, VRInteractionAuthoring interactionParameters)
         {
+            // If the device loaded is the Simulator
             if (VRSF_Components.DeviceLoaded == SetupVR.EDevice.SIMULATOR)
             {
                 if (UseMouseButton && SimulationMouseButton != EMouseButton.NONE)
@@ -47,7 +55,9 @@ namespace VRSF.Core.Simulator
             Destroy(this);
 
 
-
+            /// <summary>
+            /// Add the basic SimulatorButtonProxy component, used in Keyboard and Mouse Input Systems
+            /// </summary>
             void AddSimulatorButtonProxyComp()
             {
                 entityManager.AddComponentData(createdEntity, new SimulatorButtonProxy

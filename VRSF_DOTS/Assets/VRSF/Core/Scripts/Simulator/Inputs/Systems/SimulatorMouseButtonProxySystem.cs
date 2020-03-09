@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using System;
+using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Inputs;
 using VRSF.Core.SetupVR;
@@ -20,28 +21,15 @@ namespace VRSF.Core.Simulator
         {
             Entities.ForEach((Entity entity, ref SimulatorButtonMouse mouseClick, ref SimulatorButtonProxy proxy, ref VRInteractions.ControllersInteractionType interactionType, ref BaseInputCapture baseInput) =>
             {
-                int mouseButtonToCheck = -1;
-                switch (mouseClick.SimulationMouseButton)
-                {
-                    case EMouseButton.LEFT_CLICK:
-                        mouseButtonToCheck = 0;
-                        break;
-                    case EMouseButton.RIGHT_CLICK:
-                        mouseButtonToCheck = 1;
-                        break;
-                    case EMouseButton.WHEEL_CLICK:
-                        mouseButtonToCheck = 2;
-                        break;
-                }
+                int mouseButtonToCheck = GetMouseButtonIndex(mouseClick.SimulationMouseButton);
 
-                if (mouseButtonToCheck == -1)
-                    throw new System.Exception();
-
+                // If the user press the mouse button used to simulate a controller's button
                 if (Input.GetMouseButtonDown(mouseButtonToCheck))
                 {
                     AddStartClickingComp(interactionType.HasClickInteraction, ref baseInput, ref entity, proxy.SimulatedButton);
                     AddStartTouchingComp(interactionType.HasTouchInteraction, ref baseInput, ref entity, proxy.SimulatedButton);
                 }
+                // If the user release the mouse button used to simulate a controller's button
                 else if (Input.GetMouseButtonUp(mouseButtonToCheck))
                 {
                     AddStopClickingComp(interactionType.HasClickInteraction, ref baseInput, ref entity, proxy.SimulatedButton);
@@ -50,8 +38,31 @@ namespace VRSF.Core.Simulator
             });
         }
 
+        private int GetMouseButtonIndex(EMouseButton simulationMouseButton)
+        {
+            switch (simulationMouseButton)
+            {
+                case EMouseButton.LEFT_CLICK:
+                    return 0;
+                case EMouseButton.RIGHT_CLICK:
+                    return 1;
+                case EMouseButton.WHEEL_CLICK:
+                    return 2;
+                default:
+                    throw new System.Exception();
+            }
+        }
+
+        /// <summary>
+        /// Add a StartClickingEventComp to activate the other systems
+        /// </summary>
+        /// <param name="hasClickInteraction"></param>
+        /// <param name="baseInput"></param>
+        /// <param name="entity"></param>
+        /// <param name="simulatedButton"></param>
         private void AddStartClickingComp(bool hasClickInteraction, ref BaseInputCapture baseInput, ref Entity entity, EControllersButton simulatedButton)
         {
+            // if the VRInteractionAuthoring has a Click Interaction set in editor
             if (hasClickInteraction)
             {
                 EntityManager.AddComponentData(entity, new StartClickingEventComp { ButtonInteracting = simulatedButton });
@@ -59,6 +70,13 @@ namespace VRSF.Core.Simulator
             }
         }
 
+        /// <summary>
+        /// Add a StartTouchingEventComp to activate the other systems
+        /// </summary>
+        /// <param name="hasTouchInteraction"></param>
+        /// <param name="baseInput"></param>
+        /// <param name="entity"></param>
+        /// <param name="simulatedButton"></param>
         private void AddStartTouchingComp(bool hasTouchInteraction, ref BaseInputCapture baseInput, ref Entity entity, EControllersButton simulatedButton)
         {
             if (hasTouchInteraction)
@@ -68,8 +86,16 @@ namespace VRSF.Core.Simulator
             }
         }
 
+        /// <summary>
+        /// Add a StopClickingEventComp to activate the other systems
+        /// </summary>
+        /// <param name="hasClickInteraction"></param>
+        /// <param name="baseInput"></param>
+        /// <param name="entity"></param>
+        /// <param name="simulatedButton"></param>
         private void AddStopClickingComp(bool hasClickInteraction, ref BaseInputCapture baseInput, ref Entity entity, EControllersButton simulatedButton)
         {
+            // if the VRInteractionAuthoring has a Click Interaction set in editor
             if (hasClickInteraction)
             {
                 EntityManager.AddComponentData(entity, new StopClickingEventComp { ButtonInteracting = simulatedButton });
@@ -77,6 +103,13 @@ namespace VRSF.Core.Simulator
             }
         }
 
+        /// <summary>
+        /// Add a StopTouchingEventComp to activate the other systems
+        /// </summary>
+        /// <param name="hasTouchInteraction"></param>
+        /// <param name="baseInput"></param>
+        /// <param name="entity"></param>
+        /// <param name="simulatedButton"></param>
         private void AddStopTouchingComp(bool hasTouchInteraction, ref BaseInputCapture baseInput, ref Entity entity, EControllersButton simulatedButton)
         {
             if (hasTouchInteraction)

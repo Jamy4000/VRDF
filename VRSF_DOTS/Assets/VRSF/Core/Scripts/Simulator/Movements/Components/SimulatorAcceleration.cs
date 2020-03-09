@@ -3,7 +3,7 @@
 namespace VRSF.Core.Simulator
 {
     /// <summary>
-    /// Components to 
+    /// Components to check the acceleration of the Simulator when moving around
     /// </summary>
     public struct SimulatorAcceleration : IComponentData
     {

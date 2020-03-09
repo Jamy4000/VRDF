@@ -20,33 +20,45 @@ namespace VRSF.Core.Simulator
         {
             Entities.ForEach((Entity entity, ref SimulatorButtonKeyCode keyCode, ref SimulatorButtonProxy proxy, ref VRInteractions.ControllersInteractionType interactionType, ref BaseInputCapture baseInput) =>
             {
+                // If the user press the keyboard key used to simulate a controller's button
                 if (Input.GetKeyDown(keyCode.SimulationKeyCode))
                 {
+                    // if the VRInteractionAuthoring has a Click Interaction set in editor
                     if (interactionType.HasClickInteraction)
                     {
+                        // Add a StartClickingEventComponent to activate the other systems
                         EntityManager.AddComponentData(entity, new StartClickingEventComp { ButtonInteracting = proxy.SimulatedButton });
                         baseInput.IsClicking = true;
                     }
 
+                    // if the VRInteractionAuthoring has a Touch Interaction set in editor
                     if (interactionType.HasTouchInteraction)
                     {
+                        // Add a StartTouchingEventComp to activate the other systems
                         EntityManager.AddComponentData(entity, new StartTouchingEventComp { ButtonInteracting = proxy.SimulatedButton });
                         baseInput.IsTouching = true;
                     }
                 }
                 else if (Input.GetKeyUp(keyCode.SimulationKeyCode))
                 {
+                    // if the VRInteractionAuthoring has a Click Interaction set in editor
                     if (interactionType.HasClickInteraction)
                     {
+                        // Add a StopClickingEventComp to activate the other systems
                         EntityManager.AddComponentData(entity, new StopClickingEventComp { ButtonInteracting = proxy.SimulatedButton });
                         baseInput.IsClicking = false;
                     }
+
+                    // if the VRInteractionAuthoring has a Touch Interaction set in editor
                     if (interactionType.HasTouchInteraction)
                     {
+                        // Add a StopTouchingEventComp to activate the other systems
                         EntityManager.AddComponentData(entity, new StopTouchingEventComp { ButtonInteracting = proxy.SimulatedButton });
                         baseInput.IsTouching = false;
                     }
                 }
+
+                // The StartTouchingEventComp and StartClickingEventComp are respectively removed in the PointerClick and CBRA System
             });
         }
 

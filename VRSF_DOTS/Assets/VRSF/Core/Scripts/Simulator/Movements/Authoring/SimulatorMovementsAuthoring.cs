@@ -3,6 +3,9 @@ using Unity.Entities;
 
 namespace VRSF.Core.Simulator
 {
+    /// <summary>
+    /// Create an entity to move the Simulator in the Scene using the Vertical and Horizontal values in the InputManager
+    /// </summary>
     public class SimulatorMovementsAuthoring : MonoBehaviour
     {
         [Header("Base speed and boost for moving on the Horizontal (x and z) axis")]
@@ -32,6 +35,7 @@ namespace VRSF.Core.Simulator
         {
             OnSetupVRReady.UnregisterSetupVRCallback(ConvertToEntity);
 
+            // If we're not using the simulator, no need for a simulator movement entity
             if (VRSF_Components.DeviceLoaded != SetupVR.EDevice.SIMULATOR)
             {
                 Destroy(this);

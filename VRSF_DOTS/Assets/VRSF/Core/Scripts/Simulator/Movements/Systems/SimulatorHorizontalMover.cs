@@ -50,12 +50,6 @@ namespace VRSF.Core.Simulator
             if (horizontal != 0.0f)
                 direction.x += horizontal;
 
-            // up or down
-            //if (Input.GetKey(KeyCode.Q))
-            //    direction += Vector3.down;
-            //if (Input.GetKey(KeyCode.E))
-            //    direction += Vector3.up;
-
             return direction;
         }
     }
