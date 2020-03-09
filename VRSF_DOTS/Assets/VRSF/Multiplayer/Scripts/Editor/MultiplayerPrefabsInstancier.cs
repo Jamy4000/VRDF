@@ -1,12 +1,30 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using VRSF.Core.SetupVR;
 using VRSF.Core.Utils;
 
 namespace VRSF.Multiplayer
 {
-    public class MultiplayerPrefabsInstancier : Editor
+    public class MultiplayerPrefabsInstancier : EditorWindow
     {
+        private static string _infoToAddToWindow;
+        private static MultiplayerPrefabsInstancier _window;
+
+        private void OnGUI()
+        {
+            // Add a Title
+            GUILayout.Label("This prefab is only to be placed under the Photon Player prefab.\n" +
+                "In VRSF, it's situated under Assets/VRSF/Multiplayer/Resources/PhotonPrefabs.\n" + _infoToAddToWindow, EditorStyles.boldLabel);
+
+            EditorGUILayout.Space();
+
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Understood !"))
+            {
+                this.Close();
+            }
+        }
+
         /// <summary>
         /// Add a new Lobby Connection Manager to the Scene
         /// </summary>
@@ -49,8 +67,8 @@ namespace VRSF.Multiplayer
         /// Add a new Sahred laser pointer for the rooms to the Scene
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("VRSF/Multiplayer/In Room/Shared Laser Pointer", priority = 0)]
-        [MenuItem("GameObject/VRSF/Multiplayer/In Room/Shared Laser Pointer", priority = 0)]
+        [MenuItem("VRSF/Multiplayer/In Room/Players Utility/Shared Remote Laser Pointer", priority = 0)]
+        [MenuItem("GameObject/VRSF/Multiplayer/In Room/Players Utility/Shared Remote Laser Pointer", priority = 0)]
         static void InstantiateSharedLaserPointer(MenuCommand menuCommand)
         {
             // Create a custom game object
@@ -62,45 +80,24 @@ namespace VRSF.Multiplayer
             // Register the creation in the undo system
             Undo.RegisterCreatedObjectUndo(newMultiObject, "Create " + newMultiObject.name);
             Selection.activeObject = newMultiObject;
-        }
 
-        /// <summary>
-        /// Add a new SetupMultiVR for the rooms to the Scene
-        /// </summary>
-        /// <param name="menuCommand"></param>
-        [MenuItem("VRSF/Multiplayer/In Room/SetupVR Multiplayer", priority = 0)]
-        [MenuItem("GameObject/VRSF/Multiplayer/In Room/SetupVR Multiplayer", priority = 0)]
-        static void InstantiateSetupMultiVR(MenuCommand menuCommand)
-        {
-            var deviceAuthoring = GameObject.FindObjectOfType<DeviceToLoadAuthoring>();
-
-            if (deviceAuthoring != null)
-            {
-                Debug.LogError("<b>[VRSF] :</b> SetupVR is already present in the scene.\n" +
-                    "If multiple instance of this object are placed in the same scene, you will encounter conflict problems.");
-                Selection.activeObject = deviceAuthoring.gameObject;
-                return;
-            }
-
-            // Create a custom game object
-            GameObject newMultiObject = (GameObject)PrefabUtility.InstantiatePrefab(VRSFPrefabReferencer.GetPrefab("SetupMultiVR"));
-
-            // Ensure it gets reparented if this was a context click (otherwise does nothing)
-            GameObjectUtility.SetParentAndAlign(newMultiObject, menuCommand.context as GameObject);
-
-            // Register the creation in the undo system
-            Undo.RegisterCreatedObjectUndo(newMultiObject, "Create " + newMultiObject.name);
-            Selection.activeObject = newMultiObject;
+            _infoToAddToWindow = "This prefab let you see the laser pointer of the remote users.";
+            _window = CreateWindow<MultiplayerPrefabsInstancier>("Laser for Remote Players");
+            SetWindowSize();
         }
 
         /// <summary>
         /// Add a Shared Right Controller Model to the Scene
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("VRSF/Multiplayer/In Room/Shared Right Controller Mesh", priority = 0)]
-        [MenuItem("GameObject/VRSF/Multiplayer/In Room/Shared Right Controller Mesh", priority = 0)]
+        [MenuItem("VRSF/Multiplayer/In Room/Players Utility/Shared Right Controller Mesh", priority = 0)]
+        [MenuItem("GameObject/VRSF/Multiplayer/In Room/Players Utility/Shared Right Controller Mesh", priority = 0)]
         static void InstantiateRightController(MenuCommand menuCommand)
         {
+            _infoToAddToWindow = "This prefab let you see the Right controller of the other users.";
+            _window = CreateWindow<MultiplayerPrefabsInstancier>("Right Controller for Remote Players");
+            SetWindowSize();
+
             // Create a custom game object
             GameObject newMultiObject = (GameObject)PrefabUtility.InstantiatePrefab(VRSFPrefabReferencer.GetPrefab("RightControllerModelMultiplayer"));
 
@@ -116,10 +113,14 @@ namespace VRSF.Multiplayer
         /// Add a new Right Controller Model for the rooms to the Scene
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("VRSF/Multiplayer/In Room/Shared Left Controller Mesh", priority = 0)]
-        [MenuItem("GameObject/VRSF/Multiplayer/In Room/Shared Left Controller Mesh", priority = 0)]
+        [MenuItem("VRSF/Multiplayer/In Room/Players Utility/Shared Left Controller Mesh", priority = 0)]
+        [MenuItem("GameObject/VRSF/Multiplayer/In Room/Players Utility/Shared Left Controller Mesh", priority = 0)]
         static void InstantiateLeftController(MenuCommand menuCommand)
         {
+            _infoToAddToWindow = "This prefab let you see the Left controller of the other users.";
+            _window = CreateWindow<MultiplayerPrefabsInstancier>("Left Controller for Remote Players");
+            SetWindowSize();
+
             // Create a custom game object
             GameObject newMultiObject = (GameObject)PrefabUtility.InstantiatePrefab(VRSFPrefabReferencer.GetPrefab("LeftControllerModelMultiplayer"));
 
@@ -129,6 +130,12 @@ namespace VRSF.Multiplayer
             // Register the creation in the undo system
             Undo.RegisterCreatedObjectUndo(newMultiObject, "Create " + newMultiObject.name);
             Selection.activeObject = newMultiObject;
+        }
+
+        private static void SetWindowSize()
+        {
+            _window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
+            _window.minSize = new Vector2(500.0f, 120.0f);
         }
     }
 }
