@@ -90,13 +90,13 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
-            if (info.ObjectHovered == gameObject && interactable && !_isSelected)
+            if (info.HoveredObject == gameObject && interactable && !_isSelected)
             {
                 _isSelected = true;
                 new OnHapticRequestedEvent(info.RaycastOrigin == Core.Raycast.ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.1f, 0.075f);
                 OnHover.Invoke();
             }
-            else if (info.ObjectHovered != gameObject && _isSelected)
+            else if (info.HoveredObject != gameObject && _isSelected)
             {
                 _isSelected = false;
                 OnDeselect(null);

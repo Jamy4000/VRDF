@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 using VRSF.Core.Raycast;
+using VRSF.Core.VRInteractions;
 
 /// <summary>
 /// Event raised when an object is hovered by the laser
@@ -15,21 +15,32 @@ public class OnObjectIsBeingHovered : EventCallbacks.Event<OnObjectIsBeingHovere
     /// <summary>
     /// The GameObject that was just hovered by the user (must have a collider)
     /// </summary>
-    public readonly GameObject ObjectHovered;
+    public readonly GameObject HoveredObject;
 
     /// <summary>
     /// Event raised when an object is hovered by the laser.
     /// </summary>
     /// <param name="raycastOrigin">The Origin of the ray that just hovered something</param>
     /// <param name="objectHovered">The GameObject that was just hovered by the user (must have a collider)</param>
-    public OnObjectIsBeingHovered(ERayOrigin raycastOrigin, GameObject objectHovered) : base("Event raised when an object is hovered by the laser.")
+    public OnObjectIsBeingHovered(ERayOrigin raycastOrigin, GameObject objectHovered, Vector3 currentHitPoint) : base("Event raised when an object is hovered by the laser.")
     {
-        // We set the object that was Hovered as the selected gameObject
-        if (objectHovered != null && objectHovered.GetComponent<UnityEngine.UI.Selectable>() != null)
-            EventSystem.current.SetSelectedGameObject(objectHovered.gameObject);
-
         RaycastOrigin = raycastOrigin;
-        ObjectHovered = objectHovered;
+        HoveredObject = objectHovered;
+
+        switch (raycastOrigin)
+        {
+            case ERayOrigin.RIGHT_HAND:
+                InteractionVariableContainer.CurrentRightHitPosition = currentHitPoint;
+                break;
+            case ERayOrigin.LEFT_HAND:
+                InteractionVariableContainer.CurrentLeftHitPosition = currentHitPoint;
+                break;
+            case ERayOrigin.CAMERA:
+                InteractionVariableContainer.CurrentGazeHitPosition = currentHitPoint;
+                break;
+            default:
+                throw new System.Exception();
+        }
 
         FireEvent(this);
     }

@@ -172,7 +172,7 @@ namespace VRSF.MoveAround.Fly
 
             entityManager.SetComponentData(entity, new VRRaycastOutputs
             {
-                RaycastHitVar = new RaycastHitVariable(),
+                RaycastHitVar = new RaycastHitVariable { IsNull = true },
                 RayVar = new Ray()
             });
 

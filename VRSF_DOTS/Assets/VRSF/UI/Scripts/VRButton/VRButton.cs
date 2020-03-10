@@ -88,12 +88,12 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
-            if (CheckGameObject(info.ObjectHovered) && _handHovering == Core.Raycast.ERayOrigin.NONE)
+            if (CheckGameObject(info.HoveredObject) && _handHovering == Core.Raycast.ERayOrigin.NONE)
             {
                 _handHovering = info.RaycastOrigin;
                 OnHover.Invoke();
             }
-            else if (info.ObjectHovered.transform != transform && _handHovering == info.RaycastOrigin)
+            else if (info.HoveredObject.transform != transform && _handHovering == info.RaycastOrigin)
             {
                 _handHovering = Core.Raycast.ERayOrigin.NONE;
                 OnDeselect(null);

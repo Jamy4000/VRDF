@@ -215,7 +215,7 @@ namespace VRSF.UI
         /// <param name="hoverEvent">The event raised when an object is hovered</param>
         private void CheckSliderHovered(OnObjectIsBeingHovered hoverEvent)
         {
-            CheckGameObject(hoverEvent.ObjectHovered, hoverEvent.RaycastOrigin);
+            CheckGameObject(hoverEvent.HoveredObject, hoverEvent.RaycastOrigin);
         }
 
         private void CheckGameObject(GameObject toCheck, ERayOrigin raycastOrigin)

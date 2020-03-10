@@ -15,48 +15,65 @@ namespace VRSF.Core.Raycast
         {
             Entities.WithAll(typeof(VRHovering)).ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs) =>
             {
-                switch (raycastOrigin.RayOrigin)
-                {
-                    case ERayOrigin.LEFT_HAND:
-                        HandleOver(ref InteractionVariableContainer.CurrentLeftHit, ref InteractionVariableContainer.CurrentLeftHitPosition, ref InteractionVariableContainer.IsOverSomethingLeft, ref raycastOutputs.RaycastHitVar, ERayOrigin.LEFT_HAND);
-                        break;
-                    case ERayOrigin.RIGHT_HAND:
-                        HandleOver(ref InteractionVariableContainer.CurrentRightHit, ref InteractionVariableContainer.CurrentRightHitPosition, ref InteractionVariableContainer.IsOverSomethingRight, ref raycastOutputs.RaycastHitVar, ERayOrigin.RIGHT_HAND);
-                        break;
-                    case ERayOrigin.CAMERA:
-                        HandleOver(ref InteractionVariableContainer.CurrentGazeHit, ref InteractionVariableContainer.CurrentGazeHitPosition, ref InteractionVariableContainer.IsOverSomethingGaze, ref raycastOutputs.RaycastHitVar, ERayOrigin.CAMERA);
-                        break;
-                }
+                HandleOver(raycastOutputs.RaycastHitVar, raycastOrigin.RayOrigin);
             });
         }
 
         /// <summary>
         /// Handle the raycastHits to check if one of them touch something
         /// </summary>
-        private void HandleOver(ref GameObject currentHit, ref float3 hitPos, ref bool isOverSomething, ref RaycastHitVariable hitVar, ERayOrigin origin)
+        private void HandleOver(RaycastHitVariable hitVar, ERayOrigin origin)
         {
-            //If nothing is hit, we set the isOver value to false
+            GetCurrentHit(origin, out GameObject currentHit, out bool isOverSomething);
+
+            //If nothing is hit and something was previously hovered, we raise the stop hovering event
             if (hitVar.IsNull && isOverSomething)
             {
-                currentHit = null;
-                hitPos = float3.zero;
-                isOverSomething = false;
-                // Event raise with null as ObjectHovered parameter, to notify the listener that nothing is being hovered right now
-                new OnObjectIsBeingHovered(origin, null);
+                new OnStopHoveringObject(origin, currentHit);
             }
-            //If something is hit, we check that the collider is still "alive", and we check that the new transform hit is not the same as the previous one
-            else if (!hitVar.IsNull && hitVar.Value.collider != null)
+            //If something is hit
+            else if (!hitVar.IsNull)
             {
-                hitPos = hitVar.Value.point;
                 var objectHit = hitVar.Value.collider.gameObject;
 
-                if (objectHit != currentHit)
+                if (!isOverSomething)
                 {
-                    isOverSomething = true;
-                    currentHit = objectHit;
-                    // Event raised only when a new object is hovered, and not every frame
-                    new OnObjectIsBeingHovered(origin, objectHit);
+                    // Event raised only when a new object is hovered
+                    new OnStartHoveringObject(origin, objectHit, hitVar.Value.point);
                 }
+                // If the user started to hover a new object
+                else if (objectHit != currentHit)
+                {
+                    // We tell the system that we stopped hovering the current object. 
+                    // The Systems will then be notify on the next frame that something new is being hovered
+                    new OnStopHoveringObject(origin, currentHit);
+                }
+                // If we're still hovering the same object as the previous frame
+                else
+                {
+                    new OnObjectIsBeingHovered(origin, currentHit, hitVar.Value.point);
+                }
+            }
+        }
+
+        private void GetCurrentHit(ERayOrigin origin, out GameObject currentHit, out bool isOverSomething)
+        {
+            switch (origin)
+            {
+                case ERayOrigin.RIGHT_HAND:
+                    currentHit = InteractionVariableContainer.CurrentRightHit;
+                    isOverSomething = InteractionVariableContainer.IsOverSomethingRight;
+                    break;
+                case ERayOrigin.LEFT_HAND:
+                    currentHit = InteractionVariableContainer.CurrentLeftHit;
+                    isOverSomething = InteractionVariableContainer.IsOverSomethingLeft;
+                    break;
+                case ERayOrigin.CAMERA:
+                    currentHit = InteractionVariableContainer.CurrentGazeHit;
+                    isOverSomething = InteractionVariableContainer.IsOverSomethingGaze;
+                    break;
+                default:
+                    throw new System.Exception();
             }
         }
     }
