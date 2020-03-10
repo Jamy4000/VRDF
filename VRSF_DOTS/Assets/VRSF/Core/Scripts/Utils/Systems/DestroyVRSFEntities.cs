@@ -24,13 +24,13 @@ namespace VRSF.Core
 
         private void DestroyEntities(Scene unloadedScene)
         {
-            Entities.WithNone<CBRA.CBRATag>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent) =>
+            Entities.WithNone<CBRA.CBRAEventComponent>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent) =>
             {
                 if (unloadedScene.buildIndex == destroyComponent.SceneIndex)
                     EntityManager.DestroyEntity(e);
             });
 
-            Entities.WithNone<CBRA.CBRATag>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent, ref Disabled disabledEntityComp) =>
+            Entities.WithNone<CBRA.CBRAEventComponent>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent, ref Disabled disabledEntityComp) =>
             {
                 if (unloadedScene.buildIndex == destroyComponent.SceneIndex)
                     EntityManager.DestroyEntity(e);

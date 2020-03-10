@@ -66,8 +66,8 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClick))
-                OnObjectIsBeingClicked.Listeners -= CheckObjectClick;
+            if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClick))
+                OnVRClickerIsClicking.Listeners -= CheckObjectClick;
 
             if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
                 OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
@@ -107,28 +107,28 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckObjectClick(OnObjectIsBeingClicked clickEvent)
+        private void CheckObjectClick(OnVRClickerIsClicking clickEvent)
         {
-            CheckTransform(clickEvent.ObjectClicked.transform, clickEvent.RaycastOrigin);
+            CheckGameObject(clickEvent.ClickedObject, clickEvent.RaycastOrigin);
         }
 
-        private void CheckTransform(Transform toCheck, ERayOrigin raycastOrigin)
+        private void CheckGameObject(GameObject toCheck, ERayOrigin raycastOrigin)
         {
             _rayHoldingHandle = interactable && ObjectClickedIsThis() ? raycastOrigin : ERayOrigin.NONE;
 
             bool ObjectClickedIsThis()
             {
-                return toCheck == transform && _rayHoldingHandle == ERayOrigin.NONE;
+                return toCheck == gameObject && _rayHoldingHandle == ERayOrigin.NONE;
             }
         }
 
         private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
-            if (info.ObjectHovered.transform == transform && interactable && !_isSelected)
+            if (info.ObjectHovered == gameObject && interactable && !_isSelected)
             {
                 _isSelected = true;
             }
-            else if (info.ObjectHovered != transform && _isSelected)
+            else if (info.ObjectHovered != gameObject && _isSelected)
             {
                 _isSelected = false;
                 OnDeselect(null);
@@ -154,7 +154,7 @@ namespace VRSF.UI
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR && VRSF_Components.DeviceLoaded != EDevice.NONE)
             {
                 OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
-                OnObjectIsBeingClicked.Listeners += CheckObjectClick;
+                OnVRClickerIsClicking.Listeners += CheckObjectClick;
             }
 
             CheckSliderReferences();
@@ -189,9 +189,10 @@ namespace VRSF.UI
 #endif
                 if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
                 {
-                    CheckTransform(hit.transform, ERayOrigin.CAMERA);
+                    CheckGameObject(hit.collider.gameObject, ERayOrigin.CAMERA);
                     if (_rayHoldingHandle == ERayOrigin.CAMERA)
                     {
+                        // TODO WHAT THE FUCK THIS SHOULDN'T BE HERE
                         InteractionVariableContainer.CurrentGazeHit = gameObject;
                         InteractionVariableContainer.IsClickingSomethingGaze = true;
                         InteractionVariableContainer.CurrentGazeHitPosition = hit.point;

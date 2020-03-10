@@ -18,16 +18,19 @@ namespace VRSF.Core.CBRA
 
         protected override void OnUpdate()
         {
-            Entities.WithAll<CBRATag>().ForEach((Entity entity, ref StopTouchingEventComp stopTouchingEvent) =>
+            Entities.ForEach((Entity entity, ref StopTouchingEventComp stopTouchingEvent, ref CBRAEventComponent cbraEvents) =>
             {
-                if (_entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopTouchingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopTouchingEvents.TryGetValue(entity, out System.Action action))
+                if (!cbraEvents.HasCheckedStopTouchingEvent && _entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopTouchingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopTouchingEvents.TryGetValue(entity, out System.Action action))
+                {
+                    cbraEvents.HasCheckedStopTouchingEvent = true;
                     action.Invoke();
+                }
             });
 
-            // As StopTouchingEventComp is only used by this system to raise the event one time, we remove it as soon as we're done raising the event.
-            Entities.ForEach((Entity entity, ref StopTouchingEventComp stopTouchingEvent) =>
+            Entities.WithNone<StopTouchingEventComp>().ForEach((Entity entity, ref CBRAEventComponent cbraEvents) =>
             {
-                PostUpdateCommands.RemoveComponent(entity, typeof(StopTouchingEventComp));
+                if (cbraEvents.HasCheckedStopTouchingEvent)
+                    cbraEvents.HasCheckedStopTouchingEvent = false;
             });
         }
     }

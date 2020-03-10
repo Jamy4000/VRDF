@@ -54,8 +54,8 @@ namespace VRSF.UI
             if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
                 OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
 
-            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClicked))
-                OnObjectIsBeingClicked.Listeners -= CheckObjectClicked;
+            if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClicked))
+                OnVRClickerIsClicking.Listeners -= CheckObjectClicked;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -80,20 +80,15 @@ namespace VRSF.UI
         /// Event called when the button is clicked
         /// </summary>
         /// <param name="objectClickEvent">The object that was clicked</param>
-        void CheckObjectClicked(OnObjectIsBeingClicked objectClickEvent)
+        private void CheckObjectClicked(OnVRClickerIsClicking objectClickEvent)
         {
-            if (CheckTransform(objectClickEvent.ObjectClicked.transform))
+            if (CheckGameObject(objectClickEvent.ClickedObject))
                 onClick.Invoke();
-        }
-
-        private bool CheckTransform(Transform toCheck)
-        {
-            return interactable && toCheck == transform;
         }
 
         private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
-            if (CheckTransform(info.ObjectHovered.transform) && _handHovering == Core.Raycast.ERayOrigin.NONE)
+            if (CheckGameObject(info.ObjectHovered) && _handHovering == Core.Raycast.ERayOrigin.NONE)
             {
                 _handHovering = info.RaycastOrigin;
                 OnHover.Invoke();
@@ -104,6 +99,11 @@ namespace VRSF.UI
                 OnDeselect(null);
                 OnStopHovering.Invoke();
             }
+        }
+
+        private bool CheckGameObject(GameObject toCheck)
+        {
+            return interactable && toCheck == gameObject;
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace VRSF.UI
             if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
                 OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
-                OnObjectIsBeingClicked.Listeners += CheckObjectClicked;
+                OnVRClickerIsClicking.Listeners += CheckObjectClicked;
             }
 
             var boxCollider = GetComponent<BoxCollider>();

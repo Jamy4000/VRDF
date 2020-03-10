@@ -58,25 +58,25 @@ namespace VRSF.Core.Inputs
                 // Check Click Events
                 if (YClickButtonDown)
                 {
-                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.Y_BUTTON });
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.Y_BUTTON });
                     baseInput.IsClicking = true;
                     baseInput.IsTouching = false;
                 }
                 else if (YClickButtonUp)
                 {
-                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.Y_BUTTON });
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.Y_BUTTON });
                     baseInput.IsClicking = false;
                     baseInput.IsTouching = true;
                 }
                 // Check Touch Events if user is not clicking
                 else if (!baseInput.IsClicking && !baseInput.IsTouching && YTouchButtonDown)
                 {
-                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.Y_BUTTON });
+                    Commands.AddComponent(index, entity, new StartTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.Y_BUTTON });
                     baseInput.IsTouching = true;
                 }
                 else if (baseInput.IsTouching && YTouchButtonUp)
                 {
-                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.Y_BUTTON });
+                    Commands.AddComponent(index, entity, new StopTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.Y_BUTTON });
                     baseInput.IsTouching = false;
                 }
             }

@@ -11,5 +11,10 @@ namespace VRSF.Core.Inputs
         /// TODO
         /// </summary>
         public EControllersButton ButtonInteracting;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public bool HasWaitedOneFrameBeforeRemoval;
     }
 }

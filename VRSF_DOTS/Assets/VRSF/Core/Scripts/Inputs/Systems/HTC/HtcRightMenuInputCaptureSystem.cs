@@ -52,12 +52,12 @@ namespace VRSF.Core.Inputs
             {
                 if (RightMenuButtonDown)
                 {
-                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.MENU });
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.MENU });
                     baseInput.IsClicking = true;
                 }
                 else if (RightMenuButtonUp)
                 {
-                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.MENU });
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.MENU });
                     baseInput.IsClicking = false;
                 }
             }

@@ -6,7 +6,6 @@ namespace VRSF.Core.CBRA
     /// <summary>
     /// Handle the Start Clicking events for CBRAs Entities
     /// </summary>
-    [UpdateAfter(typeof(VRClicker.PointerClickingSystem))]
     public class CBRAStartClickingSystem : ComponentSystem
     {
         private EntityManager _entityManager;
@@ -19,16 +18,19 @@ namespace VRSF.Core.CBRA
 
         protected override void OnUpdate()
         {
-            Entities.WithAll<CBRATag>().ForEach((Entity entity, ref StartClickingEventComp startClickingEvent) =>
+            Entities.ForEach((Entity entity, ref StartClickingEventComp startClickingEvent, ref CBRAEventComponent cbraEvent) =>
             {
-                if (_entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(startClickingEvent.ButtonInteracting)) && CBRADelegatesHolder.StartClickingEvents.TryGetValue(entity, out System.Action action))
+                if (!cbraEvent.HasCheckedStartClickingEvent && _entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(startClickingEvent.ButtonInteracting)) && CBRADelegatesHolder.StartClickingEvents.TryGetValue(entity, out System.Action action))
+                {
+                    cbraEvent.HasCheckedStartClickingEvent = true;
                     action.Invoke();
+                }
             });
 
-            // As StartClickingEventComp is only used by this system to raise the event one time, we remove it as soon as we're done raising the event.
-            Entities.WithAll<CBRATag, StartClickingEventComp>().ForEach((Entity entity) =>
+            Entities.WithNone<StartClickingEventComp>().ForEach((Entity entity, ref CBRAEventComponent cbraEvents) =>
             {
-                PostUpdateCommands.RemoveComponent(entity, typeof(StartClickingEventComp));
+                if (cbraEvents.HasCheckedStartClickingEvent)
+                    cbraEvents.HasCheckedStartClickingEvent = false;
             });
         }
     }

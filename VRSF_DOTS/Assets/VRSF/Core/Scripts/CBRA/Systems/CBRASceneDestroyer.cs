@@ -25,7 +25,7 @@ namespace VRSF.Core.CBRA
 
         private void DestroyEntities(Scene unloadedScene)
         {
-            Entities.WithAll<CBRATag>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent) =>
+            Entities.WithAll<CBRAEventComponent>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent) =>
             {
                 if (unloadedScene.buildIndex == destroyComponent.SceneIndex)
                 {
@@ -34,7 +34,7 @@ namespace VRSF.Core.CBRA
                 }
             });
 
-            Entities.WithAll<CBRATag>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent, ref Disabled disabledEntityComp) =>
+            Entities.WithAll<CBRAEventComponent>().ForEach((Entity e, ref DestroyOnSceneUnloaded destroyComponent, ref Disabled disabledEntityComp) =>
             {
                 if (unloadedScene.buildIndex == destroyComponent.SceneIndex)
                 {

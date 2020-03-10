@@ -68,25 +68,25 @@ namespace VRSF.Core.Inputs
                 // Check Click Events
                 if (LeftThumbClickDown)
                 {
-                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.TOUCHPAD });
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.TOUCHPAD });
                     baseInput.IsTouching = false;
                     baseInput.IsClicking = true;
                 }
                 else if (LeftThumbClickUp)
                 {
-                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.TOUCHPAD });
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.TOUCHPAD });
                     baseInput.IsClicking = false;
                     baseInput.IsTouching = true;
                 }
                 // Check Touch Events if user is not clicking
                 else if (!baseInput.IsClicking && !baseInput.IsTouching && UserIsTouching(touchpadInput.UseThumbPosForTouch))
                 {
-                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.TOUCHPAD });
+                    Commands.AddComponent(index, entity, new StartTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.TOUCHPAD });
                     baseInput.IsTouching = true;
                 }
                 else if (baseInput.IsTouching && UserStopTouching(touchpadInput.UseThumbPosForTouch))
                 {
-                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.TOUCHPAD });
+                    Commands.AddComponent(index, entity, new StopTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.TOUCHPAD });
                     baseInput.IsTouching = false;
                 }
             }

@@ -53,8 +53,8 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClick))
-                OnObjectIsBeingClicked.Listeners -= CheckObjectClick;
+            if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClick))
+                OnVRClickerIsClicking.Listeners -= CheckObjectClick;
 
             if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
                 OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
@@ -89,9 +89,9 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckObjectClick(OnObjectIsBeingClicked clickEvent)
+        private void CheckObjectClick(OnVRClickerIsClicking clickEvent)
         {
-            if (interactable && clickEvent.ObjectClicked == transform && _rayHoldingHandle == ERayOrigin.NONE)
+            if (interactable && clickEvent.ClickedObject == gameObject && _rayHoldingHandle == ERayOrigin.NONE)
             {
                 _rayHoldingHandle = clickEvent.RaycastOrigin;
                 new OnHapticRequestedEvent(_rayHoldingHandle == ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
@@ -100,12 +100,12 @@ namespace VRSF.UI
 
         private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
-            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            if (info.ObjectHovered == gameObject && interactable && !_isSelected)
             {
                 _isSelected = true;
                 new OnHapticRequestedEvent(info.RaycastOrigin == ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.1f, 0.075f);
             }
-            else if (info.ObjectHovered != transform && _isSelected)
+            else if (info.ObjectHovered != gameObject && _isSelected)
             {
                 _isSelected = false;
                 OnDeselect(null);
@@ -170,7 +170,7 @@ namespace VRSF.UI
             if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
             {
                 OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
-                OnObjectIsBeingClicked.Listeners += CheckObjectClick;
+                OnVRClickerIsClicking.Listeners += CheckObjectClick;
             }
 
             _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));

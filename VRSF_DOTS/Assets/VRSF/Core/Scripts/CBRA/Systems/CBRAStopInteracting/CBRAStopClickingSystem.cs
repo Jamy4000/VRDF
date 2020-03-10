@@ -6,7 +6,6 @@ namespace VRSF.Core.CBRA
     /// <summary>
     /// Handle the Start Clicking events for CBRAs Entities
     /// </summary>
-    [UpdateAfter(typeof(VRClicker.PointerUnclickingSystem))]
     public class CBRAStopClickingSystem : ComponentSystem
     {
         private EntityManager _entityManager;
@@ -19,16 +18,19 @@ namespace VRSF.Core.CBRA
 
         protected override void OnUpdate()
         {
-            Entities.WithAll<CBRATag>().ForEach((Entity entity, ref StopClickingEventComp stopClickingEvent) =>
+            Entities.ForEach((Entity entity, ref StopClickingEventComp stopClickingEvent, ref CBRAEventComponent cbraEvents) =>
             {
-                if (_entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopClickingEvents.TryGetValue(entity, out System.Action action))
+                if (!cbraEvents.HasCheckedStopClickingEvent && _entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopClickingEvents.TryGetValue(entity, out System.Action action))
+                {
+                    cbraEvents.HasCheckedStopClickingEvent = true;
                     action.Invoke();
+                }
             });
 
-            // As StopClickingEventComp is only used by this system to raise the event one time, we remove it as soon as we're done raising the event.
-            Entities.ForEach((Entity entity, ref StopClickingEventComp stopClickingEvent) =>
+            Entities.WithNone<StopClickingEventComp>().ForEach((Entity entity, ref CBRAEventComponent cbraEvents) =>
             {
-                PostUpdateCommands.RemoveComponent(entity, typeof(StopClickingEventComp));
+                if (cbraEvents.HasCheckedStopClickingEvent)
+                    cbraEvents.HasCheckedStopClickingEvent = false;
             });
         }
     }

@@ -20,7 +20,7 @@ namespace VRSF.Core.VRClicker
             if ((interactionParameters.DeviceUsingFeature & VRSF_Components.DeviceLoaded) == VRSF_Components.DeviceLoaded)
             {
                 // We add a new pointer click to store
-                entityManager.AddComponentData(entity, new PointerClicker
+                entityManager.AddComponentData(entity, new VRClicker
                 {
                     ControllersButton = interactionParameters.ButtonToUse,
                     HandClicking = interactionParameters.ButtonHand,

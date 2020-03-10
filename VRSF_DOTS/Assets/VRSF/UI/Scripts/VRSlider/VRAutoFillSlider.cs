@@ -88,8 +88,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                if (UnityEngine.XR.XRSettings.enabled)
-                    OnSetupVRReady.RegisterSetupVRCallback(Init);
+                OnSetupVRReady.RegisterSetupVRCallback(Init);
 
                 // We setup the BoxCollider size and center
                 if (SetColliderAuto)
@@ -109,8 +108,8 @@ namespace VRSF.UI
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
 
-            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckSliderClick))
-                OnObjectIsBeingClicked.Listeners -= CheckSliderClick;
+            if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckSliderClick))
+                OnVRClickerIsClicking.Listeners -= CheckSliderClick;
 
             if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckSliderHovered))
                 OnObjectIsBeingHovered.Listeners -= CheckSliderHovered;
@@ -136,10 +135,10 @@ namespace VRSF.UI
 
         private void OnTriggerEnter(Collider other)
         {
-            if (ControllerClickable && interactable && other.gameObject.tag.Contains("ControllerBody"))
+            if (ControllerClickable && interactable && other.gameObject.CompareTag("ControllerBody"))
             {
                 _isFillingWithMesh = true;
-                HandleHandInteracting(other.gameObject.name.Contains("RIGHT") ? ERayOrigin.RIGHT_HAND : ERayOrigin.LEFT_HAND);
+                HandleHandInteracting(other.gameObject.name.ToLower().Contains("right") ? ERayOrigin.RIGHT_HAND : ERayOrigin.LEFT_HAND);
             }
         }
 
@@ -160,7 +159,7 @@ namespace VRSF.UI
 
             if (_fillBarRoutine != null)
             {
-                CheckHandStillOver();
+                CheckHandStillClicking();
             }
             else if (ValueIsGoingDown && value > 0)
             {
@@ -182,7 +181,7 @@ namespace VRSF.UI
                 var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
 #endif
                 if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
-                    CheckTransform(hit.transform, ERayOrigin.CAMERA);
+                    CheckGameObject(hit.collider.gameObject, ERayOrigin.CAMERA);
             }
 #if UNITY_STANDALONE || UNITY_EDITOR
             else if (Input.GetMouseButtonUp(0))
@@ -205,9 +204,9 @@ namespace VRSF.UI
         /// Event called when the user is clicking on something
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckSliderClick(OnObjectIsBeingClicked clickEvent)
+        private void CheckSliderClick(OnVRClickerIsClicking clickEvent)
         {
-            CheckTransform(clickEvent.ObjectClicked.transform, clickEvent.RaycastOrigin);
+            CheckGameObject(clickEvent.ClickedObject, clickEvent.RaycastOrigin);
         }
 
         /// <summary>
@@ -216,20 +215,20 @@ namespace VRSF.UI
         /// <param name="hoverEvent">The event raised when an object is hovered</param>
         private void CheckSliderHovered(OnObjectIsBeingHovered hoverEvent)
         {
-            CheckTransform(hoverEvent.ObjectHovered.transform, hoverEvent.RaycastOrigin);
+            CheckGameObject(hoverEvent.ObjectHovered, hoverEvent.RaycastOrigin);
         }
 
-        private void CheckTransform(Transform toCheck, ERayOrigin raycastOrigin)
+        private void CheckGameObject(GameObject toCheck, ERayOrigin raycastOrigin)
         {
             if (IsInteractable())
             {
                 // if the object hovered correspond to this transform and the coroutine to fill the bar didn't started yet
-                if (toCheck == transform && _fillBarRoutine == null)
+                if (toCheck == gameObject && _fillBarRoutine == null)
                 {
                     HandleHandInteracting(raycastOrigin);
                 }
                 // If the user was hovering the bar but stopped
-                else if (_fillBarRoutine != null && raycastOrigin == _handFilling && toCheck != transform)
+                else if (_fillBarRoutine != null && raycastOrigin == _handFilling && toCheck != gameObject)
                 {
                     HandleUp();
                 }
@@ -312,25 +311,28 @@ namespace VRSF.UI
         /// <summary>
         /// Check if the Controller or the Gaze filling the bar is still over the Slider or, if we use the click, if the user is still clicking
         /// </summary>
-        private void CheckHandStillOver()
+        private void CheckHandStillClicking()
         {
+            if (!FillWithClick)
+                return;
+
             switch (_handFilling)
             {
                 // if we fill with click and the user is not clicking anymore
                 // OR, if the user is not on the slider anymore
 
                 case ERayOrigin.LEFT_HAND:
-                    if (FillWithClick && !InteractionVariableContainer.IsClickingSomethingLeft)
+                    if (InteractionVariableContainer.CurrentLeftHit != gameObject)
                         HandleUp();
                     break;
 
                 case ERayOrigin.RIGHT_HAND:
-                    if (FillWithClick && !InteractionVariableContainer.IsClickingSomethingRight)
+                    if (InteractionVariableContainer.CurrentRightHit != gameObject)
                         HandleUp();
                     break;
 
                 case ERayOrigin.CAMERA:
-                    if (FillWithClick && !InteractionVariableContainer.IsClickingSomethingGaze)
+                    if (InteractionVariableContainer.CurrentGazeHit != gameObject)
                         HandleUp();
                     break;
             }
@@ -357,7 +359,7 @@ namespace VRSF.UI
             if (LaserClickable)
             {
                 if (FillWithClick)
-                    OnObjectIsBeingClicked.Listeners += CheckSliderClick;
+                    OnVRClickerIsClicking.Listeners += CheckSliderClick;
                 else
                     OnObjectIsBeingHovered.Listeners += CheckSliderHovered;
             }

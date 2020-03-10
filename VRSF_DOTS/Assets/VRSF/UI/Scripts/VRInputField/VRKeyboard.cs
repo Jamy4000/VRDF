@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-
 namespace VRSF.UI
 {
     /// <summary>

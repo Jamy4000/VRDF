@@ -65,7 +65,7 @@ namespace VRSF.Core.Simulator
             // if the VRInteractionAuthoring has a Click Interaction set in editor
             if (hasClickInteraction)
             {
-                EntityManager.AddComponentData(entity, new StartClickingEventComp { ButtonInteracting = simulatedButton });
+                EntityManager.AddComponentData(entity, new StartClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = simulatedButton });
                 baseInput.IsClicking = true;
             }
         }
@@ -81,7 +81,7 @@ namespace VRSF.Core.Simulator
         {
             if (hasTouchInteraction)
             {
-                EntityManager.AddComponentData(entity, new StartTouchingEventComp { ButtonInteracting = simulatedButton });
+                EntityManager.AddComponentData(entity, new StartTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = simulatedButton });
                 baseInput.IsTouching = true;
             }
         }
@@ -98,7 +98,7 @@ namespace VRSF.Core.Simulator
             // if the VRInteractionAuthoring has a Click Interaction set in editor
             if (hasClickInteraction)
             {
-                EntityManager.AddComponentData(entity, new StopClickingEventComp { ButtonInteracting = simulatedButton });
+                EntityManager.AddComponentData(entity, new StopClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = simulatedButton });
                 baseInput.IsClicking = false;
             }
         }
@@ -114,7 +114,7 @@ namespace VRSF.Core.Simulator
         {
             if (hasTouchInteraction)
             {
-                EntityManager.AddComponentData(entity, new StopTouchingEventComp { ButtonInteracting = simulatedButton });
+                EntityManager.AddComponentData(entity, new StopTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = simulatedButton });
                 baseInput.IsTouching = false;
             }
         }

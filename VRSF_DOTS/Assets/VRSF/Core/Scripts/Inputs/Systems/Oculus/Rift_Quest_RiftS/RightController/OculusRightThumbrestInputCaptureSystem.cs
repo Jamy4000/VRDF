@@ -53,12 +53,12 @@ namespace VRSF.Core.Inputs
             {
                 if (ThumbrestTouchButtonDown)
                 {
-                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.THUMBREST });
+                    Commands.AddComponent(index, entity, new StartTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.THUMBREST });
                     baseInput.IsTouching = true;
                 }
                 else if (ThumbrestTouchButtonUp)
                 {
-                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.THUMBREST });
+                    Commands.AddComponent(index, entity, new StopTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.THUMBREST });
                     baseInput.IsTouching = false;
                 }
             }

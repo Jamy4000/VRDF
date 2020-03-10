@@ -48,7 +48,7 @@ namespace VRSF.Core.CBRA
                 (
                     typeof(BaseInputCapture),
                     typeof(ControllersInteractionType),
-                    typeof(CBRATag)
+                    typeof(CBRAEventComponent)
                 );
 
                 // Add the corresponding input, Hand and Interaction type component for the selected button. 

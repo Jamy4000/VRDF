@@ -41,6 +41,7 @@ namespace VRSF.Core.Raycast
                 currentHit = null;
                 hitPos = float3.zero;
                 isOverSomething = false;
+                // Event raise with null as ObjectHovered parameter, to notify the listener that nothing is being hovered right now
                 new OnObjectIsBeingHovered(origin, null);
             }
             //If something is hit, we check that the collider is still "alive", and we check that the new transform hit is not the same as the previous one
@@ -48,10 +49,12 @@ namespace VRSF.Core.Raycast
             {
                 hitPos = hitVar.Value.point;
                 var objectHit = hitVar.Value.collider.gameObject;
+
                 if (objectHit != currentHit)
                 {
                     isOverSomething = true;
                     currentHit = objectHit;
+                    // Event raised only when a new object is hovered, and not every frame
                     new OnObjectIsBeingHovered(origin, objectHit);
                 }
             }

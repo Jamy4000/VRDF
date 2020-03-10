@@ -40,7 +40,7 @@ namespace VRSF.UI
                 if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
                 {
                     OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
-                    OnObjectIsBeingClicked.Listeners += CheckObjectClick;
+                    OnVRClickerIsClicking.Listeners += CheckObjectClick;
                 }
 
                 if (ControllerClickable)
@@ -57,8 +57,8 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnObjectIsBeingClicked.IsMethodAlreadyRegistered(CheckObjectClick))
-                OnObjectIsBeingClicked.Listeners -= CheckObjectClick;
+            if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClick))
+                OnVRClickerIsClicking.Listeners -= CheckObjectClick;
             if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
                 OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
         }
@@ -84,19 +84,19 @@ namespace VRSF.UI
         /// Method called when the user is clicking
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        void CheckObjectClick(OnObjectIsBeingClicked clickEvent)
+        void CheckObjectClick(OnVRClickerIsClicking clickEvent)
         {
-            if (interactable && clickEvent.ObjectClicked == transform)
+            if (interactable && clickEvent.ClickedObject == gameObject)
                 StartTyping();
         }
 
         private void CheckObjectOvered(OnObjectIsBeingHovered info)
         {
-            if (info.ObjectHovered == transform && interactable && !_isSelected)
+            if (info.ObjectHovered == gameObject && interactable && !_isSelected)
             {
                 _isSelected = true;
             }
-            else if (info.ObjectHovered != transform && _isSelected)
+            else if (info.ObjectHovered != gameObject && _isSelected)
             {
                 _isSelected = false;
                 OnDeselect(null);

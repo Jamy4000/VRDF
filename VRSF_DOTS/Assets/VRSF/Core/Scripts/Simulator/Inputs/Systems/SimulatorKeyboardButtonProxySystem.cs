@@ -27,7 +27,7 @@ namespace VRSF.Core.Simulator
                     if (interactionType.HasClickInteraction)
                     {
                         // Add a StartClickingEventComponent to activate the other systems
-                        EntityManager.AddComponentData(entity, new StartClickingEventComp { ButtonInteracting = proxy.SimulatedButton });
+                        EntityManager.AddComponentData(entity, new StartClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = proxy.SimulatedButton });
                         baseInput.IsClicking = true;
                     }
 
@@ -35,7 +35,7 @@ namespace VRSF.Core.Simulator
                     if (interactionType.HasTouchInteraction)
                     {
                         // Add a StartTouchingEventComp to activate the other systems
-                        EntityManager.AddComponentData(entity, new StartTouchingEventComp { ButtonInteracting = proxy.SimulatedButton });
+                        EntityManager.AddComponentData(entity, new StartTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = proxy.SimulatedButton });
                         baseInput.IsTouching = true;
                     }
                 }
@@ -45,7 +45,7 @@ namespace VRSF.Core.Simulator
                     if (interactionType.HasClickInteraction)
                     {
                         // Add a StopClickingEventComp to activate the other systems
-                        EntityManager.AddComponentData(entity, new StopClickingEventComp { ButtonInteracting = proxy.SimulatedButton });
+                        EntityManager.AddComponentData(entity, new StopClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = proxy.SimulatedButton });
                         baseInput.IsClicking = false;
                     }
 
@@ -53,7 +53,7 @@ namespace VRSF.Core.Simulator
                     if (interactionType.HasTouchInteraction)
                     {
                         // Add a StopTouchingEventComp to activate the other systems
-                        EntityManager.AddComponentData(entity, new StopTouchingEventComp { ButtonInteracting = proxy.SimulatedButton });
+                        EntityManager.AddComponentData(entity, new StopTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = proxy.SimulatedButton });
                         baseInput.IsTouching = false;
                     }
                 }

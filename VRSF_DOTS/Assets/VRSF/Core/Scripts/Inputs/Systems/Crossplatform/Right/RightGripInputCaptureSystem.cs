@@ -50,24 +50,24 @@ namespace VRSF.Core.Inputs
             {
                 if (!baseInput.IsClicking && RightGripSqueezeValue > gripInput.SqueezeClickThreshold)
                 {
-                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.GRIP });
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.GRIP });
                     baseInput.IsTouching = false;
                     baseInput.IsClicking = true;
                 }
                 else if (baseInput.IsClicking && RightGripSqueezeValue < gripInput.SqueezeClickThreshold)
                 {
-                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.GRIP });
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.GRIP });
                     baseInput.IsClicking = false;
                     baseInput.IsTouching = true;
                 }
                 else if (!baseInput.IsClicking && !baseInput.IsTouching && RightGripSqueezeValue > 0.0f)
                 {
-                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.GRIP });
+                    Commands.AddComponent(index, entity, new StartTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.GRIP });
                     baseInput.IsTouching = true;
                 }
                 else if (baseInput.IsTouching && RightGripSqueezeValue == 0.0f)
                 {
-                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.GRIP });
+                    Commands.AddComponent(index, entity, new StopTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.GRIP });
                     baseInput.IsTouching = false;
                 }
             }

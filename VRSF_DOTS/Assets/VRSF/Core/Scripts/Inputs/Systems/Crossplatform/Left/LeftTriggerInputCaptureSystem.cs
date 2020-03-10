@@ -50,25 +50,25 @@ namespace VRSF.Core.Inputs
             {
                 if (!baseInput.IsClicking && LeftTriggerSqueezeValue > triggerInput.SqueezeClickThreshold)
                 {
-                    Commands.AddComponent(index, entity, new StartClickingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
+                    Commands.AddComponent(index, entity, new StartClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.TRIGGER });
                     baseInput.IsTouching = false;
                     baseInput.IsClicking = true;
                 }
                 else if (baseInput.IsClicking && LeftTriggerSqueezeValue < triggerInput.SqueezeClickThreshold)
                 {
-                    Commands.AddComponent(index, entity, new StopClickingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
+                    Commands.AddComponent(index, entity, new StopClickingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.TRIGGER });
                     baseInput.IsClicking = false;
                     baseInput.IsTouching = true;
                 }
                 else if (!baseInput.IsClicking && !baseInput.IsTouching && LeftTriggerSqueezeValue > 0.0f)
                 {
                     baseInput.IsTouching = true;
-                    Commands.AddComponent(index, entity, new StartTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
+                    Commands.AddComponent(index, entity, new StartTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.TRIGGER });
                 }
                 else if (baseInput.IsTouching && LeftTriggerSqueezeValue == 0.0f)
                 {
                     baseInput.IsTouching = false;
-                    Commands.AddComponent(index, entity, new StopTouchingEventComp { ButtonInteracting = EControllersButton.TRIGGER });
+                    Commands.AddComponent(index, entity, new StopTouchingEventComp { HasWaitedOneFrameBeforeRemoval = false, ButtonInteracting = EControllersButton.TRIGGER });
                 }
             }
         }
