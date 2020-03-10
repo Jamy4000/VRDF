@@ -12,7 +12,10 @@ namespace VRSF.Core.VRInteractions
         {
             // Add the corresponding input component for the selected button. If the button wasn't chose correctly, we destroy this entity and return.
             if (!AddInputCaptureComponent(ref entityManager, ref entity, interactionParameters))
+            {
+                Debug.Log("<Color=yellow><b>[VRSF] :</b> An error has occur while setting up the Input Capture Component. Please check that the right device is loaded, and your VRInteractionAuthoring parameters.</Color>", interactionParameters.gameObject);
                 return false;
+            }
 
             // If the Hand wasn't chose correctly, we destroy this entity and return.
             if (!AddButtonHand(ref entityManager, ref entity, interactionParameters.ButtonHand))
@@ -202,17 +205,17 @@ namespace VRSF.Core.VRInteractions
 
         private static bool IsTwoHandOculusDevice()
         {
-            return VRSF_Components.DeviceLoaded == EDevice.OCULUS_QUEST || VRSF_Components.DeviceLoaded == EDevice.OCULUS_RIFT || VRSF_Components.DeviceLoaded == EDevice.OCULUS_RIFT_S;
+            return VRSF_Components.DeviceLoaded == EDevice.OCULUS_QUEST || VRSF_Components.DeviceLoaded == EDevice.OCULUS_RIFT || VRSF_Components.DeviceLoaded == EDevice.OCULUS_RIFT_S || VRSF_Components.DeviceLoaded == EDevice.SIMULATOR;
         }
 
         private static bool IsOneHandPortableDevice()
         {
-            return VRSF_Components.DeviceLoaded == EDevice.GEAR_VR || VRSF_Components.DeviceLoaded == EDevice.OCULUS_GO;
+            return VRSF_Components.DeviceLoaded == EDevice.GEAR_VR || VRSF_Components.DeviceLoaded == EDevice.OCULUS_GO || VRSF_Components.DeviceLoaded == EDevice.SIMULATOR;
         }
 
         public static bool FlagHasOculusDevice(EDevice flagToTest)
         {
-            return flagToTest.HasFlag(EDevice.OCULUS_GO) || flagToTest.HasFlag(EDevice.OCULUS_QUEST) || flagToTest.HasFlag(EDevice.OCULUS_RIFT) || flagToTest.HasFlag(EDevice.OCULUS_RIFT_S);
+            return flagToTest.HasFlag(EDevice.OCULUS_GO) || flagToTest.HasFlag(EDevice.OCULUS_QUEST) || flagToTest.HasFlag(EDevice.OCULUS_RIFT) || flagToTest.HasFlag(EDevice.OCULUS_RIFT_S) || flagToTest.HasFlag(EDevice.SIMULATOR);
         }
     }
 }

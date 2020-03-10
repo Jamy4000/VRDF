@@ -34,8 +34,8 @@ namespace VRSF.Core.Raycast
         {
             Entities.ForEach((ref VRRaycastOrigin raycastOrigin, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs) =>
             {
-                // We set the ray based on the raycastOrigin if not simulator, and the ScreenPointToRay method if we use the Simulator
-                raycastOutputs.RayVar = _mainCamera.ScreenPointToRay(Input.mousePosition);
+                // We set the ray based on the raycastOrigin
+                raycastOutputs.RayVar = raycastOrigin.RayOrigin == ERayOrigin.CAMERA ? new Ray(_mainCamera.transform.position, _mainCamera.transform.forward) : _mainCamera.ScreenPointToRay(Input.mousePosition);
             });
         }
 
@@ -45,11 +45,6 @@ namespace VRSF.Core.Raycast
             {
                 this.Enabled = true;
                 _mainCamera = VRSF_Components.VRCamera.GetComponent<Camera>();
-                Entities.ForEach((ref VRRaycastOrigin raycastOrigin) =>
-                {
-                    // We set the ray origin to the camera, as we are in simulator
-                    raycastOrigin.RayOrigin = ERayOrigin.CAMERA;
-                });
             }
             else
             {
