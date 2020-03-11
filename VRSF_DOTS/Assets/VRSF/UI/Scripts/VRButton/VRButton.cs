@@ -50,7 +50,10 @@ namespace VRSF.UI
             {
                 OnStartHoveringObject.Listeners -= CheckHoveredObject;
                 OnStopHoveringObject.Listeners -= CheckUnhoveredObject;
-                OnVRClickerStartClicking.Listeners -= CheckClickedObject;
+
+                // Normal Button Callback is still called with the mouse
+                if (VRSF_Components.DeviceLoaded != Core.SetupVR.EDevice.SIMULATOR)
+                    OnVRClickerStartClicking.Listeners -= CheckClickedObject;
             }
         }
 
@@ -82,14 +85,24 @@ namespace VRSF.UI
 
         private void CheckHoveredObject(OnStartHoveringObject info)
         {
+            Debug.Log("OnStartHoveringObject");
             if (CheckGameObject(info.HoveredObject))
+            {
+
+                Debug.Log("Yep uep");
                 OnHover.Invoke();
+            }
         }
 
         private void CheckUnhoveredObject(OnStopHoveringObject info)
         {
+            Debug.Log("OnStopHoveringObject");
             if (CheckGameObject(info.UnhoveredObject))
+            {
+
+                Debug.Log("Yep 2");
                 OnStopHovering.Invoke();
+            }
         }
 
         private bool CheckGameObject(GameObject toCheck)
@@ -118,7 +131,10 @@ namespace VRSF.UI
             {
                 OnStartHoveringObject.Listeners += CheckHoveredObject;
                 OnStopHoveringObject.Listeners += CheckUnhoveredObject;
-                OnVRClickerStartClicking.Listeners += CheckClickedObject;
+
+                // Normal Button Callback is still called with the mouse
+                if (VRSF_Components.DeviceLoaded != Core.SetupVR.EDevice.SIMULATOR)
+                    OnVRClickerStartClicking.Listeners += CheckClickedObject;
             }
 
             var boxCollider = GetComponent<BoxCollider>();
