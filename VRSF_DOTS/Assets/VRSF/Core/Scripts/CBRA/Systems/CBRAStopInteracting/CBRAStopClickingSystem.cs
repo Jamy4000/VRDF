@@ -6,6 +6,7 @@ namespace VRSF.Core.CBRA
     /// <summary>
     /// Handle the Start Clicking events for CBRAs Entities
     /// </summary>
+    [UpdateAfter(typeof(ClickingEventsRemover))]
     public class CBRAStopClickingSystem : ComponentSystem
     {
         private EntityManager _entityManager;
@@ -18,19 +19,10 @@ namespace VRSF.Core.CBRA
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref StopClickingEventComp stopClickingEvent, ref CBRAEventComponent cbraEvents) =>
+            Entities.ForEach((Entity entity, ref StopClickingEventComp stopClickingEvent, ref CBRATag cbraEvents) =>
             {
-                if (!cbraEvents.HasCheckedStopClickingEvent && _entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopClickingEvents.TryGetValue(entity, out System.Action action))
-                {
-                    cbraEvents.HasCheckedStopClickingEvent = true;
+                if (_entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopClickingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopClickingEvents.TryGetValue(entity, out System.Action action))
                     action.Invoke();
-                }
-            });
-
-            Entities.WithNone<StopClickingEventComp>().ForEach((Entity entity, ref CBRAEventComponent cbraEvents) =>
-            {
-                if (cbraEvents.HasCheckedStopClickingEvent)
-                    cbraEvents.HasCheckedStopClickingEvent = false;
             });
         }
     }

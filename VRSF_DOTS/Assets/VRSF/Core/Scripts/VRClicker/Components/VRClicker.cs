@@ -24,15 +24,5 @@
         /// Whether we started to click.
         /// </summary>
         public bool IsClicking;
-
-        /// <summary>
-        /// Whether we already checked the StartClickingEventComp.
-        /// </summary>
-        public bool HasCheckedStartClickingEvent;
-
-        /// <summary>
-        /// Whether we already checked the StopClickingEventComp.
-        /// </summary>
-        public bool HasCheckedStopClickingEvent;
     }
 }

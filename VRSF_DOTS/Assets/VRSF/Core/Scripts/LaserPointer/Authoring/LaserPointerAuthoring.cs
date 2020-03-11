@@ -37,15 +37,15 @@ namespace VRSF.Core.LaserPointer
                 StateJustChangedToOn = false
             });
 
-            entityManager.AddComponentData(entity, new LaserPointerVisibility
+            if (_disappearanceSpeed > 0.0f)
             {
-                DisappearanceSpeed = _disappearanceSpeed
-            });
-
-            entityManager.AddComponentData(entity, new LaserPointerWidth
-            {
-                BaseWidth = _pointerWidth
-            });
+                entityManager.AddComponentData(entity, new LaserPointerVisibility
+                {
+                    DisappearanceSpeed = _disappearanceSpeed,
+                    BaseWidth = _pointerWidth,
+                    CurrentWidth = _pointerWidth
+                });
+            }
 
             entityManager.AddComponentData(entity, new LaserPointerLength
             {
@@ -54,7 +54,7 @@ namespace VRSF.Core.LaserPointer
                 ShouldPointToUICenter = _shouldPointToUICenter
             });
 
-            // Check that all components are present on the gameObject
+            // Check if a line renderer is already present on the gameObject, and if not, add one
             if (GetComponent<LineRenderer>() == null)
             {
                 var lineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -64,9 +64,11 @@ namespace VRSF.Core.LaserPointer
                 lineRenderer.endColor = Color.white;
             }
 
+            // Check if a LaserLengthSetter is already present on the gameObject, and if not, add one
             if (GetComponent<LaserLengthSetter>() == null)
                 gameObject.AddComponent<LaserLengthSetter>();
 
+            // Check if a LaserWidthSetter is already present on the gameObject, and if not, add one
             if (GetComponent<LaserWidthSetter>() == null)
                 gameObject.AddComponent<LaserWidthSetter>();
 

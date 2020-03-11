@@ -33,10 +33,29 @@ namespace VRSF.Core.LaserPointer
         ///
         /// </summary>
         /// <param name="menuCommand"></param>
+        [MenuItem("GameObject/VRSF/Raycast, Laser Pointer and VR Clicker/Add Raycaster with VR Clicker", priority = 1)]
+        [MenuItem("VRSF/Raycast, Laser Pointer and VR Clicker/Add Raycaster with VR Clicker", priority = 1)]
+        private static void AddRaycasterWithClick(MenuCommand menuCommand)
+        {
+            var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("RaycasterWithClick");
+            var newGameObject = CreateGameObject(pointerPrefab, menuCommand);
+            var simulatorProxy = newGameObject.GetComponent<Simulator.SimulatorButtonProxyAuthoring>();
+            if (simulatorProxy != null)
+            {
+                simulatorProxy.UseMouseButton = true;
+                simulatorProxy.SimulationMouseButton = Simulator.EMouseButton.LEFT_CLICK;
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="menuCommand"></param>
         [MenuItem("GameObject/VRSF/Raycast, Laser Pointer and VR Clicker/Add Raycaster with Laser and VR Clicker", priority = 1)]
         [MenuItem("VRSF/Raycast, Laser Pointer and VR Clicker/Add Raycaster with Laser and VR Clicker", priority = 1)]
         private static void AddLaserPointerWithClick(MenuCommand menuCommand)
         {
+            //Add Raycaster with VR Clicker
             var pointerPrefab = Utils.VRSFPrefabReferencer.GetPrefab("LaserPointerWithClick");
             var newGameObject = CreateGameObject(pointerPrefab, menuCommand);
             var simulatorProxy = newGameObject.GetComponent<Simulator.SimulatorButtonProxyAuthoring>();

@@ -9,8 +9,7 @@ namespace VRSF.Core.VRClicker
     /// Handle the Click event in VR. Basically link the Raycast system and the Input System.
     /// CANNOT BE JOBIFIED as we need to send transform info in the ObjectWasClickedEvent
     /// </summary>
-    [UpdateAfter(typeof(PointerStartClickingSystem))]
-    public class PointerClickingSystem : ComponentSystem
+    public class VRClickerClickingSystem : ComponentSystem
     {
         protected override void OnUpdate()
         {

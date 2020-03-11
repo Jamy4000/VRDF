@@ -6,6 +6,7 @@ namespace VRSF.Core.CBRA
     /// <summary>
     /// Handle the Stop Touching events for CBRAs Entities
     /// </summary>
+    [UpdateAfter(typeof(TouchingEventsRemover))]
     public class CBRAStopTouchingSystem : ComponentSystem
     {
         private EntityManager _entityManager;
@@ -18,19 +19,10 @@ namespace VRSF.Core.CBRA
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref StopTouchingEventComp stopTouchingEvent, ref CBRAEventComponent cbraEvents) =>
+            Entities.ForEach((Entity entity, ref StopTouchingEventComp stopTouchingEvent, ref CBRATag cbraEvents) =>
             {
-                if (!cbraEvents.HasCheckedStopTouchingEvent && _entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopTouchingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopTouchingEvents.TryGetValue(entity, out System.Action action))
-                {
-                    cbraEvents.HasCheckedStopTouchingEvent = true;
+                if (_entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(stopTouchingEvent.ButtonInteracting)) && CBRADelegatesHolder.StopTouchingEvents.TryGetValue(entity, out System.Action action))
                     action.Invoke();
-                }
-            });
-
-            Entities.WithNone<StopTouchingEventComp>().ForEach((Entity entity, ref CBRAEventComponent cbraEvents) =>
-            {
-                if (cbraEvents.HasCheckedStopTouchingEvent)
-                    cbraEvents.HasCheckedStopTouchingEvent = false;
             });
         }
     }

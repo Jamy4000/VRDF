@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.Core.LaserPointer
 {
@@ -10,6 +9,9 @@ namespace VRSF.Core.LaserPointer
     /// </summary>
     public class LaserPointerLengthSystem : ComponentSystem
     {
+        /// <summary>
+        /// The byte value of the UI Layer
+        /// </summary>
         private int _uiLayer;
 
         protected override void OnCreate()
@@ -18,6 +20,7 @@ namespace VRSF.Core.LaserPointer
             _uiLayer = LayerMask.NameToLayer("UI");
         }
 
+        [Unity.Burst.BurstCompile]
         protected override void OnUpdate()
         {
             Entities.ForEach((ref LaserPointerLength laserLength, ref VRRaycastOrigin raycastOrigin, ref VRRaycastOutputs raycastOutputs) =>
@@ -45,30 +48,21 @@ namespace VRSF.Core.LaserPointer
                         return;
                 }
 
-                // Reduce lineRenderer from the controllers position to the object that was hit
-                // OR put back lineRenderer to its normal length if nothing was hit
-                Vector3 newEndPoint = raycastOutputs.RaycastHitVar.IsNull || raycastOutputs.RaycastHitVar.Value.collider == null ?
-                    originTransform.InverseTransformDirection(raycastOutputs.RayVar.direction) : originTransform.InverseTransformPoint(CheckEndPoint(laserLength, raycastOutputs));
+                // Reduce lineRenderer from the controllers position to the object that was hit OR put back lineRenderer to its normal length if nothing was hit
+                var hitVar = raycastOutputs.RaycastHitVar;
+                Vector3 newEndPoint = hitVar.IsNull || hitVar.Value.collider == null ?
+                    originTransform.InverseTransformDirection(raycastOutputs.RayVar.direction) : originTransform.InverseTransformPoint(CheckEndPoint(laserLength, hitVar.Value));
 
+                // Raise the event with the new endPoint of the laser
                 new OnLaserLengthChanged(raycastOrigin.RayOrigin, newEndPoint);
             });
-        }
-
-        private Vector3 CheckEndPoint(LaserPointerLength laserLength, VRRaycastOutputs raycastOutputs)
-        {
-            return ShouldAimForCenter() ? raycastOutputs.RaycastHitVar.Value.collider.bounds.center : raycastOutputs.RaycastHitVar.Value.point;
-
-            bool ShouldAimForCenter()
-            {
-                return (raycastOutputs.RaycastHitVar.Value.collider.gameObject.layer == _uiLayer && laserLength.ShouldPointToUICenter) || laserLength.ShouldPointTo3DObjectsCenter;
-            }
         }
 
         private bool FetchTransformOrigin(GameObject toFetchFrom, out Transform originTransform)
         {
             if (toFetchFrom == null)
             {
-                Debug.Log("<b>[VRSF] :</b> The transform origin of the Laser couldn't be found. Skipping to next frame.");
+                Debug.LogError("<b>[VRSF] :</b> The transform origin of the Laser couldn't be found. Skipping to next frame.");
                 originTransform = null;
                 return false;
             }
@@ -76,6 +70,16 @@ namespace VRSF.Core.LaserPointer
             {
                 originTransform = toFetchFrom.transform;
                 return true;
+            }
+        }
+
+        private Vector3 CheckEndPoint(LaserPointerLength laserLength, RaycastHit hitVar)
+        {
+            return ShouldAimForCenter() ? hitVar.collider.bounds.center : hitVar.point;
+
+            bool ShouldAimForCenter()
+            {
+                return (hitVar.collider.gameObject.layer == _uiLayer && laserLength.ShouldPointToUICenter) || laserLength.ShouldPointTo3DObjectsCenter;
             }
         }
     }

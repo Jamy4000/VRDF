@@ -1,12 +1,10 @@
 ﻿using Unity.Entities;
-using VRSF.Core.Raycast;
 
 namespace VRSF.Core.LaserPointer
 {
     /// <summary>
-    /// Contains all the variable for the ControllerPointer Systems
+    /// Handle the actual state of the laser pointer
     /// </summary>
-    [RequireComponentTag(typeof(VRRaycastOrigin))]
     public struct LaserPointerState : IComponentData
     {
         /// <summary>
@@ -14,6 +12,9 @@ namespace VRSF.Core.LaserPointer
         /// </summary>
         public EPointerState State;
 
+        /// <summary>
+        /// Check if the State variable just switch to ON
+        /// </summary>
         public bool StateJustChangedToOn;
     }
 }

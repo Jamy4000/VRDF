@@ -11,33 +11,33 @@ namespace VRSF.Core.LaserPointer
         [Unity.Burst.BurstCompile]
         protected override void OnUpdate()
         {
-            Entities.ForEach((ref LaserPointerState stateComp, ref LaserPointerVisibility visibilityComp, ref LaserPointerWidth widthComp, ref VRRaycastOrigin raycastOrigin) =>
+            Entities.ForEach((ref LaserPointerState stateComp, ref LaserPointerVisibility visibilityComp, ref VRRaycastOrigin raycastOrigin) =>
             {
                 switch (stateComp.State)
                 {
                     case EPointerState.FORCE_OFF:
-                        if (widthComp.CurrentWidth != 0.0f)
+                        if (visibilityComp.CurrentWidth != 0.0f)
                         {
-                            widthComp.CurrentWidth = 0.0f;
-                            new OnLaserWidthChanged(raycastOrigin.RayOrigin, widthComp.CurrentWidth);
+                            visibilityComp.CurrentWidth = 0.0f;
+                            new OnLaserWidthChanged(raycastOrigin.RayOrigin, visibilityComp.CurrentWidth);
                         }
                         break;
                     case EPointerState.ON:
                         if (stateComp.StateJustChangedToOn)
                         {
                             stateComp.StateJustChangedToOn = false;
-                            widthComp.CurrentWidth = widthComp.BaseWidth;
-                            new OnLaserWidthChanged(raycastOrigin.RayOrigin, widthComp.BaseWidth);
+                            visibilityComp.CurrentWidth = visibilityComp.BaseWidth;
+                            new OnLaserWidthChanged(raycastOrigin.RayOrigin, visibilityComp.BaseWidth);
                         }
                         break;
 
                     case EPointerState.DISAPPEARING:
-                        widthComp.CurrentWidth -= (Time.DeltaTime * visibilityComp.DisappearanceSpeed) / 2000;
+                        visibilityComp.CurrentWidth -= (Time.DeltaTime * visibilityComp.DisappearanceSpeed) / 2000;
 
-                        if (widthComp.CurrentWidth < 0.0f)
+                        if (visibilityComp.CurrentWidth < 0.0f)
                             stateComp.State = EPointerState.OFF;
 
-                        new OnLaserWidthChanged(raycastOrigin.RayOrigin, widthComp.CurrentWidth);
+                        new OnLaserWidthChanged(raycastOrigin.RayOrigin, visibilityComp.CurrentWidth);
                         break;
                 }
             });

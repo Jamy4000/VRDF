@@ -6,6 +6,7 @@ namespace VRSF.Core.CBRA
     /// <summary>
     /// Handle the Start Touching events for CBRAs Entities
     /// </summary>
+    [UpdateAfter(typeof(TouchingEventsRemover))]
     public class CBRAStartTouchingSystem : ComponentSystem
     {
         private EntityManager _entityManager;
@@ -18,19 +19,10 @@ namespace VRSF.Core.CBRA
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity entity, ref StartTouchingEventComp startTouchingEvent, ref CBRAEventComponent cbraEvents) =>
+            Entities.ForEach((Entity entity, ref StartTouchingEventComp startTouchingEvent, ref CBRATag cbraEvents) =>
             {
-                if (!cbraEvents.HasCheckedStartTouchingEvent && _entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(startTouchingEvent.ButtonInteracting)) && CBRADelegatesHolder.StartTouchingEvents.TryGetValue(entity, out System.Action action))
-                {
-                    cbraEvents.HasCheckedStartTouchingEvent = true;
+                if (_entityManager.HasComponent(entity, VRInteractions.InputTypeGetter.GetTypeFor(startTouchingEvent.ButtonInteracting)) && CBRADelegatesHolder.StartTouchingEvents.TryGetValue(entity, out System.Action action))
                     action.Invoke();
-                }
-            });
-
-            Entities.WithNone<StartTouchingEventComp>().ForEach((Entity entity, ref CBRAEventComponent cbraEvents) =>
-            {
-                if (cbraEvents.HasCheckedStartTouchingEvent)
-                    cbraEvents.HasCheckedStartTouchingEvent = false;
             });
         }
     }

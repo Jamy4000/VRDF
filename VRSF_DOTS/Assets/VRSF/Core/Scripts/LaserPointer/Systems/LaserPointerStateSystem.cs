@@ -9,12 +9,10 @@ namespace VRSF.Core.LaserPointer
     /// </summary>
     public class LaserPointerStateSystem : JobComponentSystem
     {
-        #region ComponentSystem_Methods
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             return new CheckPointerStateJob().Schedule(this, inputDeps);
         }
-        #endregion ComponentSystem_Methods
 
         [Unity.Burst.BurstCompile]
         struct CheckPointerStateJob : IJobForEach<LaserPointerState, VRRaycastOutputs>

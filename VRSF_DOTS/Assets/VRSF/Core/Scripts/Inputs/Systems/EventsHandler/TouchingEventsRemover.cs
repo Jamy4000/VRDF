@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
-using VRSF.Core.Inputs;
 
-namespace VRSF.Core.VRClicker
+namespace VRSF.Core.Inputs
 {
     /// <summary>
     /// When a StartTouchingEventComp or StopTouchingEventComp is added on an Entity, wait one frame, and then remove the component

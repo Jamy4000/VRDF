@@ -35,14 +35,14 @@ namespace VRSF.Core.VRClicker
                     return;
                 }
 
-#if UNITY_EDITOR
-                // Set it's name in Editor Mode for the Entity Debugger Window
-                entityManager.SetName(entity, string.Format("PointerClick Entity from GO {0}", transform.name));
-#endif
-
                 // If we use the simulator, we check for a SimulatorButtonProxy. if not null, we add the simulatorButtonProxy script
                 if (VRSF_Components.DeviceLoaded == SetupVR.EDevice.SIMULATOR)
                     GetComponent<Simulator.SimulatorButtonProxyAuthoring>()?.AddSimulatorButtonProxy(ref entityManager, ref entity, interactionParameters);
+
+#if UNITY_EDITOR
+                // Set it's name in Editor Mode for the Entity Debugger Window
+                entityManager.SetName(entity, string.Format("VR Clicker Entity from GO {0}", transform.name));
+#endif
 
                 Destroy(this);
             }

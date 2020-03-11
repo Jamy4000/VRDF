@@ -50,7 +50,7 @@ namespace VRSF.UI
         {
             base.OnDestroy();
             OnSetupVRReady.UnregisterSetupVRCallback(Init);
-
+            // TODO ALL UI STUFFS : Add listeners for OnStartHoveringObject and OnStopHoveringObject
             if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
                 OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
 

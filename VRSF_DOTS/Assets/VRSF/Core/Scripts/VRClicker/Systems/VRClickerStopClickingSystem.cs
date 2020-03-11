@@ -8,13 +8,14 @@ namespace VRSF.Core.VRClicker
     /// Handle the Start Clicking event in VR. Basically link the Raycast, Input and Interaction System.
     /// CANNOT BE JOBIFIED as we need to send transform info in the OnStartClickingOnObject
     /// </summary>
-    public class PointerStopClickingSystem : ComponentSystem
+    [UpdateAfter(typeof(ClickingEventsRemover))]
+    public class VRClickerStopClickingSystem : ComponentSystem
     {
         protected override void OnUpdate()
         {
             Entities.WithAll<StopClickingEventComp>().ForEach((Entity entity, ref VRClicker vrClicker, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
             {
-                if (vrClicker.CanClick && !vrClicker.HasCheckedStopClickingEvent)
+                if (vrClicker.CanClick)
                 {
                     switch (raycastOrigin.RayOrigin)
                     {
@@ -29,16 +30,8 @@ namespace VRSF.Core.VRClicker
                             break;
                     }
 
-                    vrClicker.HasCheckedStopClickingEvent = true;
                     vrClicker.IsClicking = false;
                 }
-            });
-
-            // reset HasCheckedStopClickingEvent once the StartClickingEventComp has been removed from other systems
-            Entities.WithNone<StopClickingEventComp>().ForEach((Entity entity, ref VRClicker vrClicker) =>
-            {
-                if (vrClicker.HasCheckedStopClickingEvent)
-                    vrClicker.HasCheckedStopClickingEvent = false;
             });
         }
     }
