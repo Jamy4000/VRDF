@@ -16,7 +16,7 @@ namespace VRSF.UI
         public bool UseVRKeyboard = true;
         public VRKeyboard VRKeyboard;
 
-        [Tooltip("If you want to set the collider yourself, set this value to false.")]
+        [Tooltip("If you want to set the collider's size yourself, set this value to false.")]
         [SerializeField] public bool SetColliderAuto = true;
 
         [Tooltip("If this button can be click using a Raycast and the trigger of your controller.")]
@@ -25,10 +25,8 @@ namespace VRSF.UI
         [Tooltip("If this button can be click using the meshcollider of your controller.")]
         [SerializeField] public bool ControllerClickable = true;
 
-        private bool _isSelected;
-        #endregion VARIABLES
-
         private TMPro.TMP_Text _placeHolderText;
+        #endregion VARIABLES
 
         #region MONOBEHAVIOUR_METHODS
         protected override void Awake()
@@ -37,43 +35,40 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-                {
-                    OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
-                    OnVRClickerIsClicking.Listeners += CheckObjectClick;
-                }
+                if (LaserClickable)
+                    OnVRClickerStartClicking.Listeners += CheckClickedObject;
 
                 if (ControllerClickable)
                     GetComponent<BoxCollider>().isTrigger = true;
 
                 SetInputFieldReferences();
-
-                // We setup the BoxCollider size and center
-                if (SetColliderAuto)
-                    StartCoroutine(SetupBoxCollider());
             }
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            // We setup the BoxCollider size and center
+            if (Application.isPlaying && SetColliderAuto)
+                StartCoroutine(SetupBoxCollider());
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClick))
-                OnVRClickerIsClicking.Listeners -= CheckObjectClick;
-            if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
-                OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
+            if (OnVRClickerStartClicking.IsMethodAlreadyRegistered(CheckClickedObject))
+                OnVRClickerStartClicking.Listeners -= CheckClickedObject;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            // if the user is in VR
-            if (UnityEngine.XR.XRSettings.enabled && VRSF_Components.SetupVRIsReady)
+            if (!ControllerClickable || !interactable)
+                return;
+
+            if (other.gameObject.CompareTag("ControllerBody") || other.gameObject.CompareTag("UIClicker"))
             {
-                var objectTag = other.gameObject.tag;
-                if (ControllerClickable && interactable && (objectTag.Contains("ControllerBody") || objectTag.Contains("UIClicker")))
-                {
-                    StartTyping();
-                    new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
-                }
+                StartTyping();
+                UIHapticGenerator.CreateClickHapticSignal(other.name.ToLower().Contains("left") ? Core.Raycast.ERayOrigin.LEFT_HAND : Core.Raycast.ERayOrigin.RIGHT_HAND);
             }
         }
         #endregion MONOBEHAVIOUR_METHODS
@@ -81,25 +76,19 @@ namespace VRSF.UI
 
         #region PRIVATE_METHODS
         /// <summary>
-        /// Method called when the user is clicking
+        /// Event called when the user is clicking on something
         /// </summary>
-        /// <param name="clickEvent">The event raised when an object is clicked</param>
-        void CheckObjectClick(OnVRClickerIsClicking clickEvent)
+        /// <param name="startClickingEvent">The event raised when an object was clicked</param>
+        private void CheckClickedObject(OnVRClickerStartClicking startClickingEvent)
         {
-            if (interactable && clickEvent.ClickedObject == gameObject)
+            if (interactable && startClickingEvent.ClickedObject == gameObject)
+            {
                 StartTyping();
-        }
-
-        private void CheckObjectOvered(OnObjectIsBeingHovered info)
-        {
-            if (info.HoveredObject == gameObject && interactable && !_isSelected)
-            {
-                _isSelected = true;
+                UIHapticGenerator.CreateClickHapticSignal(startClickingEvent.RaycastOrigin);
             }
-            else if (info.HoveredObject != gameObject && _isSelected)
+            else
             {
-                _isSelected = false;
-                OnDeselect(null);
+                m_CaretVisible = false;
             }
         }
 
@@ -110,6 +99,7 @@ namespace VRSF.UI
 
             ActivateInputField();
             CheckForVRKeyboard();
+            m_CaretVisible = true;
         }
 
         /// <summary>
@@ -167,8 +157,6 @@ namespace VRSF.UI
         IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            yield return new WaitForEndOfFrame();
-
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
         #endregion PRIVATE_METHODS

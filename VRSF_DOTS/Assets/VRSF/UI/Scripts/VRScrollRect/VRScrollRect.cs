@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -30,13 +29,6 @@ namespace VRSF.UI
         private ERayOrigin _rayHoldingHandle = ERayOrigin.NONE;
 
         private VRUIScrollableSetup _scrollableSetup;
-
-        private bool _boxColliderSetup;
-
-        /// <summary>
-        /// true when the events for ObjectWasClicked or Hovered were registered.
-        /// </summary>
-        private bool _eventWereRegistered;
         #endregion
 
 
@@ -44,50 +36,44 @@ namespace VRSF.UI
         protected override void Awake()
         {
             base.Awake();
-
             if (Application.isPlaying)
             {
                 _scrollableSetup = new VRUIScrollableSetup(Direction);
-
-                OnSetupVRReady.RegisterSetupVRCallback(Init);
-
-                // We setup the BoxCollider size and center
-                StartCoroutine(SetupBoxCollider());
+                SetupVRScrollRect();
+                _scrollableSetup.CheckContentStatus(viewport, content);
             }
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            // We setup the BoxCollider size and center
+            if (Application.isPlaying && SetColliderAuto)
+                StartCoroutine(SetupBoxCollider());
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnSetupVRReady.UnregisterSetupVRCallback(Init);
+            if (verticalScrollbar != null)
+                verticalScrollbar.onValueChanged.RemoveAllListeners();
 
-            if (_eventWereRegistered)
-            {
-                if (verticalScrollbar != null)
-                    verticalScrollbar.onValueChanged.RemoveAllListeners();
+            if (horizontalScrollbar != null)
+                horizontalScrollbar.onValueChanged.RemoveAllListeners();
 
-                if (horizontalScrollbar != null)
-                    horizontalScrollbar.onValueChanged.RemoveAllListeners();
-
-                if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClick))
-                    OnVRClickerIsClicking.Listeners -= CheckObjectClick;
-
-                _eventWereRegistered = false;
-            }
+            OnVRClickerStartClicking.Listeners -= CheckClickedObject;
+            OnVRClickerStopClicking.Listeners -= CheckUnclickedObject;
         }
 
         private void Update()
         {
-            if (Application.isPlaying && _boxColliderSetup)
+            if (Application.isPlaying)
             {
-                CheckClickDown();
-
                 if (_rayHoldingHandle != ERayOrigin.NONE)
                 {
                     if (vertical && verticalScrollbar)
                         verticalScrollbar.value = CheckScrollbarValue();
-
-                    if (horizontal && horizontalScrollbar)
+                    else if (horizontal && horizontalScrollbar)
                         horizontalScrollbar.value = CheckScrollbarValue();
                 }
             }
@@ -114,31 +100,29 @@ namespace VRSF.UI
         /// <summary>
         /// Event called when the user is clicking on something
         /// </summary>
-        /// <param name="clickEvent">The event raised when something is clicked</param>
-        void CheckObjectClick(OnVRClickerIsClicking clickEvent)
+        /// <param name="startClickingEvent">The event raised when an object was clicked</param>
+        private void CheckClickedObject(OnVRClickerStartClicking startClickingEvent)
         {
-            if (clickEvent.ClickedObject == gameObject && _rayHoldingHandle == ERayOrigin.NONE)
-                _rayHoldingHandle = clickEvent.RaycastOrigin;
-            // todo haptic
+            if (CanHoldHandle())
+            {
+                _rayHoldingHandle = startClickingEvent.RaycastOrigin;
+                UIHapticGenerator.CreateClickHapticSignal(_rayHoldingHandle);
+            }
+
+            bool CanHoldHandle()
+            {
+                return startClickingEvent.ClickedObject == gameObject && _rayHoldingHandle == ERayOrigin.NONE;
+            }
         }
 
         /// <summary>
-        /// Depending on the hand holding the trigger, call the CheckClickStillDown with the right boolean
+        /// Check whenever an object is unclicked if it correspond to this gameObject.
         /// </summary>
-        private void CheckClickDown()
+        /// <param name="stopClickingEvent"></param>
+        private void CheckUnclickedObject(OnVRClickerStopClicking stopClickingEvent)
         {
-            switch (_rayHoldingHandle)
-            {
-                case ERayOrigin.CAMERA:
-                    _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingGaze);
-                    break;
-                case ERayOrigin.LEFT_HAND:
-                    _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingLeft);
-                    break;
-                case ERayOrigin.RIGHT_HAND:
-                    _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingRight);
-                    break;
-            }
+            if (stopClickingEvent.UnclickedObject == gameObject)
+                _rayHoldingHandle = ERayOrigin.NONE;
         }
 
         /// <summary>
@@ -147,7 +131,6 @@ namespace VRSF.UI
         /// <returns></returns>
         IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
-            yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
 
             if (SetColliderAuto)
@@ -172,12 +155,9 @@ namespace VRSF.UI
                     box.center = new Vector3(box.center.x, barCollider.size.y / 2, box.center.z + 0.1f);
                 }
             }
-
-            _scrollableSetup.CheckContentStatus(viewport, content);
-            _boxColliderSetup = true;
         }
 
-        private void Init(OnSetupVRReady _)
+        private void SetupVRScrollRect()
         {
             // We setup the references to the ScrollRect elements
             SetScrollRectReferences();
@@ -195,10 +175,8 @@ namespace VRSF.UI
                 horizontalScrollbar.onValueChanged.AddListener(delegate { OnValueChangedCallback(); });
             }
 
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-                OnVRClickerIsClicking.Listeners += CheckObjectClick;
-
-            _eventWereRegistered = true;
+            OnVRClickerStartClicking.Listeners += CheckClickedObject;
+            OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
 
             // We setup the Min and Max pos transform
             _scrollableSetup.CheckMinMaxGameObjects(transform, Direction, ref _minPosBar, ref _maxPosBar);

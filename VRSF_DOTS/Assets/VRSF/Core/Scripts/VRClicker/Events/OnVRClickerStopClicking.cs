@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using VRSF.Core.Raycast;
+using VRSF.Core.VRClicker;
 
 /// <summary>
 /// Event raised when an object was being clicked and is not anymore, using the VR Clicker system
@@ -29,16 +30,16 @@ public class OnVRClickerStopClicking : EventCallbacks.Event<OnVRClickerStopClick
         switch (rayOrigin)
         {
             case ERayOrigin.RIGHT_HAND:
-                VRSF.Core.VRInteractions.InteractionVariableContainer.CurrentClickedObjectRight = null;
-                VRSF.Core.VRInteractions.InteractionVariableContainer.IsClickingSomethingRight = false;
+                VRClickerVariablesContainer.CurrentClickedObjectRight = null;
+                VRClickerVariablesContainer.IsClickingRight = false;
                 break;
             case ERayOrigin.LEFT_HAND:
-                VRSF.Core.VRInteractions.InteractionVariableContainer.CurrentClickedObjectLeft = null;
-                VRSF.Core.VRInteractions.InteractionVariableContainer.IsClickingSomethingLeft = false;
+                VRClickerVariablesContainer.CurrentClickedObjectLeft = null;
+                VRClickerVariablesContainer.IsClickingLeft = false;
                 break;
             case ERayOrigin.CAMERA:
-                VRSF.Core.VRInteractions.InteractionVariableContainer.CurrentClickedObjectGaze = null;
-                VRSF.Core.VRInteractions.InteractionVariableContainer.IsClickingSomethingGaze = false;
+                VRClickerVariablesContainer.CurrentClickedObjectGaze = null;
+                VRClickerVariablesContainer.IsClickingGaze = false;
                 break;
         }
 

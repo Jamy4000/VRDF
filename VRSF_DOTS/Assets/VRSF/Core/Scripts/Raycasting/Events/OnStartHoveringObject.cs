@@ -26,32 +26,17 @@ public class OnStartHoveringObject : EventCallbacks.Event<OnStartHoveringObject>
     public OnStartHoveringObject(ERayOrigin raycastOrigin, GameObject objectHovered, Vector3 hitPoint) : base("Event raised when the user start to hover an object with a VR Raycaster")
     {
         // We set the object that was Hovered as the selected gameObject
-        if (objectHovered != null && objectHovered.GetComponent<UnityEngine.UI.Selectable>() != null)
+        if (objectHovered != null)
+        {
             EventSystem.current.SetSelectedGameObject(objectHovered.gameObject);
+
+            var selectableObject = objectHovered.GetComponent<UnityEngine.UI.Selectable>();
+            if (selectableObject != null)
+                selectableObject.OnSelect(null);
+        }
 
         RaycastOrigin = raycastOrigin;
         HoveredObject = objectHovered;
-
-        switch (raycastOrigin)
-        {
-            case ERayOrigin.RIGHT_HAND:
-                InteractionVariableContainer.CurrentRightHitPosition = hitPoint;
-                InteractionVariableContainer.CurrentRightHit = objectHovered;
-                InteractionVariableContainer.IsOverSomethingRight = true;
-                break;
-            case ERayOrigin.LEFT_HAND:
-                InteractionVariableContainer.CurrentLeftHitPosition = hitPoint;
-                InteractionVariableContainer.CurrentLeftHit = objectHovered;
-                InteractionVariableContainer.IsOverSomethingLeft = true;
-                break;
-            case ERayOrigin.CAMERA:
-                InteractionVariableContainer.CurrentGazeHitPosition = hitPoint;
-                InteractionVariableContainer.CurrentGazeHit = objectHovered;
-                InteractionVariableContainer.IsOverSomethingGaze = true;
-                break;
-            default:
-                throw new System.Exception();
-        }
 
         FireEvent(this);
     }

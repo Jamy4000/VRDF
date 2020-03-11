@@ -20,13 +20,13 @@ namespace VRSF.Core.VRClicker
                     switch (raycastOrigin.RayOrigin)
                     {
                         case ERayOrigin.LEFT_HAND:
-                            new OnVRClickerStopClicking(ERayOrigin.LEFT_HAND, VRInteractions.InteractionVariableContainer.CurrentClickedObjectLeft);
+                            new OnVRClickerStopClicking(ERayOrigin.LEFT_HAND, VRClickerVariablesContainer.CurrentClickedObjectLeft);
                             break;
                         case ERayOrigin.RIGHT_HAND:
-                            new OnVRClickerStopClicking(ERayOrigin.RIGHT_HAND, VRInteractions.InteractionVariableContainer.CurrentClickedObjectRight);
+                            new OnVRClickerStopClicking(ERayOrigin.RIGHT_HAND, VRClickerVariablesContainer.CurrentClickedObjectRight);
                             break;
                         case ERayOrigin.CAMERA:
-                            new OnVRClickerStopClicking(ERayOrigin.CAMERA, VRInteractions.InteractionVariableContainer.CurrentClickedObjectGaze);
+                            new OnVRClickerStopClicking(ERayOrigin.CAMERA, VRClickerVariablesContainer.CurrentClickedObjectGaze);
                             break;
                     }
 

@@ -1,7 +1,6 @@
 ﻿using Unity.Entities;
 using VRSF.Core.Inputs;
 using VRSF.Core.Raycast;
-using VRSF.Core.VRInteractions;
 
 namespace VRSF.Core.VRClicker
 {
@@ -32,11 +31,11 @@ namespace VRSF.Core.VRClicker
             switch (origin)
             {
                 case ERayOrigin.LEFT_HAND:
-                    return InteractionVariableContainer.CurrentClickedObjectLeft;
+                    return VRClickerVariablesContainer.CurrentClickedObjectLeft;
                 case ERayOrigin.RIGHT_HAND:
-                    return InteractionVariableContainer.CurrentClickedObjectRight;
+                    return VRClickerVariablesContainer.CurrentClickedObjectRight;
                 case ERayOrigin.CAMERA:
-                    return InteractionVariableContainer.CurrentClickedObjectGaze;
+                    return VRClickerVariablesContainer.CurrentClickedObjectGaze;
                 default:
                     throw new System.Exception();
             }

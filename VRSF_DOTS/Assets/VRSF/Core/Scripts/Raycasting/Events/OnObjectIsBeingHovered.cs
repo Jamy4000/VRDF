@@ -27,21 +27,6 @@ public class OnObjectIsBeingHovered : EventCallbacks.Event<OnObjectIsBeingHovere
         RaycastOrigin = raycastOrigin;
         HoveredObject = objectHovered;
 
-        switch (raycastOrigin)
-        {
-            case ERayOrigin.RIGHT_HAND:
-                InteractionVariableContainer.CurrentRightHitPosition = currentHitPoint;
-                break;
-            case ERayOrigin.LEFT_HAND:
-                InteractionVariableContainer.CurrentLeftHitPosition = currentHitPoint;
-                break;
-            case ERayOrigin.CAMERA:
-                InteractionVariableContainer.CurrentGazeHitPosition = currentHitPoint;
-                break;
-            default:
-                throw new System.Exception();
-        }
-
         FireEvent(this);
     }
 }

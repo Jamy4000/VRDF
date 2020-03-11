@@ -2,8 +2,6 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.Events;
-using VRSF.Core.SetupVR;
-using VRSF.Core.Controllers;
 
 namespace VRSF.UI
 {
@@ -26,11 +24,6 @@ namespace VRSF.UI
         GameObject _template;
         bool _isShown = false;
 
-        /// <summary>
-        /// true when the events for ObjectWasClicked or Hovered were registered.
-        /// </summary>
-        private bool _eventWereRegistered;
-
         private UnityAction<int> _onValueChangedAction;
         #endregion PRIVATE_VARIABLES
 
@@ -39,45 +32,35 @@ namespace VRSF.UI
         protected override void Awake()
         {
             base.Awake();
-
             if (Application.isPlaying)
-            {
-                OnSetupVRReady.RegisterSetupVRCallback(Init);
+                SetupDropDown();
+        }
 
-                // We setup the BoxCollider size and center
-                if (SetColliderAuto)
-                    StartCoroutine(SetupBoxCollider());
-            }
+        protected override void Start()
+        {
+            base.Start();
+            // We setup the BoxCollider size and center
+            if (Application.isPlaying && SetColliderAuto)
+                StartCoroutine(SetupBoxCollider());
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            // if the user is in VR
-            if (UnityEngine.XR.XRSettings.enabled && VRSF_Components.SetupVRIsReady)
+            if (!ControllerClickable || !interactable)
+                return;
+
+            if (other.gameObject.CompareTag("ControllerBody") || other.gameObject.CompareTag("UIClicker"))
             {
-                var objectTag = other.gameObject.tag;
-                if (ControllerClickable && interactable && (objectTag.Contains("ControllerBody") || objectTag.Contains("UIClicker")))
-                {
-                    SetDropDownNewState();
-                    new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
-                }
+                SetDropDownNewState();
+                UIHapticGenerator.CreateClickHapticSignal(other.name.ToLower().Contains("left") ? Core.Raycast.ERayOrigin.LEFT_HAND : Core.Raycast.ERayOrigin.RIGHT_HAND);
             }
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnSetupVRReady.UnregisterSetupVRCallback(Init);
-
-            if (_eventWereRegistered)
-            {
-                onValueChanged.RemoveListener(_onValueChangedAction);
-
-                if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClicked))
-                    OnVRClickerIsClicking.Listeners -= CheckObjectClicked;
-
-                _eventWereRegistered = false;
-            }
+            onValueChanged.RemoveListener(_onValueChangedAction);
+            OnVRClickerStartClicking.Listeners -= CheckClickedObject;
         }
         #endregion MONOBEHAVIOUR_METHODS
 
@@ -87,9 +70,10 @@ namespace VRSF.UI
         /// Event called when the DropDown or its children is clicked
         /// </summary>
         /// <param name="clickEvent">The event raised when an object is clicked</param>
-        public void CheckObjectClicked(OnVRClickerIsClicking clickEvent)
+        public void CheckClickedObject(OnVRClickerStartClicking clickEvent)
         {
-            if (interactable && clickEvent.ClickedObject == gameObject)
+            // if the clicked object is this one OR if it's something else and this dropdown was shown
+            if (interactable && (clickEvent.ClickedObject == gameObject || _isShown))
                 SetDropDownNewState();
         }
 
@@ -99,15 +83,11 @@ namespace VRSF.UI
         void SetDropDownNewState()
         {
             if (!_isShown)
-            {
                 Show();
-                _isShown = true;
-            }
             else
-            {
                 Hide();
-                _isShown = false;
-            }
+
+            _isShown = !_isShown;
         }
 
         /// <summary>
@@ -118,15 +98,13 @@ namespace VRSF.UI
         IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            yield return new WaitForEndOfFrame();
-
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
         /// <summary>
         /// Set the Dropdown references to the Toggle
         /// </summary>
-        void SetToggleReferences()
+        private void SetToggleReferences()
         {
             template = _template.GetComponent<RectTransform>();
             captionText = transform.Find("Label").GetComponent<Text>();
@@ -136,7 +114,7 @@ namespace VRSF.UI
         /// <summary>
         /// Change the Template to add the VRToggle instead of the one from Unity
         /// </summary>
-        void ChangeTemplate()
+        private void ChangeTemplate()
         {
             _template.SetActive(true);
 
@@ -156,20 +134,12 @@ namespace VRSF.UI
             _template.SetActive(false);
         }
 
-        private void Init(OnSetupVRReady _)
-        {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
-                SetupUIElement();
-        }
-
-        private void SetupUIElement()
+        private void SetupDropDown()
         {
             _onValueChangedAction = delegate { SetDropDownNewState(); };
             onValueChanged.AddListener(_onValueChangedAction);
 
-            OnVRClickerIsClicking.Listeners += CheckObjectClicked;
-
-            _eventWereRegistered = true;
+            OnVRClickerStartClicking.Listeners += CheckClickedObject;
 
             // We setup the Template and Options to fit the VRFramework
             _template = transform.Find("Template").gameObject;

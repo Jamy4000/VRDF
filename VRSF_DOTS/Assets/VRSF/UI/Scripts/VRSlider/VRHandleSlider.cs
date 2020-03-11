@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRSF.Core.VRInteractions;
 using VRSF.Core.Raycast;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -27,74 +26,47 @@ namespace VRSF.UI
         private ERayOrigin _rayHoldingHandle = ERayOrigin.NONE;
 
         private VRUIScrollableSetup _scrollableSetup;
-
-        private bool _boxColliderSetup;
-
-        private bool _isSelected;
         #endregion
 
 
         #region MONOBEHAVIOUR_METHODS
+        protected override void Awake()
+        {
+            base.Awake();
+            if (Application.isPlaying)
+                SliderSetup();
+        }
+
         protected override void Start()
         {
             base.Start();
-
-            if (Application.isPlaying)
-            {
-                _boxColliderSetup = false;
-
-                if (!UnityEngine.XR.XRSettings.enabled || !VRSF_Components.SetupVRIsReady)
-                    Init(null);
-                else
-                    OnSetupVRReady.RegisterSetupVRCallback(Init);
-
-                // We setup the BoxCollider size and center
-                if (SetColliderAuto)
-                {
-                    _boxColliderSetup = false;
-                    StartCoroutine(SetupBoxCollider());
-                }
-                else
-                {
-                    _boxColliderSetup = true;
-                }
-            }
+            // We setup the BoxCollider size and center
+            if (Application.isPlaying && SetColliderAuto)
+                StartCoroutine(SetupBoxCollider());
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnSetupVRReady.UnregisterSetupVRCallback(Init);
-
-            if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClick))
-                OnVRClickerIsClicking.Listeners -= CheckObjectClick;
-
-            if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
-                OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
+            OnVRClickerStartClicking.Listeners -= CheckClickedObject;
+            OnVRClickerStopClicking.Listeners -= CheckUnclickedObject;
         }
 
         protected override void Update()
         {
             base.Update();
-            if (Application.isPlaying && interactable && _boxColliderSetup)
+            if (Application.isPlaying && interactable)
             {
-                // Support for 2D Users
-                if (!UnityEngine.XR.XRSettings.enabled || !VRSF_Components.SetupVRIsReady)
-                    Check2DInputs();
-
                 switch (_rayHoldingHandle)
                 {
                     case ERayOrigin.LEFT_HAND:
-                        _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingLeft);
-                        value = InteractionVariableContainer.CurrentLeftHit != transform ? value : _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
                         break;
                     case ERayOrigin.RIGHT_HAND:
-                        _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingRight);
-                        value = InteractionVariableContainer.CurrentRightHit != transform ? value : _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
                         break;
                     case ERayOrigin.CAMERA:
-                        _scrollableSetup.CheckClickStillDown(ref _rayHoldingHandle, InteractionVariableContainer.IsClickingSomethingGaze);
-                        value = InteractionVariableContainer.CurrentGazeHit != transform ? value : _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
+                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
                         break;
                 }
             }
@@ -106,35 +78,26 @@ namespace VRSF.UI
         /// <summary>
         /// Event called when the user is clicking on something
         /// </summary>
-        /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckObjectClick(OnVRClickerIsClicking clickEvent)
+        /// <param name="startClickingEvent">The event raised when an object was just clicked</param>
+        private void CheckClickedObject(OnVRClickerStartClicking startClickingEvent)
         {
-            CheckGameObject(clickEvent.ClickedObject, clickEvent.RaycastOrigin);
-        }
-
-        private void CheckGameObject(GameObject toCheck, ERayOrigin raycastOrigin)
-        {
-            _rayHoldingHandle = interactable && ObjectClickedIsThis() ? raycastOrigin : ERayOrigin.NONE;
-
-            bool ObjectClickedIsThis()
+            if (CanHoldHandle())
             {
-                return toCheck == gameObject && _rayHoldingHandle == ERayOrigin.NONE;
+                _rayHoldingHandle = startClickingEvent.RaycastOrigin;
+                UIHapticGenerator.CreateClickHapticSignal(_rayHoldingHandle);
+            }
+
+            bool CanHoldHandle()
+            {
+                return interactable && startClickingEvent.ClickedObject == gameObject && _rayHoldingHandle == ERayOrigin.NONE;
             }
         }
 
-        private void CheckObjectOvered(OnObjectIsBeingHovered info)
+        private void CheckUnclickedObject(OnVRClickerStopClicking stopClickingEvent)
         {
-            if (info.HoveredObject == gameObject && interactable && !_isSelected)
-            {
-                _isSelected = true;
-            }
-            else if (info.HoveredObject != gameObject && _isSelected)
-            {
-                _isSelected = false;
-                OnDeselect(null);
-            }
+            if (stopClickingEvent.UnclickedObject == gameObject)
+                _rayHoldingHandle = ERayOrigin.NONE;
         }
-
 
         /// <summary>
         /// Set the BoxCollider size if SetColliderAuto is at true
@@ -143,19 +106,13 @@ namespace VRSF.UI
         private IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
-            
-            _boxColliderSetup = true;
         }
 
-        private void Init(OnSetupVRReady _)
+        private void SliderSetup()
         {
-            if (VRSF_Components.DeviceLoaded != EDevice.SIMULATOR && VRSF_Components.DeviceLoaded != EDevice.NONE)
-            {
-                OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
-                OnVRClickerIsClicking.Listeners += CheckObjectClick;
-            }
+            OnVRClickerStartClicking.Listeners += CheckClickedObject;
+            OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
 
             CheckSliderReferences();
 
@@ -175,54 +132,6 @@ namespace VRSF.UI
                 Debug.LogError("<b>[VRSF] :</b> Please specify a HandleRect in the inspector as a child of this VR Handle Slider.", gameObject);
             }
         }
-
-        private void Check2DInputs()
-        {
-#if UNITY_IOS || UNITY_ANDROID
-            if (Input.touchCount == 1)
-            {
-                var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-#else
-            if (Input.GetMouseButtonDown(0))
-            {
-                var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-#endif
-                if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
-                {
-                    CheckGameObject(hit.collider.gameObject, ERayOrigin.CAMERA);
-                    if (_rayHoldingHandle == ERayOrigin.CAMERA)
-                    {
-                        // TODO WHAT THE FUCK THIS SHOULDN'T BE HERE
-                        InteractionVariableContainer.CurrentGazeHit = gameObject;
-                        InteractionVariableContainer.IsClickingSomethingGaze = true;
-                        InteractionVariableContainer.CurrentGazeHitPosition = hit.point;
-                    }
-                }
-            }
-#if UNITY_IOS || UNITY_ANDROID
-            else if (Input.GetMouseButtonUp(0) && _rayHoldingHandle != ERayOrigin.NONE)
-            {
-#else
-            else if (Input.touchCount == 0 && _rayHoldingHandle != ERayOrigin.NONE)
-            {
-#endif
-                _rayHoldingHandle = ERayOrigin.NONE;
-                InteractionVariableContainer.IsClickingSomethingGaze = false;
-                InteractionVariableContainer.CurrentGazeHit = null;
-            }
-#if UNITY_IOS || UNITY_ANDROID
-            else if (Input.GetMouseButton(0) && _rayHoldingHandle == ERayOrigin.CAMERA)
-            {
-                var mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-#else
-            else if (Input.touchCount == 1 && _rayHoldingHandle == ERayOrigin.CAMERA)
-            {
-                var mouseRay = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-#endif
-                if (Physics.Raycast(mouseRay, out RaycastHit hit, 200, ~LayerMask.NameToLayer("UI"), QueryTriggerInteraction.UseGlobal))
-                    InteractionVariableContainer.CurrentGazeHitPosition = hit.point;
-            }
-        }
-#endregion
+        #endregion
     }
 }

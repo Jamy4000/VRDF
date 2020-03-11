@@ -21,11 +21,18 @@ public class OnStopHoveringObject : EventCallbacks.Event<OnStopHoveringObject>
     /// Event raised when the user was hovering somethinf with a VR Raycaster, and just stop hovering it
     /// </summary>
     /// <param name="raycastOrigin">The Origin of the ray that just hovered something</param>
-    /// <param name="objectHovered">The GameObject that was hovered by the user, but isn't anymore (must have a collider)</param>
-    public OnStopHoveringObject(ERayOrigin raycastOrigin, GameObject objectHovered) : base("Event raised when the user was hovering somethinf with a VR Raycaster, and just stop hovering it")
+    /// <param name="unhoveredObject">The GameObject that was hovered by the user, but isn't anymore (must have a collider)</param>
+    public OnStopHoveringObject(ERayOrigin raycastOrigin, GameObject unhoveredObject) : base("Event raised when the user was hovering somethinf with a VR Raycaster, and just stop hovering it")
     {
         RaycastOrigin = raycastOrigin;
-        UnhoveredObject = objectHovered;
+        UnhoveredObject = unhoveredObject;
+
+        if (unhoveredObject != null)
+        {
+            var selectableObject = unhoveredObject.GetComponent<UnityEngine.UI.Selectable>();
+            if (selectableObject != null)
+                selectableObject.OnDeselect(null);
+        }
 
         switch (raycastOrigin)
         {

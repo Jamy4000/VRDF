@@ -27,18 +27,6 @@ namespace VRSF.UI
 
         #region PUBLIC_METHODS
         /// <summary>
-        /// Called in an update method to check if a click is still down
-        /// </summary>
-        /// <param name="handHoldingHandle">The hand with with the user is clicking</param>
-        /// <param name="clickIsDown">The ClickIsDown BoolVariable Value for the corresponding hand</param>
-        public void CheckClickStillDown(ref ERayOrigin handHoldingHandle, bool clickIsDown)
-        {
-            if (!clickIsDown)
-                handHoldingHandle = ERayOrigin.NONE;
-        }
-
-
-        /// <summary>
         /// Set the UI Scrollable component new value according to the hitPoint, the min and max position and the direction of the element
         /// </summary>
         /// <param name="minPos">The minimum world position of the scrollable element</param>

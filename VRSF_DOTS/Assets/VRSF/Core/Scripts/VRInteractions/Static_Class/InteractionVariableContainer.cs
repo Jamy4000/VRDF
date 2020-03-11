@@ -10,22 +10,6 @@ namespace VRSF.Core.VRInteractions
 	public static class InteractionVariableContainer
     {
         /// <summary>
-        /// Bool to verify if something is being clicked with a Right Hand Raycaster
-        /// </summary>
-        public static bool IsClickingSomethingRight;
-
-        /// <summary>
-        /// Bool to verify if something is being clicked with a Left Hand Raycaster
-        /// </summary>
-        public static bool IsClickingSomethingLeft;
-
-        /// <summary>
-        /// Bool to verify if something is being clicked with a Camera Raycaster
-        /// </summary>
-        public static bool IsClickingSomethingGaze;
-
-
-        /// <summary>
         /// Bool to verify if something is being hovered by the Right Hand Raycaster
         /// </summary>
         public static bool IsOverSomethingRight;
@@ -71,21 +55,5 @@ namespace VRSF.Core.VRInteractions
         /// The current hit position of the Camera Raycaster
         /// </summary>
         public static float3 CurrentGazeHitPosition;
-
-
-        /// <summary>
-        /// The currentclicked GameObject using the Right Hand Raycaster with a VR Clicker
-        /// </summary>
-        public static GameObject CurrentClickedObjectRight;
-
-        /// <summary>
-        /// The current clicked GameObject using the Left Hand Raycaster with a VR Clicker
-        /// </summary>
-        public static GameObject CurrentClickedObjectLeft;
-
-        /// <summary>
-        /// The currently clicked GameObject using the Camera Raycaster with a VR Clicker
-        /// </summary>
-        public static GameObject CurrentClickedObjectGaze;
     }
 }

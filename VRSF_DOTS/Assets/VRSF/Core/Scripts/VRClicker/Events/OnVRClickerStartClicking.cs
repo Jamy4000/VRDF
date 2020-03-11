@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using VRSF.Core.Raycast;
+using VRSF.Core.VRClicker;
 
 /// <summary>
 /// Event raised when an object was clicked using the VR Clicker system
@@ -29,16 +30,16 @@ public class OnVRClickerStartClicking : EventCallbacks.Event<OnVRClickerStartCli
         switch (rayOrigin)
         {
             case ERayOrigin.RIGHT_HAND:
-                VRSF.Core.VRInteractions.InteractionVariableContainer.CurrentClickedObjectRight = objectClicked;
-                VRSF.Core.VRInteractions.InteractionVariableContainer.IsClickingSomethingRight = true;
+                VRClickerVariablesContainer.CurrentClickedObjectRight = objectClicked;
+                VRClickerVariablesContainer.IsClickingRight = true;
                 break;
             case ERayOrigin.LEFT_HAND:
-                VRSF.Core.VRInteractions.InteractionVariableContainer.CurrentClickedObjectLeft = objectClicked;
-                VRSF.Core.VRInteractions.InteractionVariableContainer.IsClickingSomethingLeft = true;
+                VRClickerVariablesContainer.CurrentClickedObjectLeft = objectClicked;
+                VRClickerVariablesContainer.IsClickingLeft = true;
                 break;
             case ERayOrigin.CAMERA:
-                VRSF.Core.VRInteractions.InteractionVariableContainer.CurrentClickedObjectGaze = objectClicked;
-                VRSF.Core.VRInteractions.InteractionVariableContainer.IsClickingSomethingGaze = true;
+                VRClickerVariablesContainer.CurrentClickedObjectGaze = objectClicked;
+                VRClickerVariablesContainer.IsClickingGaze = true;
                 break;
         }
 

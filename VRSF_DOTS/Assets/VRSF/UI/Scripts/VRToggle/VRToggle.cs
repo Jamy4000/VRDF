@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VRSF.Core.Controllers;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -35,40 +33,38 @@ namespace VRSF.UI
         protected override void Awake()
         {
             base.Awake();
-
             if (Application.isPlaying)
-            {
-                OnSetupVRReady.RegisterSetupVRCallback(Init);
+                SetupToggle();            
+        }
 
-                // We setup the BoxCollider size and center
-                if (SetColliderAuto)
-                    StartCoroutine(SetupBoxCollider());
-            }
+        protected override void Start()
+        {
+            base.Start();
+            // We setup the BoxCollider size and center
+            if (Application.isPlaying && SetColliderAuto)
+                StartCoroutine(SetupBoxCollider());
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnSetupVRReady.UnregisterSetupVRCallback(Init);
-
-            if (OnObjectIsBeingHovered.IsMethodAlreadyRegistered(CheckObjectOvered))
-                OnObjectIsBeingHovered.Listeners -= CheckObjectOvered;
-
-            if (OnVRClickerIsClicking.IsMethodAlreadyRegistered(CheckObjectClick))
-                OnVRClickerIsClicking.Listeners -= CheckObjectClick;
+            if (OnStartHoveringObject.IsMethodAlreadyRegistered(CheckHoveredObject))
+            {
+                OnStartHoveringObject.Listeners -= CheckHoveredObject;
+                OnStopHoveringObject.Listeners -= CheckUnhoveredObject;
+                OnVRClickerStartClicking.Listeners -= CheckClickedObject;
+            }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            // if the user is in VR
-            if (UnityEngine.XR.XRSettings.enabled && VRSF_Components.SetupVRIsReady)
+            if (!ControllerClickable || !interactable)
+                return;
+
+            if (other.gameObject.CompareTag("ControllerBody") || other.gameObject.CompareTag("UIClicker"))
             {
-                var objectTag = other.gameObject.tag;
-                if (ControllerClickable && interactable && (objectTag.Contains("ControllerBody") || objectTag.Contains("UIClicker")))
-                {
-                    isOn = !isOn;
-                    new OnHapticRequestedEvent(other.name.ToLower().Contains("left") ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
-                }
+                isOn = !isOn;
+                UIHapticGenerator.CreateClickHapticSignal(other.name.ToLower().Contains("left") ? Core.Raycast.ERayOrigin.LEFT_HAND : Core.Raycast.ERayOrigin.RIGHT_HAND);
             }
         }
         #endregion MONOBEHAVIOUR_METHODS
@@ -76,32 +72,36 @@ namespace VRSF.UI
 
         #region PRIVATE_METHODS
         /// <summary>
-        /// Event called when the button is clicked
+        /// Event called when the user is clicking on something
         /// </summary>
-        /// <param name="clickEvent">The event raised when an object is clicked</param>
-        private void CheckObjectClick(OnVRClickerIsClicking clickEvent)
+        /// <param name="startClickingEvent">The event raised when an object was clicked</param>
+        private void CheckClickedObject(OnVRClickerStartClicking startClickingEvent)
         {
-            if (interactable && clickEvent.ClickedObject == gameObject)
+            if (CheckGameObject(startClickingEvent.ClickedObject))
             {
                 isOn = !isOn;
-                new OnHapticRequestedEvent(clickEvent.RaycastOrigin == Core.Raycast.ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.2f, 0.1f);
+                UIHapticGenerator.CreateClickHapticSignal(startClickingEvent.RaycastOrigin);
             }
         }
 
-        private void CheckObjectOvered(OnObjectIsBeingHovered info)
+        private void CheckHoveredObject(OnStartHoveringObject startHoveringEvent)
         {
-            if (info.HoveredObject == gameObject && interactable && !_isSelected)
+            if (CheckGameObject(startHoveringEvent.HoveredObject))
             {
-                _isSelected = true;
-                new OnHapticRequestedEvent(info.RaycastOrigin == Core.Raycast.ERayOrigin.LEFT_HAND ? EHand.LEFT : EHand.RIGHT, 0.1f, 0.075f);
                 OnHover.Invoke();
+                UIHapticGenerator.CreateClickHapticSignal(startHoveringEvent.RaycastOrigin);
             }
-            else if (info.HoveredObject != gameObject && _isSelected)
-            {
-                _isSelected = false;
-                OnDeselect(null);
+        }
+
+        private void CheckUnhoveredObject(OnStopHoveringObject info)
+        {
+            if (CheckGameObject(info.UnhoveredObject))
                 OnStopHovering.Invoke();
-            }
+        }
+
+        private bool CheckGameObject(GameObject toCheck)
+        {
+            return interactable && toCheck == gameObject;
         }
 
         /// <summary>
@@ -112,17 +112,16 @@ namespace VRSF.UI
         private IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            yield return new WaitForEndOfFrame();
-
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
-        private void Init(OnSetupVRReady _)
+        private void SetupToggle()
         {
-            if (LaserClickable && VRSF_Components.DeviceLoaded != EDevice.SIMULATOR)
+            if (LaserClickable)
             {
-                OnObjectIsBeingHovered.Listeners += CheckObjectOvered;
-                OnVRClickerIsClicking.Listeners += CheckObjectClick;
+                OnStartHoveringObject.Listeners += CheckHoveredObject;
+                OnStopHoveringObject.Listeners += CheckUnhoveredObject;
+                OnVRClickerStartClicking.Listeners += CheckClickedObject;
             }
 
             if (ControllerClickable)
