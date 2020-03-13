@@ -80,26 +80,16 @@ namespace VRSF.UI
                         horizontalScrollbar.value = CheckScrollbarValue();
                 }
             }
+
+            float CheckScrollbarValue()
+            {
+                return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.GetCurrentHitPosition(_rayHoldingHandle));
+            }
         }
         #endregion
 
 
         #region PRIVATE_METHODS
-        private float CheckScrollbarValue()
-        {
-            switch (_rayHoldingHandle)
-            {
-                case ERayOrigin.LEFT_HAND:
-                    return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
-                case ERayOrigin.RIGHT_HAND:
-                    return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
-                case ERayOrigin.CAMERA:
-                    return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
-                default:
-                    throw new System.Exception();
-            }
-        }
-
         /// <summary>
         /// Event called when the user is clicking on something
         /// </summary>

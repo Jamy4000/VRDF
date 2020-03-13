@@ -90,24 +90,14 @@ namespace VRSF.UI
 
         private void CheckHoveredObject(OnStartHoveringObject info)
         {
-            Debug.Log("OnStartHoveringObject");
             if (CheckGameObject(info.HoveredObject))
-            {
-
-                Debug.Log("Yep uep");
                 OnHover.Invoke();
-            }
         }
 
         private void CheckUnhoveredObject(OnStopHoveringObject info)
         {
-            Debug.Log("OnStopHoveringObject");
             if (CheckGameObject(info.UnhoveredObject))
-            {
-
-                Debug.Log("Yep 2");
                 OnStopHovering.Invoke();
-            }
         }
 
         private bool CheckGameObject(GameObject toCheck)

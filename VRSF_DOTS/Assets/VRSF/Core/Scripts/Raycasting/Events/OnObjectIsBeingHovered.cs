@@ -22,7 +22,7 @@ public class OnObjectIsBeingHovered : EventCallbacks.Event<OnObjectIsBeingHovere
     /// </summary>
     /// <param name="raycastOrigin">The Origin of the ray that just hovered something</param>
     /// <param name="objectHovered">The GameObject that was just hovered by the user (must have a collider)</param>
-    public OnObjectIsBeingHovered(ERayOrigin raycastOrigin, GameObject objectHovered, Vector3 currentHitPoint) : base("Event raised when an object is hovered by the laser.")
+    public OnObjectIsBeingHovered(ERayOrigin raycastOrigin, GameObject objectHovered) : base("Event raised when an object is hovered by the laser.")
     {
         RaycastOrigin = raycastOrigin;
         HoveredObject = objectHovered;

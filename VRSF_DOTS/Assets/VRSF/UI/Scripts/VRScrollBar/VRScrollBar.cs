@@ -59,21 +59,8 @@ namespace VRSF.UI
         protected override void Update()
         {
             base.Update();
-            if (Application.isPlaying)
-            {
-                switch (_rayHoldingHandle)
-                {
-                    case ERayOrigin.LEFT_HAND:
-                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentLeftHitPosition);
-                        break;
-                    case ERayOrigin.RIGHT_HAND:
-                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentRightHitPosition);
-                        break;
-                    case ERayOrigin.CAMERA:
-                        value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.CurrentGazeHitPosition);
-                        break;
-                }
-            }
+            if (Application.isPlaying && _rayHoldingHandle != ERayOrigin.NONE)
+                value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.GetCurrentHitPosition(_rayHoldingHandle));
         }
         #endregion
 

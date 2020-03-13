@@ -106,7 +106,7 @@ namespace VRSF.Core.Raycast
             }
             else
             {
-                Debug.Log("<Color=red><b>[VRSF]:</b> You need at least one VRRaycastAuthoring in your scene to initialize and use the VR UI Package. Waiting for next frame.</Color>");
+                Debug.Log("<Color=red><b>[VRSF]:</b> You need at least one VRRaycastAuthoring in your scene to initialize and use the VR UI Package. Waiting until a VRRaycastAuthoring is placed in scene for Setup.</Color>");
                 return false;
             }
         }

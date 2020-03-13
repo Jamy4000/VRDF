@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using VRSF.Core.Raycast;
-using VRSF.Core.VRInteractions;
 
 /// <summary>
 /// Event raised when the user was hovering somethinf with a VR Raycaster, and just stop hovering it
@@ -33,6 +32,8 @@ public class OnStopHoveringObject : EventCallbacks.Event<OnStopHoveringObject>
             if (selectableObject != null)
                 selectableObject.OnDeselect(null);
         }
+
+        HoveringVariablesContainer.SetCurrentHoveredObjects(raycastOrigin, null);
 
         FireEvent(this);
     }

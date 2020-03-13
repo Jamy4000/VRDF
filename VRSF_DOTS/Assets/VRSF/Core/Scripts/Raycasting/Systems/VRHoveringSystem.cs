@@ -23,62 +23,35 @@ namespace VRSF.Core.Raycast
         /// </summary>
         private void HandleOver(RaycastHitVariable hitVar, ERayOrigin origin)
         {
-            GetCurrentHit(origin, out GameObject currentHit, out bool isOverSomething);
-
-            Debug.Log("currentHit" + currentHit);
-            Debug.Log("isOverSomething " + isOverSomething);
+            GameObject currentHoveredObject = HoveringVariablesContainer.GetCurrentHit(origin);
 
             //If nothing is hit and something was previously hovered, we raise the stop hovering event
-            if (hitVar.IsNull && isOverSomething)
+            if (hitVar.IsNull && currentHoveredObject != null)
             {
-                Debug.Log("OnStopHoveringObject " + currentHit);
-                new OnStopHoveringObject(origin, currentHit);
+                new OnStopHoveringObject(origin, currentHoveredObject);
             }
             //If something is hit
             else if (!hitVar.IsNull)
             {
                 var objectHit = hitVar.Value.collider.gameObject;
 
-                if (!isOverSomething)
+                // Event raised only when a new object is hovered
+                if (currentHoveredObject == null)
                 {
-                    Debug.Log("OnStartHoveringObject " + objectHit);
-                    // Event raised only when a new object is hovered
-                    new OnStartHoveringObject(origin, objectHit, hitVar.Value.point);
+                    new OnStartHoveringObject(origin, objectHit);
                 }
                 // If the user started to hover a new object
-                else if (objectHit != currentHit)
+                else if (objectHit != currentHoveredObject)
                 {
-                    Debug.Log("OnStopHoveringObject " + currentHit);
                     // We tell the system that we stopped hovering the current object. 
                     // The Systems will then be notify on the next frame that something new is being hovered
-                    new OnStopHoveringObject(origin, currentHit);
+                    new OnStopHoveringObject(origin, currentHoveredObject);
                 }
                 // If we're still hovering the same object as the previous frame
                 else
                 {
-                    new OnObjectIsBeingHovered(origin, currentHit, hitVar.Value.point);
+                    new OnObjectIsBeingHovered(origin, currentHoveredObject);
                 }
-            }
-        }
-
-        private void GetCurrentHit(ERayOrigin origin, out GameObject currentHit, out bool isOverSomething)
-        {
-            switch (origin)
-            {
-                case ERayOrigin.RIGHT_HAND:
-                    currentHit = InteractionVariableContainer.CurrentRightHit;
-                    isOverSomething = InteractionVariableContainer.IsOverSomethingRight;
-                    break;
-                case ERayOrigin.LEFT_HAND:
-                    currentHit = InteractionVariableContainer.CurrentLeftHit;
-                    isOverSomething = InteractionVariableContainer.IsOverSomethingLeft;
-                    break;
-                case ERayOrigin.CAMERA:
-                    currentHit = InteractionVariableContainer.CurrentGazeHit;
-                    isOverSomething = InteractionVariableContainer.IsOverSomethingGaze;
-                    break;
-                default:
-                    throw new System.Exception();
             }
         }
     }
