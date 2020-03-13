@@ -83,7 +83,12 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-                SetupAutoFillSlider();
+            {
+                if (!VRRaycastAuthoring.SceneContainsRaycaster())
+                    OnVRRaycasterIsSetup.Listeners += SetupAutoFillSlider;
+                else
+                    SetupAutoFillSlider(null);
+            }
         }
 
         protected override void Start()
@@ -303,8 +308,10 @@ namespace VRSF.UI
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
-        private void SetupAutoFillSlider()
+        private void SetupAutoFillSlider(OnVRRaycasterIsSetup _)
         {
+            OnVRRaycasterIsSetup.Listeners -= SetupAutoFillSlider;
+
             GetFillRectReference();
 
             if (LaserClickable)

@@ -33,7 +33,12 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-                SetupDropDown();
+            {
+                if (!Core.Raycast.VRRaycastAuthoring.SceneContainsRaycaster())
+                    Core.Raycast.OnVRRaycasterIsSetup.Listeners += SetupDropDown;
+                else
+                    SetupDropDown(null);
+            }
         }
 
         protected override void Start()
@@ -134,8 +139,10 @@ namespace VRSF.UI
             _template.SetActive(false);
         }
 
-        private void SetupDropDown()
+        private void SetupDropDown(Core.Raycast.OnVRRaycasterIsSetup _)
         {
+            Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupDropDown;
+
             _onValueChangedAction = delegate { SetDropDownNewState(); };
             onValueChanged.AddListener(_onValueChangedAction);
 

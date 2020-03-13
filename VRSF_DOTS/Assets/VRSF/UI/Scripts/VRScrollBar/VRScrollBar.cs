@@ -33,7 +33,12 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-                ScrollbarSetup();
+            {
+                if (!VRRaycastAuthoring.SceneContainsRaycaster())
+                    OnVRRaycasterIsSetup.Listeners += ScrollbarSetup;
+                else
+                    ScrollbarSetup(null);
+            }
         }
 
         protected override void Start()
@@ -108,8 +113,10 @@ namespace VRSF.UI
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
-        private void ScrollbarSetup()
+        private void ScrollbarSetup(OnVRRaycasterIsSetup _)
         {
+            OnVRRaycasterIsSetup.Listeners -= ScrollbarSetup;
+
             GetHandleRectReference();
 
             OnVRClickerStartClicking.Listeners += CheckClickedObject;

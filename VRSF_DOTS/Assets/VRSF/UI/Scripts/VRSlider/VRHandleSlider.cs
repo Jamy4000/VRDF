@@ -34,7 +34,12 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-                SliderSetup();
+            {
+                if (!VRRaycastAuthoring.SceneContainsRaycaster())
+                    OnVRRaycasterIsSetup.Listeners += SliderSetup;
+                else
+                    SliderSetup(null);
+            }
         }
 
         protected override void Start()
@@ -109,8 +114,10 @@ namespace VRSF.UI
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
-        private void SliderSetup()
+        private void SliderSetup(OnVRRaycasterIsSetup _)
         {
+            OnVRRaycasterIsSetup.Listeners -= SliderSetup;
+
             OnVRClickerStartClicking.Listeners += CheckClickedObject;
             OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
 

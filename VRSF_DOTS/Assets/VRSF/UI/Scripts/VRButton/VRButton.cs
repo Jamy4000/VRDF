@@ -31,8 +31,14 @@ namespace VRSF.UI
         protected override void Awake()
         {
             base.Awake();
+
             if (Application.isPlaying)
-                SetupVRButton();
+            {
+                if (!Core.Raycast.VRRaycastAuthoring.SceneContainsRaycaster())
+                    Core.Raycast.OnVRRaycasterIsSetup.Listeners += SetupVRButton;
+                else
+                    SetupVRButton(null);
+            }
         }
 
         protected override void Start()
@@ -51,8 +57,7 @@ namespace VRSF.UI
                 OnStartHoveringObject.Listeners -= CheckHoveredObject;
                 OnStopHoveringObject.Listeners -= CheckUnhoveredObject;
 
-                // Normal Button Callback is still called with the mouse
-                if (VRSF_Components.DeviceLoaded != Core.SetupVR.EDevice.SIMULATOR)
+                if (OnVRClickerStartClicking.IsMethodAlreadyRegistered(CheckClickedObject))
                     OnVRClickerStartClicking.Listeners -= CheckClickedObject;
             }
         }
@@ -125,21 +130,29 @@ namespace VRSF.UI
                 VRUIBoxColliderSetup.CheckBoxColliderSize(boxCollider, rectTrans);
         }
 
-        private void SetupVRButton()
+        private void SetupVRButton(Core.Raycast.OnVRRaycasterIsSetup _)
         {
+            Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupVRButton;
+
             if (LaserClickable)
             {
                 OnStartHoveringObject.Listeners += CheckHoveredObject;
                 OnStopHoveringObject.Listeners += CheckUnhoveredObject;
-
-                // Normal Button Callback is still called with the mouse
-                if (VRSF_Components.DeviceLoaded != Core.SetupVR.EDevice.SIMULATOR)
+                
+                if (ShouldRegisterForSimulator())
                     OnVRClickerStartClicking.Listeners += CheckClickedObject;
             }
 
             var boxCollider = GetComponent<BoxCollider>();
             if (ControllerClickable && boxCollider != null)
                 boxCollider.isTrigger = true;
+
+
+            // Normal Button Click Callback is still called with the mouse when this VRButton isn't on a 2D UI with Image
+            bool ShouldRegisterForSimulator()
+            {
+                return VRSF_Components.DeviceLoaded == Core.SetupVR.EDevice.SIMULATOR && (targetGraphic == null || GetComponent<UnityEngine.UI.Image>() == null);
+            }
         }
         #endregion PRIVATE_METHODS
     }

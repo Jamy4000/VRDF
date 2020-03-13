@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using VRSF.Core.Raycast;
 
 namespace VRSF.UI
 {
@@ -34,7 +35,12 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-                SetupToggle();            
+            {
+                if (!VRRaycastAuthoring.SceneContainsRaycaster())
+                    OnVRRaycasterIsSetup.Listeners += SetupToggle;
+                else
+                    SetupToggle(null);
+            }     
         }
 
         protected override void Start()
@@ -115,8 +121,10 @@ namespace VRSF.UI
             VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
-        private void SetupToggle()
+        private void SetupToggle(OnVRRaycasterIsSetup _)
         {
+            OnVRRaycasterIsSetup.Listeners -= SetupToggle;
+
             if (LaserClickable)
             {
                 OnStartHoveringObject.Listeners += CheckHoveredObject;

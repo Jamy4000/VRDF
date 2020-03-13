@@ -1,5 +1,4 @@
 ﻿using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 using VRSF.Core.VRInteractions;
 
@@ -26,9 +25,13 @@ namespace VRSF.Core.Raycast
         {
             GetCurrentHit(origin, out GameObject currentHit, out bool isOverSomething);
 
+            Debug.Log("currentHit" + currentHit);
+            Debug.Log("isOverSomething " + isOverSomething);
+
             //If nothing is hit and something was previously hovered, we raise the stop hovering event
             if (hitVar.IsNull && isOverSomething)
             {
+                Debug.Log("OnStopHoveringObject " + currentHit);
                 new OnStopHoveringObject(origin, currentHit);
             }
             //If something is hit
@@ -38,12 +41,14 @@ namespace VRSF.Core.Raycast
 
                 if (!isOverSomething)
                 {
+                    Debug.Log("OnStartHoveringObject " + objectHit);
                     // Event raised only when a new object is hovered
                     new OnStartHoveringObject(origin, objectHit, hitVar.Value.point);
                 }
                 // If the user started to hover a new object
                 else if (objectHit != currentHit)
                 {
+                    Debug.Log("OnStopHoveringObject " + currentHit);
                     // We tell the system that we stopped hovering the current object. 
                     // The Systems will then be notify on the next frame that something new is being hovered
                     new OnStopHoveringObject(origin, currentHit);

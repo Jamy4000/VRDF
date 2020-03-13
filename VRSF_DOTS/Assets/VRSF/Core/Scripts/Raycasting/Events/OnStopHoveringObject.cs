@@ -34,25 +34,6 @@ public class OnStopHoveringObject : EventCallbacks.Event<OnStopHoveringObject>
                 selectableObject.OnDeselect(null);
         }
 
-        switch (raycastOrigin)
-        {
-            case ERayOrigin.RIGHT_HAND:
-                InteractionVariableContainer.CurrentRightHitPosition = Vector3.zero;
-                InteractionVariableContainer.CurrentRightHit = null;
-                InteractionVariableContainer.IsOverSomethingRight = false;
-                break;
-            case ERayOrigin.LEFT_HAND:
-                InteractionVariableContainer.CurrentLeftHitPosition = Vector3.zero;
-                InteractionVariableContainer.CurrentLeftHit = null;
-                InteractionVariableContainer.IsOverSomethingLeft = false;
-                break;
-            case ERayOrigin.CAMERA:
-                InteractionVariableContainer.CurrentGazeHitPosition = Vector3.zero;
-                InteractionVariableContainer.CurrentGazeHit = null;
-                InteractionVariableContainer.IsOverSomethingGaze = false;
-                break;
-        }
-
         FireEvent(this);
     }
 }

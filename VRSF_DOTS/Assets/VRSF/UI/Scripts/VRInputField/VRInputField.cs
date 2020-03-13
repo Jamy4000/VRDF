@@ -41,7 +41,10 @@ namespace VRSF.UI
                 if (ControllerClickable)
                     GetComponent<BoxCollider>().isTrigger = true;
 
-                SetInputFieldReferences();
+                if (!Core.Raycast.VRRaycastAuthoring.SceneContainsRaycaster())
+                    Core.Raycast.OnVRRaycasterIsSetup.Listeners += SetInputFieldReferences;
+                else
+                    SetInputFieldReferences(null);
             }
         }
 
@@ -132,8 +135,10 @@ namespace VRSF.UI
         /// <summary>
         /// Set the input field reference for the textComponent and the placeHolder
         /// </summary>
-        void SetInputFieldReferences()
+        private void SetInputFieldReferences(Core.Raycast.OnVRRaycasterIsSetup _)
         {
+            Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetInputFieldReferences;
+
             try
             {
                 if (textComponent == null)

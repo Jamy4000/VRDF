@@ -19,9 +19,12 @@ namespace VRSF.Core.Raycast
             {
                 var rayHitSomething = Physics.Raycast(raycastOutputs.RayVar, out raycastOutputs.RaycastHitVar.Value, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
                 raycastOutputs.RaycastHitVar.SetIsNull(!rayHitSomething || raycastOutputs.RaycastHitVar.Value.collider == null);
+                Debug.Log("rayHitSomething " + rayHitSomething);
+                Debug.Log("raycastOutputs.RaycastHitVar.IsNull " + raycastOutputs.RaycastHitVar.IsNull);
 
                 Vector3 hitPoint = raycastOutputs.RaycastHitVar.IsNull ? Vector3.zero : raycastOutputs.RaycastHitVar.Value.point;
                 GameObject hitObject = raycastOutputs.RaycastHitVar.IsNull ? null : raycastOutputs.RaycastHitVar.Value.collider.gameObject;
+                // Todo set this somewhere else, after the VRHovering system has run, or find another way to do this
                 SetInteractionVariables(origin.RayOrigin, hitPoint, hitObject);
             });
         }

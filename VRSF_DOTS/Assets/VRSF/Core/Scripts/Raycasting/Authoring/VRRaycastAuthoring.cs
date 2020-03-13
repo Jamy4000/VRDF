@@ -96,5 +96,19 @@ namespace VRSF.Core.Raycast
         public Vector3 StartPointOffset { get => _startPointOffset; }
         public float MaxRaycastDistance { get => _maxRaycastDistance; }
         public ERayOrigin RayOrigin { get => _rayOrigin; }
+
+
+        public static bool SceneContainsRaycaster()
+        {
+            if (GameObject.FindObjectsOfType<Core.Raycast.VRRaycastAuthoring>().Length > 0)
+            {
+                return true;
+            }
+            else
+            {
+                Debug.Log("<Color=red><b>[VRSF]:</b> You need at least one VRRaycastAuthoring in your scene to initialize and use the VR UI Package. Waiting for next frame.</Color>");
+                return false;
+            }
+        }
     }
 }

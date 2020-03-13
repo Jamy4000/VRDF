@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using VRSF.Core.Raycast;
-using VRSF.Core.VRInteractions;
 
 /// <summary>
 /// Event raised when the user start to hover an object with a VR Raycaster

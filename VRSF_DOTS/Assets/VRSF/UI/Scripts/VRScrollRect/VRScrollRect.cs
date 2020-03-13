@@ -39,8 +39,11 @@ namespace VRSF.UI
             if (Application.isPlaying)
             {
                 _scrollableSetup = new VRUIScrollableSetup(Direction);
-                SetupVRScrollRect();
-                _scrollableSetup.CheckContentStatus(viewport, content);
+
+                if (!VRRaycastAuthoring.SceneContainsRaycaster())
+                    OnVRRaycasterIsSetup.Listeners += SetupVRScrollRect;
+                else
+                    SetupVRScrollRect(null);
             }
         }
 
@@ -157,8 +160,10 @@ namespace VRSF.UI
             }
         }
 
-        private void SetupVRScrollRect()
+        private void SetupVRScrollRect(OnVRRaycasterIsSetup _)
         {
+            OnVRRaycasterIsSetup.Listeners -= SetupVRScrollRect;
+
             // We setup the references to the ScrollRect elements
             SetScrollRectReferences();
 
@@ -180,6 +185,7 @@ namespace VRSF.UI
 
             // We setup the Min and Max pos transform
             _scrollableSetup.CheckMinMaxGameObjects(transform, Direction, ref _minPosBar, ref _maxPosBar);
+            _scrollableSetup.CheckContentStatus(viewport, content);
         }
 
         /// <summary>
