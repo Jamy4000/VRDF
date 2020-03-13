@@ -27,21 +27,7 @@ public class OnVRClickerStartClicking : EventCallbacks.Event<OnVRClickerStartCli
         RaycastOrigin = rayOrigin;
         ClickedObject = objectClicked;
 
-        switch (rayOrigin)
-        {
-            case ERayOrigin.RIGHT_HAND:
-                VRClickerVariablesContainer.CurrentClickedObjectRight = objectClicked;
-                VRClickerVariablesContainer.IsClickingRight = true;
-                break;
-            case ERayOrigin.LEFT_HAND:
-                VRClickerVariablesContainer.CurrentClickedObjectLeft = objectClicked;
-                VRClickerVariablesContainer.IsClickingLeft = true;
-                break;
-            case ERayOrigin.CAMERA:
-                VRClickerVariablesContainer.CurrentClickedObjectGaze = objectClicked;
-                VRClickerVariablesContainer.IsClickingGaze = true;
-                break;
-        }
+        VRClickerVariablesContainer.SetCurrentClickedVariables(rayOrigin, objectClicked, true);
 
         FireEvent(this);
     }

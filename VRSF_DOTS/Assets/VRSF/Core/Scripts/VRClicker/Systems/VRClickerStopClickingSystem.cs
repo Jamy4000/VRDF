@@ -17,19 +17,7 @@ namespace VRSF.Core.VRClicker
             {
                 if (vrClicker.CanClick)
                 {
-                    switch (raycastOrigin.RayOrigin)
-                    {
-                        case ERayOrigin.LEFT_HAND:
-                            new OnVRClickerStopClicking(ERayOrigin.LEFT_HAND, VRClickerVariablesContainer.CurrentClickedObjectLeft);
-                            break;
-                        case ERayOrigin.RIGHT_HAND:
-                            new OnVRClickerStopClicking(ERayOrigin.RIGHT_HAND, VRClickerVariablesContainer.CurrentClickedObjectRight);
-                            break;
-                        case ERayOrigin.CAMERA:
-                            new OnVRClickerStopClicking(ERayOrigin.CAMERA, VRClickerVariablesContainer.CurrentClickedObjectGaze);
-                            break;
-                    }
-
+                    new OnVRClickerStopClicking(raycastOrigin.RayOrigin, VRClickerVariablesContainer.GetCurrentClickedObject(raycastOrigin.RayOrigin));
                     vrClicker.IsClicking = false;
                 }
             });

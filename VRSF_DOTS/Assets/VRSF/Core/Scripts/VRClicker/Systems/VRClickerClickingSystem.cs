@@ -15,30 +15,8 @@ namespace VRSF.Core.VRClicker
             Entities.WithNone<StartClickingEventComp, StopClickingEventComp>().ForEach((Entity entity, ref VRClicker vrClicker, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin raycastOrigin) =>
             {
                 if (vrClicker.CanClick && vrClicker.IsClicking)
-                    new OnVRClickerIsClicking(raycastOrigin.RayOrigin, GetCurrentlyClickedObject(raycastOrigin.RayOrigin));
+                    new OnVRClickerIsClicking(raycastOrigin.RayOrigin, VRClickerVariablesContainer.GetCurrentClickedObject(raycastOrigin.RayOrigin));
             });
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hitVar"></param>
-        /// <param name="hasClickSomething"></param>
-        /// <param name="origin"></param>
-        /// <returns>True if the user is still clicking on the same object</returns>
-        private UnityEngine.GameObject GetCurrentlyClickedObject(ERayOrigin origin)
-        {
-            switch (origin)
-            {
-                case ERayOrigin.LEFT_HAND:
-                    return VRClickerVariablesContainer.CurrentClickedObjectLeft;
-                case ERayOrigin.RIGHT_HAND:
-                    return VRClickerVariablesContainer.CurrentClickedObjectRight;
-                case ERayOrigin.CAMERA:
-                    return VRClickerVariablesContainer.CurrentClickedObjectGaze;
-                default:
-                    throw new System.Exception();
-            }
         }
     }
 }
