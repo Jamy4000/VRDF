@@ -8,6 +8,14 @@ namespace VRSF.Core.Simulator
     /// </summary>
     public class SimulatorRotator : ComponentSystem
     {
+        private Transform _vrCamera;
+
+        protected override void OnCreate()
+        {
+            base.OnCreate();
+            OnSetupVRReady.Listeners += AssignToRotate;
+        }
+
         protected override void OnUpdate()
         {
             CheckCursorState();
@@ -17,19 +25,24 @@ namespace VRSF.Core.Simulator
             {
                 if (rotation != Vector3.zero)
                 {
-                    var toRotate = VRSF_Components.CameraRig.transform;
                     rotation *= rotationComp.RotationSpeed;
 
                     var newRotation = new Vector3
                     {
-                        x = toRotate.eulerAngles.x + rotation.x,
-                        y = toRotate.eulerAngles.y + rotation.y,
+                        x = _vrCamera.eulerAngles.x + rotation.x,
+                        y = _vrCamera.eulerAngles.y + rotation.y,
                         z = 0.0f
                     };
 
-                    toRotate.eulerAngles = newRotation;
+                    _vrCamera.rotation = Quaternion.Euler(newRotation);
                 }
             });
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            OnSetupVRReady.Listeners -= AssignToRotate;
         }
 
         private Vector3 GetInputRotationDirection()
@@ -67,6 +80,11 @@ namespace VRSF.Core.Simulator
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
+        }
+
+        private void AssignToRotate(OnSetupVRReady _)
+        {
+            _vrCamera = VRSF_Components.VRCamera.transform;
         }
     }
 }
