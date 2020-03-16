@@ -64,8 +64,13 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            onValueChanged.RemoveListener(_onValueChangedAction);
-            OnVRClickerStartClicking.Listeners -= CheckClickedObject;
+            if (Application.isPlaying)
+            {
+                if (_onValueChangedAction != null)
+                    onValueChanged.RemoveListener(_onValueChangedAction);
+
+                OnVRClickerStartClicking.Listeners -= CheckClickedObject;
+            }
         }
         #endregion MONOBEHAVIOUR_METHODS
 
@@ -141,7 +146,8 @@ namespace VRSF.UI
 
         private void SetupDropDown(Core.Raycast.OnVRRaycasterIsSetup _)
         {
-            Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupDropDown;
+            if (Core.Raycast.OnVRRaycasterIsSetup.IsMethodAlreadyRegistered(SetupDropDown))
+                Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupDropDown;
 
             _onValueChangedAction = delegate { SetDropDownNewState(); };
             onValueChanged.AddListener(_onValueChangedAction);

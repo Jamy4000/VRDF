@@ -25,8 +25,6 @@ namespace VRSF.UI
 
         [Tooltip("Event raised when you stop hovering the button with your gaze or one of the controller's laser.")]
         [SerializeField] public UnityEngine.Events.UnityEvent OnStopHovering = new UnityEngine.Events.UnityEvent();
-
-        private bool _isSelected;
         #endregion VARIABLES
 
 
@@ -123,7 +121,8 @@ namespace VRSF.UI
 
         private void SetupToggle(OnVRRaycasterIsSetup _)
         {
-            OnVRRaycasterIsSetup.Listeners -= SetupToggle;
+            if (OnVRRaycasterIsSetup.IsMethodAlreadyRegistered(SetupToggle))
+                OnVRRaycasterIsSetup.Listeners -= SetupToggle;
 
             if (LaserClickable)
             {
