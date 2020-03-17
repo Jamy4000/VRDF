@@ -15,6 +15,7 @@ namespace VRSF.UI.Editor
         private SerializedProperty _setColliderAuto;
         private SerializedProperty _clickableWithRaycast;
         private SerializedProperty _clickableUsingControllers;
+        private SerializedProperty _checkForVRRaycaster;
         private SerializedProperty _onHoverEvent;
         private SerializedProperty _onStopHoverEvent;
 
@@ -30,6 +31,7 @@ namespace VRSF.UI.Editor
             _setColliderAuto = serializedObject.FindProperty("SetColliderAuto");
             _clickableWithRaycast = serializedObject.FindProperty("LaserClickable");
             _clickableUsingControllers = serializedObject.FindProperty("ControllerClickable");
+            _checkForVRRaycaster = serializedObject.FindProperty("_checkForVRRaycaster");
             _onHoverEvent = serializedObject.FindProperty("OnHover");
             _onStopHoverEvent = serializedObject.FindProperty("OnStopHovering");
         }
@@ -81,6 +83,12 @@ namespace VRSF.UI.Editor
             Undo.RecordObject(_toggle, "MeshClickable");
             EditorGUILayout.LabelField("Clickable using Controllers' meshes", EditorStyles.miniBoldLabel);
             EditorGUILayout.PropertyField(_clickableUsingControllers);
+            CheckEndChanges();
+
+            EditorGUI.BeginChangeCheck();
+            Undo.RecordObject(_toggle, "CheckForVRRaycaster");
+            EditorGUILayout.LabelField("Check for VR Raycaster on Awake", EditorStyles.miniBoldLabel);
+            EditorGUILayout.PropertyField(_checkForVRRaycaster);
             CheckEndChanges();
 
             EditorGUILayout.Space();

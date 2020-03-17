@@ -18,7 +18,7 @@ namespace VRSF.Core.Raycast
             Entities.ForEach((Entity e, ref VRRaycastParameters parameters, ref VRRaycastOutputs raycastOutputs, ref VRRaycastOrigin origin) =>
             {
                 var rayHitSomething = Physics.Raycast(raycastOutputs.RayVar, out raycastOutputs.RaycastHitVar.Value, parameters.MaxRaycastDistance, ~parameters.ExcludedLayer);
-                raycastOutputs.RaycastHitVar.SetIsNull(!rayHitSomething || raycastOutputs.RaycastHitVar.Value.collider == null);
+                raycastOutputs.RaycastHitVar.IsNull = !rayHitSomething || raycastOutputs.RaycastHitVar.Value.collider == null;
 
                 Vector3 hitPoint = raycastOutputs.RaycastHitVar.IsNull ? Vector3.zero : raycastOutputs.RaycastHitVar.Value.point;
                 GameObject hitObject = raycastOutputs.RaycastHitVar.IsNull ? null : raycastOutputs.RaycastHitVar.Value.collider.gameObject;

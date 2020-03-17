@@ -13,11 +13,6 @@ namespace VRSF.Core.Raycast
             IsNull = isNullOnStart;
         }
 
-        public void SetIsNull(bool value)
-        {
-            IsNull = value;
-        }
-
         public bool RaycastHitIsOnUI()
         {
             return Value.collider != null && Value.collider.gameObject.layer == LayerMask.NameToLayer("UI");

@@ -25,6 +25,9 @@ namespace VRSF.UI
 
         [Tooltip("Event raised when you stop hovering the button with your gaze or one of the controller's laser.")]
         [SerializeField] public UnityEngine.Events.UnityEvent OnStopHovering = new UnityEngine.Events.UnityEvent();
+
+        [Tooltip("Only change this value if you know what you're doing.")]
+        [SerializeField] private bool _checkForVRRaycaster = true;
         #endregion VARIABLES
 
 
@@ -34,13 +37,12 @@ namespace VRSF.UI
             base.Awake();
             if (Application.isPlaying)
             {
-                if (!VRRaycastAuthoring.SceneContainsRaycaster())
+                if (_checkForVRRaycaster && !VRRaycastAuthoring.SceneContainsRaycaster())
                     OnVRRaycasterIsSetup.Listeners += SetupToggle;
                 else
                     SetupToggle(null);
-            }     
+            }
         }
-
         protected override void Start()
         {
             base.Start();

@@ -31,7 +31,7 @@ namespace VRSF.Core.Raycast
                 new OnStopHoveringObject(origin, currentHoveredObject);
             }
             //If something is hit
-            else if (!hitVar.IsNull)
+            else if (!hitVar.IsNull && hitVar.Value.collider != null)
             {
                 var objectHit = hitVar.Value.collider.gameObject;
 

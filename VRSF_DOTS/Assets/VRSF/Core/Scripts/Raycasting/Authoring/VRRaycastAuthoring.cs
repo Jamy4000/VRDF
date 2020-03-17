@@ -27,7 +27,9 @@ namespace VRSF.Core.Raycast
 
         [Header("Other Parameters")]
         [Tooltip("Should we destroy this entity when the active scene is changed ?")]
-        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true; 
+        [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
+
+        [HideInInspector] public bool CheckForVRRaycaster = true;
 
         private void Awake()
         {
