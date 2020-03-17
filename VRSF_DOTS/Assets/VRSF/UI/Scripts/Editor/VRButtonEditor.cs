@@ -145,6 +145,8 @@ namespace VRSF.UI.Editor
             // Register the creation in the undo system
             Undo.RegisterCreatedObjectUndo(newButton, "Create " + newButton.name);
             Selection.activeObject = newButton;
+
+            Core.Raycast.VRRaycastAuthoring.CheckSceneContainsRaycaster();
         }
         #endregion
     }

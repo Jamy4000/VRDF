@@ -33,12 +33,7 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-            {
-                if (!VRRaycastAuthoring.SceneContainsRaycaster())
-                    OnVRRaycasterIsSetup.Listeners += ScrollbarSetup;
-                else
-                    ScrollbarSetup(null);
-            }
+                ScrollbarSetup();
         }
 
         protected override void Start()
@@ -65,6 +60,14 @@ namespace VRSF.UI
             if (Application.isPlaying && _rayHoldingHandle != ERayOrigin.NONE)
                 value = _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.GetCurrentHitPosition(_rayHoldingHandle));
         }
+
+#if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            VRRaycastAuthoring.CheckSceneContainsRaycaster();
+        }
+#endif
         #endregion
 
 
@@ -103,11 +106,8 @@ namespace VRSF.UI
             VRUISetupHelper.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
-        private void ScrollbarSetup(OnVRRaycasterIsSetup _)
+        private void ScrollbarSetup()
         {
-            if (OnVRRaycasterIsSetup.IsCallbackRegistered(ScrollbarSetup))
-                OnVRRaycasterIsSetup.Listeners -= ScrollbarSetup;
-
             GetHandleRectReference();
 
             OnSetupVRReady.RegisterSetupVRCallback(CheckDevice);

@@ -100,17 +100,11 @@ namespace VRSF.Core.Raycast
         public ERayOrigin RayOrigin { get => _rayOrigin; }
 
 
-        public static bool SceneContainsRaycaster()
+        public static void CheckSceneContainsRaycaster()
         {
-            if (GameObject.FindObjectsOfType<Core.Raycast.VRRaycastAuthoring>().Length > 0)
-            {
-                return true;
-            }
-            else
-            {
-                Debug.Log("<Color=red><b>[VRSF]:</b> You need at least one VRRaycastAuthoring in your scene to initialize and use the VR UI Package. Waiting until a VRRaycastAuthoring is placed in scene for Setup.</Color>");
-                return false;
-            }
+            if (GameObject.FindObjectsOfType<Core.Raycast.VRRaycastAuthoring>().Length == 0)
+                Debug.LogError("<Color=red><b>[VRSF]:</b> You need at least one VRRaycastAuthoring in your scene to initialize and use the VR UI Package.\n" +
+                    "To do so, Right Click in Hierarchy > VRSF > Raycaster, Laser Pointer and VR Clicker.</Color>");
         }
     }
 }

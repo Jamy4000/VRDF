@@ -112,6 +112,8 @@ namespace VRSF.UI.Editor
             // Register the creation in the undo system
             Undo.RegisterCreatedObjectUndo(newScrollRect, "Create " + newScrollRect.name);
             Selection.activeObject = newScrollRect;
+
+            Core.Raycast.VRRaycastAuthoring.CheckSceneContainsRaycaster();
         }
         #endregion PRIVATE_METHODS
     }

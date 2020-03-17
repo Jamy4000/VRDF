@@ -37,14 +37,7 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-            {
-                _scrollableSetup = new VRUIScrollableSetup(Direction);
-
-                if (!VRRaycastAuthoring.SceneContainsRaycaster())
-                    OnVRRaycasterIsSetup.Listeners += SetupVRScrollRect;
-                else
-                    SetupVRScrollRect(null);
-            }
+                SetupVRScrollRect();
         }
 
         protected override void Start()
@@ -86,6 +79,14 @@ namespace VRSF.UI
                 return _scrollableSetup.SetComponentNewValue(_minPosBar.position, _maxPosBar.position, InteractionVariableContainer.GetCurrentHitPosition(_rayHoldingHandle));
             }
         }
+
+#if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            VRRaycastAuthoring.CheckSceneContainsRaycaster();
+        }
+#endif
         #endregion
 
 
@@ -150,10 +151,9 @@ namespace VRSF.UI
             }
         }
 
-        private void SetupVRScrollRect(OnVRRaycasterIsSetup _)
+        private void SetupVRScrollRect()
         {
-            if (OnVRRaycasterIsSetup.IsCallbackRegistered(SetupVRScrollRect))
-                OnVRRaycasterIsSetup.Listeners -= SetupVRScrollRect;
+            _scrollableSetup = new VRUIScrollableSetup(Direction);
 
             // We setup the references to the ScrollRect elements
             SetScrollRectReferences();

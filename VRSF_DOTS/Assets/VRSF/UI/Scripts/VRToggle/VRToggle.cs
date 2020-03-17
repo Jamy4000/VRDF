@@ -36,12 +36,7 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-            {
-                if (_checkForVRRaycaster && !VRRaycastAuthoring.SceneContainsRaycaster())
-                    OnVRRaycasterIsSetup.Listeners += SetupToggle;
-                else
-                    SetupToggle(null);
-            }
+                SetupToggle();
         }
         protected override void Start()
         {
@@ -75,6 +70,14 @@ namespace VRSF.UI
                 UIHapticGenerator.CreateClickHapticSignal(other.name.ToLower().Contains("left") ? Core.Raycast.ERayOrigin.LEFT_HAND : Core.Raycast.ERayOrigin.RIGHT_HAND);
             }
         }
+
+#if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            VRRaycastAuthoring.CheckSceneContainsRaycaster();
+        }
+#endif
         #endregion MONOBEHAVIOUR_METHODS
 
 
@@ -123,11 +126,8 @@ namespace VRSF.UI
             VRUISetupHelper.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
-        private void SetupToggle(OnVRRaycasterIsSetup _)
+        private void SetupToggle()
         {
-            if (OnVRRaycasterIsSetup.IsCallbackRegistered(SetupToggle))
-                OnVRRaycasterIsSetup.Listeners -= SetupToggle;
-
             if (LaserClickable)
             {
                 OnStartHoveringObject.Listeners += CheckHoveredObject;

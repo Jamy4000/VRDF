@@ -33,12 +33,7 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-            {
-                if (!Core.Raycast.VRRaycastAuthoring.SceneContainsRaycaster())
-                    Core.Raycast.OnVRRaycasterIsSetup.Listeners += SetupDropDown;
-                else
-                    SetupDropDown(null);
-            }
+                SetupDropDown();
         }
 
         protected override void Start()
@@ -72,6 +67,14 @@ namespace VRSF.UI
                 OnVRClickerStartClicking.Listeners -= CheckClickedObject;
             }
         }
+
+#if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            Core.Raycast.VRRaycastAuthoring.CheckSceneContainsRaycaster();
+        }
+#endif
         #endregion MONOBEHAVIOUR_METHODS
 
 
@@ -144,11 +147,8 @@ namespace VRSF.UI
             _template.SetActive(false);
         }
 
-        private void SetupDropDown(Core.Raycast.OnVRRaycasterIsSetup _)
+        private void SetupDropDown()
         {
-            if (Core.Raycast.OnVRRaycasterIsSetup.IsCallbackRegistered(SetupDropDown))
-                Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupDropDown;
-
             _onValueChangedAction = delegate { SetDropDownNewState(); };
             onValueChanged.AddListener(_onValueChangedAction);
 

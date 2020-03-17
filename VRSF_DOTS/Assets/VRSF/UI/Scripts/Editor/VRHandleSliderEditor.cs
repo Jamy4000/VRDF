@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace VRSF.UI.Editor
@@ -105,8 +104,9 @@ namespace VRSF.UI.Editor
             // Register the creation in the undo system
             Undo.RegisterCreatedObjectUndo(newSlider, "Create " + newSlider.name);
             Selection.activeObject = newSlider;
+
+            Core.Raycast.VRRaycastAuthoring.CheckSceneContainsRaycaster();
         }
         #endregion
     }
 }
-#endif

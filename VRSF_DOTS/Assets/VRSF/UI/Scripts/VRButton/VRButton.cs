@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System;
 
 namespace VRSF.UI
 {
@@ -32,14 +31,8 @@ namespace VRSF.UI
         protected override void Awake()
         {
             base.Awake();
-
             if (Application.isPlaying)
-            {
-                if (!Core.Raycast.VRRaycastAuthoring.SceneContainsRaycaster())
-                    Core.Raycast.OnVRRaycasterIsSetup.Listeners += SetupVRButton;
-                else
-                    SetupVRButton(null);
-            }
+                SetupVRButton();
         }
 
         protected override void Start()
@@ -72,6 +65,14 @@ namespace VRSF.UI
                 UIHapticGenerator.CreateClickHapticSignal(other.name.ToLower().Contains("left") ? Core.Raycast.ERayOrigin.LEFT_HAND : Core.Raycast.ERayOrigin.RIGHT_HAND);
             }
         }
+
+#if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            Core.Raycast.VRRaycastAuthoring.CheckSceneContainsRaycaster();
+        }
+#endif
         #endregion MONOBEHAVIOUR_METHODS
 
 
@@ -121,11 +122,8 @@ namespace VRSF.UI
                 VRUISetupHelper.CheckBoxColliderSize(boxCollider, rectTrans);
         }
 
-        private void SetupVRButton(Core.Raycast.OnVRRaycasterIsSetup _)
+        private void SetupVRButton()
         {
-            if (Core.Raycast.OnVRRaycasterIsSetup.IsCallbackRegistered(SetupVRButton))
-                Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupVRButton;
-
             if (LaserClickable)
             {
                 OnStartHoveringObject.Listeners += CheckHoveredObject;
@@ -138,7 +136,7 @@ namespace VRSF.UI
                 boxCollider.isTrigger = true;
         }
 
-        private void CheckDevice(OnSetupVRReady info)
+        private void CheckDevice(OnSetupVRReady _)
         {
             if (OnSetupVRReady.IsCallbackRegistered(CheckDevice))
                 OnSetupVRReady.Listeners -= CheckDevice;

@@ -38,10 +38,7 @@ namespace VRSF.UI
                 if (ControllerClickable)
                     GetComponent<BoxCollider>().isTrigger = true;
 
-                if (!Core.Raycast.VRRaycastAuthoring.SceneContainsRaycaster())
-                    Core.Raycast.OnVRRaycasterIsSetup.Listeners += SetInputFieldReferences;
-                else
-                    SetInputFieldReferences(null);
+                SetInputFieldReferences();
             }
         }
 
@@ -71,6 +68,14 @@ namespace VRSF.UI
                 UIHapticGenerator.CreateClickHapticSignal(other.name.ToLower().Contains("left") ? Core.Raycast.ERayOrigin.LEFT_HAND : Core.Raycast.ERayOrigin.RIGHT_HAND);
             }
         }
+
+#if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            Core.Raycast.VRRaycastAuthoring.CheckSceneContainsRaycaster();
+        }
+#endif
         #endregion MONOBEHAVIOUR_METHODS
 
 
@@ -129,11 +134,8 @@ namespace VRSF.UI
         /// <summary>
         /// Set the input field reference for the textComponent and the placeHolder
         /// </summary>
-        private void SetInputFieldReferences(Core.Raycast.OnVRRaycasterIsSetup _)
+        private void SetInputFieldReferences()
         {
-            if (Core.Raycast.OnVRRaycasterIsSetup.IsCallbackRegistered(SetInputFieldReferences))
-                Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetInputFieldReferences;
-
             try
             {
                 if (textComponent == null)

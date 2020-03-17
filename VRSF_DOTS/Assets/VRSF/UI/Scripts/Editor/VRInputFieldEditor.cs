@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace VRSF.UI.Editor
@@ -140,6 +139,8 @@ namespace VRSF.UI.Editor
             // Register the creation in the undo system
             Undo.RegisterCreatedObjectUndo(newInputField, "Create " + newInputField.name);
             Selection.activeObject = newInputField;
+
+            Core.Raycast.VRRaycastAuthoring.CheckSceneContainsRaycaster();
         }
 
         /// <summary>
@@ -162,4 +163,3 @@ namespace VRSF.UI.Editor
         #endregion PRIVATE_METHODS
     }
 }
-#endif 

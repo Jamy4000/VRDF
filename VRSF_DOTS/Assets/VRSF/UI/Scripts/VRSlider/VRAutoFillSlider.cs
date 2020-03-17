@@ -92,12 +92,7 @@ namespace VRSF.UI
         {
             base.Awake();
             if (Application.isPlaying)
-            {
-                if (!VRRaycastAuthoring.SceneContainsRaycaster())
-                    OnVRRaycasterIsSetup.Listeners += SetupAutoFillSlider;
-                else
-                    SetupAutoFillSlider(null);
-            }
+                SetupAutoFillSlider();
         }
 
         protected override void Start()
@@ -158,7 +153,15 @@ namespace VRSF.UI
             if (_isFillingWithMesh && other.gameObject.tag.Contains("ControllerBody"))
                 HandleUp();
         }
-#endregion
+
+#if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            VRRaycastAuthoring.CheckSceneContainsRaycaster();
+        }
+#endif
+        #endregion
 
 
         #region PRIVATE_METHODS
@@ -316,11 +319,8 @@ namespace VRSF.UI
             VRUISetupHelper.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
-        private void SetupAutoFillSlider(OnVRRaycasterIsSetup _)
+        private void SetupAutoFillSlider()
         {
-            if (OnVRRaycasterIsSetup.IsCallbackRegistered(SetupAutoFillSlider))
-                OnVRRaycasterIsSetup.Listeners -= SetupAutoFillSlider;
-
             if (fillRect == null)
                 GetFillRectReference();
 
