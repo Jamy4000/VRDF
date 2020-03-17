@@ -13,17 +13,23 @@ namespace VRSF.Core.Simulator
             Vector3 translation = GetInputTranslationDirection();
             bool isUsingShiftBoost = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-            Entities.ForEach((ref SimulatorAcceleration acceleration, ref SimulatorMovements horizontalMovements) =>
+            Entities.ForEach((ref SimulatorAcceleration acceleration, ref SimulatorMovements movements) =>
             {
                 if (translation != Vector3.zero)
                 {
-                    translation *= isUsingShiftBoost ? horizontalMovements.WalkSpeed * horizontalMovements.ShiftBoost : horizontalMovements.WalkSpeed;
+                    translation *= isUsingShiftBoost ? movements.WalkSpeed * movements.ShiftBoost : movements.WalkSpeed;
 
                     if (acceleration.AccelerationTimer < acceleration.MaxAccelerationFactor)
                         acceleration.AccelerationTimer += Time.DeltaTime / acceleration.AccelerationSpeed;
 
                     translation *= acceleration.AccelerationTimer;
-                    VRSF_Components.CameraRig.transform.Translate(translation);
+
+                    var posBeforeMoving = VRSF_Components.CameraRig.transform.position;
+
+                    VRSF_Components.CameraRig.transform.position += VRSF_Components.VRCamera.transform.TransformDirection(translation);
+
+                    if (movements.IsGrounded)
+                        CheckForGround(posBeforeMoving);
                 }
                 else if (acceleration.AccelerationTimer > 0.0f)
                 {
@@ -51,6 +57,24 @@ namespace VRSF.Core.Simulator
                 direction.x += horizontal;
 
             return direction;
+        }
+
+        private void CheckForGround(Vector3 posBeforeMoving)
+        {
+            if (Physics.Raycast(new Ray(VRSF_Components.VRCamera.transform.position, Vector3.down), out RaycastHit hit, 100.0f))
+            {
+                var currentPos = VRSF_Components.CameraRig.transform.position;
+                VRSF_Components.CameraRig.transform.position = new Vector3
+                (
+                    currentPos.x,
+                    hit.point.y,
+                    currentPos.z
+                );
+            }
+            else
+            {
+                VRSF_Components.CameraRig.transform.position = posBeforeMoving;
+            }
         }
     }
 }

@@ -23,6 +23,8 @@ namespace VRSF.Core.Simulator
         private float _accelerationSpeed = 3.0f;
 
         [Header("Other Parameters")]
+        [Tooltip("Should the player always stay on the floor ? Use raycasting to check for collider under the Camera.")]
+        [SerializeField] private bool _isGrounded = true;
         [Tooltip("Should we destroy this entity when the active scene is changed ?")]
         [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
@@ -52,7 +54,8 @@ namespace VRSF.Core.Simulator
             entityManager.SetComponentData(entity, new SimulatorMovements
             {
                 WalkSpeed = _walkSpeed * 0.1f,
-                ShiftBoost = _shiftBoost
+                ShiftBoost = _shiftBoost,
+                IsGrounded = _isGrounded
             });
 
             entityManager.SetComponentData(entity, new SimulatorAcceleration
