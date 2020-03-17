@@ -52,12 +52,12 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnStartHoveringObject.IsMethodAlreadyRegistered(CheckHoveredObject))
+            if (OnStartHoveringObject.IsCallbackRegistered(CheckHoveredObject))
             {
                 OnStartHoveringObject.Listeners -= CheckHoveredObject;
                 OnStopHoveringObject.Listeners -= CheckUnhoveredObject;
 
-                if (OnVRClickerStartClicking.IsMethodAlreadyRegistered(CheckClickedObject))
+                if (OnVRClickerStartClicking.IsCallbackRegistered(CheckClickedObject))
                     OnVRClickerStartClicking.Listeners -= CheckClickedObject;
             }
         }
@@ -117,7 +117,7 @@ namespace VRSF.UI
             var boxCollider = GetComponent<BoxCollider>();
             var rectTrans = GetComponent<RectTransform>();
             if (boxCollider != null && rectTrans != null)
-                VRUIBoxColliderSetup.CheckBoxColliderSize(boxCollider, rectTrans);
+                VRUISetupHelper.CheckBoxColliderSize(boxCollider, rectTrans);
         }
 
         private void SetupVRButton(Core.Raycast.OnVRRaycasterIsSetup _)
@@ -129,20 +129,13 @@ namespace VRSF.UI
                 OnStartHoveringObject.Listeners += CheckHoveredObject;
                 OnStopHoveringObject.Listeners += CheckUnhoveredObject;
                 
-                if (ShouldRegisterForSimulator())
+                if (VRUISetupHelper.ShouldRegisterForSimulator(this))
                     OnVRClickerStartClicking.Listeners += CheckClickedObject;
             }
 
             var boxCollider = GetComponent<BoxCollider>();
             if (ControllerClickable && boxCollider != null)
                 boxCollider.isTrigger = true;
-
-
-            // Normal Button Click Callback is still called with the mouse when this VRButton isn't on a 2D UI with Image
-            bool ShouldRegisterForSimulator()
-            {
-                return VRSF_Components.DeviceLoaded == Core.SetupVR.EDevice.SIMULATOR && (targetGraphic == null || GetComponent<UnityEngine.UI.Image>() == null);
-            }
         }
         #endregion PRIVATE_METHODS
     }

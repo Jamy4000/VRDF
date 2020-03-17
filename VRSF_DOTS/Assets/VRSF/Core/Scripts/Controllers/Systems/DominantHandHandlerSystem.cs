@@ -23,7 +23,7 @@ namespace VRSF.Core.Controllers
             base.OnDestroy();
             OnSetupVRReady.Listeners -= Setup;
 
-            if (ChangeDominantHandEvent.IsMethodAlreadyRegistered(ChangeDominantHand))
+            if (ChangeDominantHandEvent.IsCallbackRegistered(ChangeDominantHand))
                 ChangeDominantHandEvent.Listeners -= ChangeDominantHand;
         }
 

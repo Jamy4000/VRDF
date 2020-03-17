@@ -20,7 +20,7 @@ namespace VRSF.UI
 
         private void OnEnable()
         {
-            _inputField.StartTyping(false);
+            _inputField.StartTyping();
         }
 
         private void OnDisable()

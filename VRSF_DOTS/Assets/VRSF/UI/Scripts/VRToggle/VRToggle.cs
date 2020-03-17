@@ -54,12 +54,14 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnStartHoveringObject.IsMethodAlreadyRegistered(CheckHoveredObject))
+            if (OnStartHoveringObject.IsCallbackRegistered(CheckHoveredObject))
             {
                 OnStartHoveringObject.Listeners -= CheckHoveredObject;
                 OnStopHoveringObject.Listeners -= CheckUnhoveredObject;
-                OnVRClickerStartClicking.Listeners -= CheckClickedObject;
             }
+
+            if (OnVRClickerStartClicking.IsCallbackRegistered(CheckClickedObject))
+                OnVRClickerStartClicking.Listeners -= CheckClickedObject;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -118,19 +120,21 @@ namespace VRSF.UI
         private IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+            VRUISetupHelper.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
         private void SetupToggle(OnVRRaycasterIsSetup _)
         {
-            if (OnVRRaycasterIsSetup.IsMethodAlreadyRegistered(SetupToggle))
+            if (OnVRRaycasterIsSetup.IsCallbackRegistered(SetupToggle))
                 OnVRRaycasterIsSetup.Listeners -= SetupToggle;
 
             if (LaserClickable)
             {
                 OnStartHoveringObject.Listeners += CheckHoveredObject;
                 OnStopHoveringObject.Listeners += CheckUnhoveredObject;
-                OnVRClickerStartClicking.Listeners += CheckClickedObject;
+
+                if (VRUISetupHelper.ShouldRegisterForSimulator(this))
+                    OnVRClickerStartClicking.Listeners += CheckClickedObject;
             }
 
             if (ControllerClickable)

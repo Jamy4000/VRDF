@@ -33,7 +33,7 @@ public class OnSetupVRReady : EventCallbacks.Event<OnSetupVRReady>
     /// <param name="listener">The listener to remove from OnSetupVRReady Listeners</param>
     public static void UnregisterSetupVRCallback(EventListener listener)
     {
-        if (IsMethodAlreadyRegistered(listener))
+        if (IsCallbackRegistered(listener))
             Listeners -= listener;
     }
 }

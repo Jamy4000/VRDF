@@ -104,7 +104,7 @@ namespace EventCallbacks
         /// </summary>
         /// <param name="listener">The method/delegate that you wanna check</param>
         /// <returns>true if the delegate is already registered</returns>
-        public static bool IsMethodAlreadyRegistered(EventListener listener)
+        public static bool IsCallbackRegistered(EventListener listener)
         {
             return _listenersDelegates.Contains(listener);
         }

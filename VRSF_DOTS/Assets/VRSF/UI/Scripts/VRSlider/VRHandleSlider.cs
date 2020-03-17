@@ -53,8 +53,11 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnVRClickerStartClicking.Listeners -= CheckClickedObject;
-            OnVRClickerStopClicking.Listeners -= CheckUnclickedObject;
+            if (OnVRClickerStartClicking.IsCallbackRegistered(CheckClickedObject))
+            {
+                OnVRClickerStartClicking.Listeners -= CheckClickedObject;
+                OnVRClickerStopClicking.Listeners -= CheckUnclickedObject;
+            }
         }
 
         protected override void Update()
@@ -98,15 +101,18 @@ namespace VRSF.UI
         private IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+            VRUISetupHelper.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
         private void SliderSetup(OnVRRaycasterIsSetup _)
         {
             OnVRRaycasterIsSetup.Listeners -= SliderSetup;
 
-            OnVRClickerStartClicking.Listeners += CheckClickedObject;
-            OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
+            if (VRUISetupHelper.ShouldRegisterForSimulator(this))
+            {
+                OnVRClickerStartClicking.Listeners += CheckClickedObject;
+                OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
+            }
 
             CheckSliderReferences();
 

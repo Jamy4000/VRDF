@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VRSF.Core.Controllers;
-using VRSF.Core.SetupVR;
 
 namespace VRSF.UI
 {
@@ -24,9 +22,8 @@ namespace VRSF.UI
 
         [Tooltip("If this button can be click using the meshcollider of your controller.")]
         [SerializeField] public bool ControllerClickable = true;
-
-        private TMPro.TMP_Text _placeHolderText;
         #endregion VARIABLES
+
 
         #region MONOBEHAVIOUR_METHODS
         protected override void Awake()
@@ -35,7 +32,7 @@ namespace VRSF.UI
 
             if (Application.isPlaying)
             {
-                if (LaserClickable)
+                if (LaserClickable && VRUISetupHelper.ShouldRegisterForSimulator(this))
                     OnVRClickerStartClicking.Listeners += CheckClickedObject;
 
                 if (ControllerClickable)
@@ -59,7 +56,7 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (OnVRClickerStartClicking.IsMethodAlreadyRegistered(CheckClickedObject))
+            if (OnVRClickerStartClicking.IsCallbackRegistered(CheckClickedObject))
                 OnVRClickerStartClicking.Listeners -= CheckClickedObject;
         }
 
@@ -95,11 +92,8 @@ namespace VRSF.UI
             }
         }
 
-        public void StartTyping(bool deletePlaceHoldText = true)
+        public void StartTyping()
         {
-            if (deletePlaceHoldText)
-                _placeHolderText.text = "";
-
             ActivateInputField();
             CheckForVRKeyboard();
             m_CaretVisible = true;
@@ -108,7 +102,7 @@ namespace VRSF.UI
         /// <summary>
         /// Check if a VRKeyboard is used and present in the scene
         /// </summary>
-        void CheckForVRKeyboard()
+        private void CheckForVRKeyboard()
         {
             if (UseVRKeyboard)
             {
@@ -137,7 +131,8 @@ namespace VRSF.UI
         /// </summary>
         private void SetInputFieldReferences(Core.Raycast.OnVRRaycasterIsSetup _)
         {
-            Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetInputFieldReferences;
+            if (Core.Raycast.OnVRRaycasterIsSetup.IsCallbackRegistered(SetInputFieldReferences))
+                Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetInputFieldReferences;
 
             try
             {
@@ -145,8 +140,6 @@ namespace VRSF.UI
                     textComponent = transform.Find("Text").GetComponent<TMPro.TMP_Text>();
                 if (placeholder == null)
                     placeholder = transform.Find("Placeholder").GetComponent<TMPro.TMP_Text>();
-
-                _placeHolderText = (TMPro.TMP_Text)placeholder;
             }
             catch
             {
@@ -162,7 +155,7 @@ namespace VRSF.UI
         IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+            VRUISetupHelper.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
         #endregion PRIVATE_METHODS
     }

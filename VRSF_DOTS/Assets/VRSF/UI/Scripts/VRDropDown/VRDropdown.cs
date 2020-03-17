@@ -108,7 +108,7 @@ namespace VRSF.UI
         IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+            VRUISetupHelper.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
         /// <summary>
@@ -146,13 +146,14 @@ namespace VRSF.UI
 
         private void SetupDropDown(Core.Raycast.OnVRRaycasterIsSetup _)
         {
-            if (Core.Raycast.OnVRRaycasterIsSetup.IsMethodAlreadyRegistered(SetupDropDown))
+            if (Core.Raycast.OnVRRaycasterIsSetup.IsCallbackRegistered(SetupDropDown))
                 Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupDropDown;
 
             _onValueChangedAction = delegate { SetDropDownNewState(); };
             onValueChanged.AddListener(_onValueChangedAction);
 
-            OnVRClickerStartClicking.Listeners += CheckClickedObject;
+            if (VRUISetupHelper.ShouldRegisterForSimulator(this))
+                OnVRClickerStartClicking.Listeners += CheckClickedObject;
 
             // We setup the Template and Options to fit the VRFramework
             _template = transform.Find("Template").gameObject;

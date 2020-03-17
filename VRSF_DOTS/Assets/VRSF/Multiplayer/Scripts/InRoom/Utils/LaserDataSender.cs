@@ -55,7 +55,7 @@ namespace VRSF.Multiplayer
 
         private void OnDestroy()
         {
-            if (OnLaserWidthChanged.IsMethodAlreadyRegistered(UpdateLineRenderWidth))
+            if (OnLaserWidthChanged.IsCallbackRegistered(UpdateLineRenderWidth))
             {
                 OnLaserWidthChanged.Listeners -= UpdateLineRenderWidth;
                 OnLaserLengthChanged.Listeners -= UpdateLineRenderLength;

@@ -100,7 +100,7 @@ namespace VRSF.UI.Editor
         static void InstantiateVRScrollRect(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newScrollRect = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollview"));
+            GameObject newScrollRect = (GameObject)PrefabUtility.InstantiatePrefab(Core.Utils.VRSFPrefabReferencer.GetPrefab("VRScrollView"));
 
             RectTransform rt = newScrollRect.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(rt.rect.x, rt.rect.y, 0);

@@ -28,6 +28,11 @@ namespace VRSF.UI
         {
             if (!InputField) return;
 
+            if (InputField.placeholder is TMPro.TMP_Text placeHolderTextMesh)
+                placeHolderTextMesh.text = string.Empty;
+            else if (InputField.placeholder is UnityEngine.UI.Text placeHolderText)
+                placeHolderText.text = string.Empty;
+
             switch (character.ToLower())
             {
                 case "backspace":

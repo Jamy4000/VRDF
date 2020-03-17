@@ -52,8 +52,11 @@ namespace VRSF.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            OnVRClickerStartClicking.Listeners -= CheckClickedObject;
-            OnVRClickerStopClicking.Listeners -= CheckUnclickedObject;
+            if (OnVRClickerStartClicking.IsCallbackRegistered(CheckClickedObject))
+            {
+                OnVRClickerStartClicking.Listeners -= CheckClickedObject;
+                OnVRClickerStopClicking.Listeners -= CheckUnclickedObject;
+            }
         }
 
         protected override void Update()
@@ -97,7 +100,7 @@ namespace VRSF.UI
         private IEnumerator<WaitForEndOfFrame> SetupBoxCollider()
         {
             yield return new WaitForEndOfFrame();
-            VRUIBoxColliderSetup.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
+            VRUISetupHelper.CheckBoxColliderSize(GetComponent<BoxCollider>(), GetComponent<RectTransform>());
         }
 
         private void ScrollbarSetup(OnVRRaycasterIsSetup _)
@@ -106,8 +109,11 @@ namespace VRSF.UI
 
             GetHandleRectReference();
 
-            OnVRClickerStartClicking.Listeners += CheckClickedObject;
-            OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
+            if (VRUISetupHelper.ShouldRegisterForSimulator(this))
+            {
+                OnVRClickerStartClicking.Listeners += CheckClickedObject;
+                OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
+            }
 
             _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.ScrollbarDirectionToUIDirection(direction));
             // Check if the Min and Max object are already created, and set there references

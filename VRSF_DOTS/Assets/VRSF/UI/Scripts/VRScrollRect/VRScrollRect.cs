@@ -129,7 +129,7 @@ namespace VRSF.UI
             if (SetColliderAuto)
             {
                 BoxCollider box = GetComponent<BoxCollider>();
-                box = VRUIBoxColliderSetup.CheckBoxColliderSize(box, GetComponent<RectTransform>());
+                box = VRUISetupHelper.CheckBoxColliderSize(box, GetComponent<RectTransform>());
                 box.center = Vector3.zero;
 
                 if (vertical)

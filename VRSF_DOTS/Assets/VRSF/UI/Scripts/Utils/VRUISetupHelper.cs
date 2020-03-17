@@ -3,9 +3,9 @@
 namespace VRSF.UI
 {
     /// <summary>
-    /// This class is called in every UI Elements to setup the gameEvents and there Listeners and add the response to them.
+    /// This class is called in every UI Elements to setup the box colliders or check event registration for Simulator
     /// </summary>
-	public static class VRUIBoxColliderSetup
+	public static class VRUISetupHelper
     {
         #region PUBLIC_METHODS
         /// <summary>
@@ -25,6 +25,16 @@ namespace VRSF.UI
             box.center = new Vector3(x, y, box.center.z);
 
             return box;
+        }
+
+        /// <summary>
+        /// Normal UI Element Callback is still called with the mouse when this VRButton isn't on a 2D UI with Image
+        /// </summary>
+        /// <param name="selectable">The selectable for which we check the registration of the events</param>
+        /// <returns>True if the Click callback should be registered</returns>
+        public static bool ShouldRegisterForSimulator(UnityEngine.UI.Selectable selectable)
+        {
+            return VRSF_Components.DeviceLoaded == Core.SetupVR.EDevice.SIMULATOR && (selectable.targetGraphic == null || selectable.GetComponent<UnityEngine.UI.Image>() == null);
         }
         #endregion
 
