@@ -132,13 +132,20 @@ namespace VRSF.UI
             {
                 OnStartHoveringObject.Listeners += CheckHoveredObject;
                 OnStopHoveringObject.Listeners += CheckUnhoveredObject;
-
-                if (VRUISetupHelper.ShouldRegisterForSimulator(this))
-                    OnVRClickerStartClicking.Listeners += CheckClickedObject;
+                OnSetupVRReady.RegisterSetupVRCallback(CheckDevice);
             }
 
             if (ControllerClickable)
                 GetComponent<BoxCollider>().isTrigger = true;
+        }
+
+        private void CheckDevice(OnSetupVRReady info)
+        {
+            if (OnSetupVRReady.IsCallbackRegistered(CheckDevice))
+                OnSetupVRReady.Listeners -= CheckDevice;
+
+            if (VRSF_Components.DeviceLoaded != Core.SetupVR.EDevice.SIMULATOR || VRUISetupHelper.ShouldRegisterForSimulator(this))
+                OnVRClickerStartClicking.Listeners += CheckClickedObject;
         }
         #endregion PRIVATE_METHODS
     }

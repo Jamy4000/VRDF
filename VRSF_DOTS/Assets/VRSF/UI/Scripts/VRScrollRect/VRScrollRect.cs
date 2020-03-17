@@ -152,7 +152,8 @@ namespace VRSF.UI
 
         private void SetupVRScrollRect(OnVRRaycasterIsSetup _)
         {
-            OnVRRaycasterIsSetup.Listeners -= SetupVRScrollRect;
+            if (OnVRRaycasterIsSetup.IsCallbackRegistered(SetupVRScrollRect))
+                OnVRRaycasterIsSetup.Listeners -= SetupVRScrollRect;
 
             // We setup the references to the ScrollRect elements
             SetScrollRectReferences();

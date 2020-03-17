@@ -152,13 +152,21 @@ namespace VRSF.UI
             _onValueChangedAction = delegate { SetDropDownNewState(); };
             onValueChanged.AddListener(_onValueChangedAction);
 
-            if (VRUISetupHelper.ShouldRegisterForSimulator(this))
-                OnVRClickerStartClicking.Listeners += CheckClickedObject;
+            OnSetupVRReady.RegisterSetupVRCallback(CheckDevice);
 
             // We setup the Template and Options to fit the VRFramework
             _template = transform.Find("Template").gameObject;
             SetToggleReferences();
             ChangeTemplate();
+        }
+
+        private void CheckDevice(OnSetupVRReady info)
+        {
+            if (OnSetupVRReady.IsCallbackRegistered(CheckDevice))
+                OnSetupVRReady.Listeners -= CheckDevice;
+
+            if (VRSF_Components.DeviceLoaded != Core.SetupVR.EDevice.SIMULATOR || VRUISetupHelper.ShouldRegisterForSimulator(this))
+                OnVRClickerStartClicking.Listeners += CheckClickedObject;
         }
         #endregion PRIVATE_METHODS
     }

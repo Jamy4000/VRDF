@@ -34,7 +34,7 @@ namespace VRSF.UI
         /// <returns>True if the Click callback should be registered</returns>
         public static bool ShouldRegisterForSimulator(UnityEngine.UI.Selectable selectable)
         {
-            return VRSF_Components.DeviceLoaded == Core.SetupVR.EDevice.SIMULATOR && (selectable.targetGraphic == null || selectable.GetComponent<UnityEngine.UI.Image>() == null);
+            return selectable.targetGraphic == null || selectable.GetComponent<UnityEngine.UI.Image>() == null;
         }
         #endregion
 

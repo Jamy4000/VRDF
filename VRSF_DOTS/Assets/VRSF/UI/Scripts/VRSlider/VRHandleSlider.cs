@@ -106,18 +106,27 @@ namespace VRSF.UI
 
         private void SliderSetup(OnVRRaycasterIsSetup _)
         {
-            OnVRRaycasterIsSetup.Listeners -= SliderSetup;
+            if (OnVRRaycasterIsSetup.IsCallbackRegistered(SliderSetup))
+                OnVRRaycasterIsSetup.Listeners -= SliderSetup;
 
-            if (VRUISetupHelper.ShouldRegisterForSimulator(this))
-            {
-                OnVRClickerStartClicking.Listeners += CheckClickedObject;
-                OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
-            }
+            OnSetupVRReady.RegisterSetupVRCallback(CheckDevice);
 
             CheckSliderReferences();
 
             _scrollableSetup = new VRUIScrollableSetup(UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), minValue, maxValue, wholeNumbers);
             _scrollableSetup.CheckMinMaxGameObjects(handleRect.parent, UnityUIToVRSFUI.SliderDirectionToUIDirection(direction), ref _minPosBar, ref _maxPosBar);
+        }
+
+        private void CheckDevice(OnSetupVRReady info)
+        {
+            if (OnSetupVRReady.IsCallbackRegistered(CheckDevice))
+                OnSetupVRReady.Listeners -= CheckDevice;
+
+            if (VRSF_Components.DeviceLoaded != Core.SetupVR.EDevice.SIMULATOR || VRUISetupHelper.ShouldRegisterForSimulator(this))
+            {
+                OnVRClickerStartClicking.Listeners += CheckClickedObject;
+                OnVRClickerStopClicking.Listeners += CheckUnclickedObject;
+            }
         }
 
         private void CheckSliderReferences()

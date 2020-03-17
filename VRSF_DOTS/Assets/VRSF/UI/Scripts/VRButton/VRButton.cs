@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace VRSF.UI
 {
@@ -122,20 +123,28 @@ namespace VRSF.UI
 
         private void SetupVRButton(Core.Raycast.OnVRRaycasterIsSetup _)
         {
-            Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupVRButton;
+            if (Core.Raycast.OnVRRaycasterIsSetup.IsCallbackRegistered(SetupVRButton))
+                Core.Raycast.OnVRRaycasterIsSetup.Listeners -= SetupVRButton;
 
             if (LaserClickable)
             {
                 OnStartHoveringObject.Listeners += CheckHoveredObject;
                 OnStopHoveringObject.Listeners += CheckUnhoveredObject;
-                
-                if (VRUISetupHelper.ShouldRegisterForSimulator(this))
-                    OnVRClickerStartClicking.Listeners += CheckClickedObject;
+                OnSetupVRReady.RegisterSetupVRCallback(CheckDevice);
             }
 
             var boxCollider = GetComponent<BoxCollider>();
             if (ControllerClickable && boxCollider != null)
                 boxCollider.isTrigger = true;
+        }
+
+        private void CheckDevice(OnSetupVRReady info)
+        {
+            if (OnSetupVRReady.IsCallbackRegistered(CheckDevice))
+                OnSetupVRReady.Listeners -= CheckDevice;
+
+            if (VRSF_Components.DeviceLoaded != Core.SetupVR.EDevice.SIMULATOR || VRUISetupHelper.ShouldRegisterForSimulator(this))
+                OnVRClickerStartClicking.Listeners += CheckClickedObject;
         }
         #endregion PRIVATE_METHODS
     }
