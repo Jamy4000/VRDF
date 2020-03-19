@@ -3,17 +3,17 @@
 namespace VRDF.Multiplayer
 {
     /// <summary>
-    /// Event raised when we want to connect to a room
+    ///  Event raised when we want to create or join a room
     /// </summary>
     public class OnConnectionToRoomRequested : EventCallbacks.Event<OnConnectionToRoomRequested>
     {
         /// <summary>
-        /// The name of the room we wanna join
+        /// The name of the room we want to create / join
         /// </summary>
         public readonly string RoomName;
 
         /// <summary>
-        /// Contains th eparameters for the room we want to join
+        /// Contains the parameters for the room we want to create. Let it at null if you want to join a room
         /// </summary>
         public readonly RoomOptions Options;
 
@@ -24,18 +24,16 @@ namespace VRDF.Multiplayer
         public readonly bool NeedCreation;
 
         /// <summary>
-        /// Event raised when we want to connect to a room
+        /// Event raised when we want to create or join a room
         /// </summary>
-        /// <param name="roomName">The name of the room we wanna join</param>
-        /// <param name="needCreation">Contains th eparameters for the room we want to join</param>
-        /// <param name="roomOptions">Is the user joining a room or do we need to create it ?</param>
-        public OnConnectionToRoomRequested(string roomName, bool needCreation = true, RoomOptions roomOptions = null) : base("Event raised when we want to connect to a room")
+        /// <param name="roomName">The name of the room we wanna create / join</param>
+        /// <param name="roomOptions">Contains the parameters for the room we want to create. Let it at null if you want to join a room</param>
+        /// <param name="roomNeedCreation">Contains the parameters for the room we want to create. Let it at null if you want to join a room</param>
+        public OnConnectionToRoomRequested(string roomName, RoomOptions roomOptions = null, bool roomNeedCreation = true) : base(" Event raised when we want to create or join a room")
         {
             RoomName = roomName;
-            NeedCreation = needCreation;
-            Options = roomOptions ?? new RoomOptions { MaxPlayers = (byte)5 };
-
-            VRDFPlayerUtilities.PlayersInstances = new System.Collections.Generic.List<VRDFPlayer>();
+            Options = roomOptions == null ? new RoomOptions { MaxPlayers = (byte)5 } : roomOptions;
+            NeedCreation = roomNeedCreation;
 
             FireEvent(this);
         }

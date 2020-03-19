@@ -24,7 +24,10 @@ namespace VRDF.Multiplayer
         {
             // in case we started this demo with the wrong scene being active, simply load the menu scene
             if (!PhotonNetwork.IsConnectedAndReady)
+            {
+                Debug.LogError("<Color=red><b>[VRDF] :</b> You're not connected to the Photon Network ! Sending back to Lobby.</Color>");
                 SceneManager.LoadScene(_lobbySceneName);
+            }
         }
 
         /// <summary>

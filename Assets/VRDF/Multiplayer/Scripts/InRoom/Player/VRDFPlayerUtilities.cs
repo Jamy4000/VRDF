@@ -3,15 +3,18 @@ using System.Collections.Generic;
 
 namespace VRDF.Multiplayer
 {
+    /// <summary>
+    /// A couple of static, utilities variable and Method to fetch the players in the scene
+    /// </summary>
     public static class VRDFPlayerUtilities
     {
         /// <summary>
-        /// Reference to the Local Absolute Player
+        /// Reference to the Local VRDF Player
         /// </summary>
         public static VRDFPlayer LocalVRDFPlayer;
 
         /// <summary>
-        /// The local player instance. Use this to know if the local player is represented in the Scene
+        /// The list of all VRDF Players. Like PhotonNetwork.PlayersList, but for VRDF.
         /// </summary>
         public static List<VRDFPlayer> PlayersInstances = new List<VRDFPlayer>();
 
