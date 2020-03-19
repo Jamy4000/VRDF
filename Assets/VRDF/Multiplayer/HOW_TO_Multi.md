@@ -1,7 +1,7 @@
 # VRDF Multiplayer Setup 
 
 **This is a Step-by-Step tutorial on how to create your own VR multiplayer game using VRDF and Photon Engine.**
-If you have any problem during the creation of your multiplayer app, do not hesitate to [send me an email](arnaudbriche1994@gmail.com) ! :)
+If you have any problem during the creation of your multiplayer app, do not hesitate to send me an email at arnaudbriche1994@gmail.com ! :)
 
 ## First part: Photon Setup 
 1. You're going to need a Photon Engine connection to be able to use the multiplayer's features. To do so, go to https://www.photonengine.com/, Create an account / Login, create a new app of type "Photon PUN" and insert the name you want.
