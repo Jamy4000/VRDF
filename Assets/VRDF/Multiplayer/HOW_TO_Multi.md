@@ -75,7 +75,9 @@ The lobby is where you check for the user connection with the Photon Service, wh
 
 1. _Create a new Scene:_ Don't forget to add it to your Build Settings' Scene List
 
-2. _Right click in the Hierarchy > VRDF > Multiplayer > Lobby > Connection Manager:_ This will create a new Connection Manager GameObject, which contains only one script: the [VRDFConnectionManager](https://github.com/Jamy4000/VRDF/blob/develop/Assets/VRDF/Multiplayer/Scripts/Lobby/VRDFConnectionManager.cs). This component handles the callbacks from Photon, and make sure that all parameters are present to establish a connection to a room. 
+2. _Right click in the Hierarchy > VRDF > Multiplayer > Lobby > Connection Manager:_ This will create a new Connection Manager GameObject, which contains only two scripts: 
+* **the [VRDFConnectionManager](https://github.com/Jamy4000/VRDF/blob/develop/Assets/VRDF/Multiplayer/Scripts/Lobby/VRDFConnectionManager.cs):** This component handles the callbacks from Photon, and make sure that all parameters are present to establish a connection to a room. 
+* **the [RoomListFetcher](https://github.com/Jamy4000/VRDF/blob/develop/Assets/VRDF/Multiplayer/Scripts/Lobby/RoomListFetcher.cs):** Check when the room list is updated by photon, and store a list of available room in a static Dictionary.
 
 3. _Setup the VRDFConnectionManager parameters:_ Just fill the MultiplayerSceneName parameter, as well as the maximum amount of player in a room.
 
