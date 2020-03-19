@@ -1,6 +1,6 @@
-# VRSF Multiplayer Setup 
+# VRDF Multiplayer Setup 
 
-**This is a Step-by-Step tutorial on how to create your own VR multiplayer game using VRSF and Photon Engine.**
+**This is a Step-by-Step tutorial on how to create your own VR multiplayer game using VRDF and Photon Engine.**
 If you have any problem during the creation of your multiplayer app, do not hesitate to [send me an email](arnaudbriche1994@gmail.com) ! :)
 
 ## First part: Photon Setup 
@@ -26,7 +26,7 @@ And that's it for Photon! You may need to redo the step 3 to 6 when you clone yo
 
 
 ## Second part: VRDF Setup
-1. [Follow the Basic Steps to setup VRSF in your project](https://github.com/Jamy4000/VRDF/wiki/Setup#basic-setup)
+1. [Follow the Basic Steps to setup VRDF in your project](https://github.com/Jamy4000/VRDF/wiki/Setup#basic-setup)
 
 2. Import the VRDF_Multiplayer_vX.x.unitypackage from the [Release Page](https://github.com/Jamy4000/VRDF/releases) into your project
 
@@ -92,7 +92,7 @@ public void CreateOrJoinRoom()
 
 This method will create a room with the name "Room name" if it doesn't exist yet, or join the room with this exact same name if it does exists. 
 
-**WARNING: This event is only listened to if the current user is connected to a Lobby, meaning that the OnJoinedLobby Callback from Photon was raised !**  If you do use the VRSF Multiplayer extension, a message in your console will be displayed once you've entered the Lobby
+**WARNING: This event is only listened to if the current user is connected to a Lobby, meaning that the OnJoinedLobby Callback from Photon was raised !**  If you do use the VRDF Multiplayer extension, a message in your console will be displayed once you've entered the Lobby
 
 5. _Call the above method:_ You've got the choice on this one: Create a "Connect" Button and link the OnClick response to the mehtod above, add it to the OnJoinedLobby callback from the MonoBehaviourPunCallbacks, ... Your call :).    
 
