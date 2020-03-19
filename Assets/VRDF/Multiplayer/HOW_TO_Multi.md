@@ -71,7 +71,7 @@ For more info, [check the doc !](https://github.com/Jamy4000/VRDF/wiki/VRDF-Mult
 
 
 ## Fourth and Last Part: Lobby Setup
-The lobby is where you check for the user connection with the Photon Service, where you create a new Room for your players to meet (warning: The room isn't the scene, a room is just an abstract place for the player to connect to. [Check the Photon Doc for more info !](https://doc-api.photonengine.com/en/pun/v1/class_room.html))
+The lobby is where you check for the user connection with the Photon Service, where you create a new Room for your players to meet (**WARING: A room does NOT correspond to a scene, a room is just an abstract place for the players to connect to, and where you can load whichever scenes you want. [Check the Photon Doc for more info !](https://doc-api.photonengine.com/en/pun/v1/class_room.html))**
 
 1. _Create a new Scene:_ Don't forget to add it to your Build Settings' Scene List
 
