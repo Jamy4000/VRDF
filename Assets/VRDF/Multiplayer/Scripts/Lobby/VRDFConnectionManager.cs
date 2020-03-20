@@ -40,7 +40,7 @@ namespace VRDF.Multiplayer
         public override void OnConnectedToMaster()
         {
             Debug.Log("<Color=Green><b>[VRDF] :</b> Connection with Master established ! Trying to join Lobby ...</Color>");
-            
+
             // When the user is connected to the server, we make him load a basic lobby so he can get the rooms info.
             PhotonNetwork.JoinLobby(new TypedLobby("BaseVRLobby", LobbyType.Default));
 
@@ -87,9 +87,6 @@ namespace VRDF.Multiplayer
         public override void OnJoinedRoom()
         {
             Debug.Log("<Color=Green><b>[VRDF] :</b> The room was successfully <b>JOINED</b>, loading the scene ...</Color>");
-            // If we don't automatically sync the scenes between users, we load it locally
-            if (!PhotonNetwork.AutomaticallySyncScene)
-                UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(MultiplayerSceneName);
         }
 
         /// <summary>
@@ -160,13 +157,7 @@ namespace VRDF.Multiplayer
             try
             {
                 Debug.LogFormat("<b>[VRDF] :</b> Trying to load the scene with name '{0}'", MultiplayerSceneName);
-
-                // If we automatically sync the scenes with the MasterClient, we call the PhotonNetworkLoadLevel Method. If not, we need to load the scene locally.
-                if (PhotonNetwork.AutomaticallySyncScene)
-                    PhotonNetwork.LoadLevel(MultiplayerSceneName);
-                else
-                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(MultiplayerSceneName);
-
+                PhotonNetwork.LoadLevel(MultiplayerSceneName);
                 return true;
             }
             catch

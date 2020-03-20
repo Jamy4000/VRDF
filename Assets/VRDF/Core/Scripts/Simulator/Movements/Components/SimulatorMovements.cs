@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+using UnityEngine;
 
 namespace VRDF.Core.Simulator
 {
@@ -21,5 +22,10 @@ namespace VRDF.Core.Simulator
         /// Should the player always stay on the floor ? Use raycasting to check for collider under the Camera.
         /// </summary>
         public bool IsGrounded;
+
+        /// <summary>
+        /// The layers we can check to ground the user
+        /// </summary>
+        public LayerMask GroundLayerMask;
     }
 }

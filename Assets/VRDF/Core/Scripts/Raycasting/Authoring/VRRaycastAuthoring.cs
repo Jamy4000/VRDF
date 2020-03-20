@@ -33,7 +33,15 @@ namespace VRDF.Core.Raycast
 
         private void Awake()
         {
-            OnSetupVRReady.RegisterSetupVRCallback(ConvertToEntity);
+            if (RayOrigin == ERayOrigin.NONE)
+                Debug.LogError("<Color=red><b>[VRDF] :</b> Provide a correct RayOrigin on your VRRaycastAuthoring. Not creating the Entity.</Color>", gameObject);
+            else
+                OnSetupVRReady.RegisterSetupVRCallback(ConvertToEntity);
+        }
+
+        private void OnDestroy()
+        {
+            OnSetupVRReady.UnregisterSetupVRCallback(ConvertToEntity);
         }
 
         /// <summary>

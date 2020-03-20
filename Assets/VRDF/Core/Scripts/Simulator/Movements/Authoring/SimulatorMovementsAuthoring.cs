@@ -25,6 +25,8 @@ namespace VRDF.Core.Simulator
         [Header("Other Parameters")]
         [Tooltip("Should the player always stay on the floor ? Use raycasting to check for collider under the Camera.")]
         [SerializeField] private bool _isGrounded = true;
+        [Tooltip("The layers we can check to ground the user")]
+        [SerializeField] private LayerMask _groundLayerMask;
         [Tooltip("Should we destroy this entity when the active scene is changed ?")]
         [SerializeField] private bool _destroyEntityOnSceneUnloaded = true;
 
@@ -55,7 +57,8 @@ namespace VRDF.Core.Simulator
             {
                 WalkSpeed = _walkSpeed * 0.1f,
                 ShiftBoost = _shiftBoost,
-                IsGrounded = _isGrounded
+                IsGrounded = _isGrounded,
+                GroundLayerMask = _groundLayerMask
             });
 
             entityManager.SetComponentData(entity, new SimulatorAcceleration

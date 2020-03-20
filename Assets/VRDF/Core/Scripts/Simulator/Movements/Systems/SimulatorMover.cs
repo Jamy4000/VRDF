@@ -6,7 +6,7 @@ namespace VRDF.Core.Simulator
     /// <summary>
     /// Calculate and move the Simulator in the scene
     /// </summary>
-    public class SimulatorHorizontalMover : ComponentSystem
+    public class SimulatorMover : ComponentSystem
     {
         protected override void OnUpdate()
         {
@@ -29,7 +29,7 @@ namespace VRDF.Core.Simulator
                     VRDF_Components.CameraRig.transform.position += VRDF_Components.VRCamera.transform.TransformDirection(translation);
 
                     if (movements.IsGrounded)
-                        CheckForGround(posBeforeMoving);
+                        CheckForGround(posBeforeMoving, movements.GroundLayerMask);
                 }
                 else if (acceleration.AccelerationTimer > 0.0f)
                 {
@@ -59,9 +59,9 @@ namespace VRDF.Core.Simulator
             return direction;
         }
 
-        private void CheckForGround(Vector3 posBeforeMoving)
+        private void CheckForGround(Vector3 posBeforeMoving, LayerMask layerMask)
         {
-            if (Physics.Raycast(new Ray(VRDF_Components.VRCamera.transform.position, Vector3.down), out RaycastHit hit, 100.0f))
+            if (Physics.Raycast(new Ray(VRDF_Components.VRCamera.transform.position, Vector3.down), out RaycastHit hit, 5.0f, layerMask))
             {
                 var currentPos = VRDF_Components.CameraRig.transform.position;
                 VRDF_Components.CameraRig.transform.position = new Vector3
