@@ -7,7 +7,7 @@ namespace VRDF.Multiplayer.Samples
     /// <summary>
     /// Simple sample script to create a room, and handle the "Create Room" button by checking the Photon network callbacks
     /// </summary>
-    public class ConnectToRoom : Photon.Pun.MonoBehaviourPunCallbacks
+    public class RoomCreator : Photon.Pun.MonoBehaviourPunCallbacks
     {
         [Header("Button used to create a room")]
         [SerializeField] private UnityEngine.UI.Button _createRoomButton;
@@ -35,7 +35,7 @@ namespace VRDF.Multiplayer.Samples
         public void SetRoomName(string newName)
         {
             _roomName = newName;
-            CheckConnectButton();
+            CheckCreateRoomButton();
         }
 
         /// <summary>
@@ -55,26 +55,26 @@ namespace VRDF.Multiplayer.Samples
             IEnumerator<WaitForEndOfFrame> WaitForOneFrame()
             {
                 yield return new WaitForEndOfFrame();
-                CheckConnectButton();
+                CheckCreateRoomButton();
             }
         }
 
         public override void OnJoinedLobby()
         {
             base.OnJoinedLobby();
-            CheckConnectButton();
+            CheckCreateRoomButton();
         }
 
         public override void OnDisconnected(DisconnectCause cause)
         {
             base.OnDisconnected(cause);
-            CheckConnectButton();
+            CheckCreateRoomButton();
         }
 
         /// <summary>
         /// Check if all requirement to create a room are reached, and set the interactibility of the connect button accordingly
         /// </summary>
-        private void CheckConnectButton()
+        private void CheckCreateRoomButton()
         {
             if (!string.IsNullOrEmpty(_roomName) && RoomListFetcher.AvailableRooms.ContainsKey(_roomName))
             {

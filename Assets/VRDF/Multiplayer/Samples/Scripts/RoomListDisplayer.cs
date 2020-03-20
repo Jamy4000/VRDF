@@ -18,7 +18,7 @@ namespace VRDF.Multiplayer.Samples
 
         /// <summary>
         /// Callback for when we receive an update on the list of available rooms
-        /// WARNING : This callback does not provide a list of all the available room, only the one that changed and have been updated
+        /// WARNING : This callback does NOT provide a list of all the available room, only the one that changed and have been updated
         /// </summary>
         /// <param name="roomList">The list of rooms and there info</param>
         public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -56,7 +56,7 @@ namespace VRDF.Multiplayer.Samples
             foreach (var room in RoomListFetcher.AvailableRooms)
             {
                 var newRoomButton = Instantiate(_roomButton, _scrollviewContent);
-                newRoomButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Room Name: " + room;
+                newRoomButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Room Name: " + room.Key;
                 newRoomButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => JoinRoom(room.Key));
             }
 

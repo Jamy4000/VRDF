@@ -280,7 +280,7 @@ PrefabInstance:
     - target: {fileID: 2279628518798762632, guid: f85b9bb0711ad4246b57ba7b71317dca,
         type: 3}
       propertyPath: m_Name
-      value: ConnectionManager
+      value: VRDFConnectionManager
       objectReference: {fileID: 0}
     - target: {fileID: 2279628518798762633, guid: f85b9bb0711ad4246b57ba7b71317dca,
         type: 3}
@@ -364,7 +364,7 @@ PrefabInstance:
     - target: {fileID: 5297190506495987287, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.020150494
+      value: -0.000008892268
       objectReference: {fileID: 0}
     - target: {fileID: 5297190506741931488, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
         type: 3}

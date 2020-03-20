@@ -33,33 +33,6 @@ namespace VRDF.Multiplayer
                 OnConnectionToRoomRequested.Listeners -= ConnectOrCreateRoom;
         }
 
-
-        /// <summary>
-        /// Callback for when the user want to connect to a room.
-        /// </summary>
-        protected virtual void ConnectOrCreateRoom(OnConnectionToRoomRequested info)
-        {
-            if (info.NeedCreation)
-            {
-                if (!RoomListFetcher.AvailableRooms.ContainsKey(info.RoomName))
-                {
-                    Debug.Log("<b>[VRDF] :</b> Creating Room with name: " + info.RoomName);
-                    // #Critical we need at this point to create a Room.
-                    PhotonNetwork.CreateRoom(info.RoomName, info.Options);
-                }
-                else
-                {
-                    Debug.LogFormat("<b>[VRDF] :</b> Room with name {0} already exist, can't create it. Joining instead.", info.RoomName);
-                    JoinRoom(info.RoomName);
-                }
-            }
-            else
-            {
-                JoinRoom(info.RoomName);
-            }
-        }
-
-
         #region PunCallbacks
         /// <summary>
         /// Callback for when the user could connect to the server.
@@ -153,6 +126,31 @@ namespace VRDF.Multiplayer
 
 
         #region Other_Methods
+        /// <summary>
+        /// Callback for when the user want to connect to a room.
+        /// </summary>
+        protected virtual void ConnectOrCreateRoom(OnConnectionToRoomRequested info)
+        {
+            if (info.NeedCreation)
+            {
+                if (!RoomListFetcher.AvailableRooms.ContainsKey(info.RoomName))
+                {
+                    Debug.Log("<b>[VRDF] :</b> Creating Room with name: " + info.RoomName);
+                    // #Critical we need at this point to create a Room.
+                    PhotonNetwork.CreateRoom(info.RoomName, info.Options);
+                }
+                else
+                {
+                    Debug.LogFormat("<b>[VRDF] :</b> Room with name {0} already exist, can't create it. Joining instead.", info.RoomName);
+                    JoinRoom(info.RoomName);
+                }
+            }
+            else
+            {
+                JoinRoom(info.RoomName);
+            }
+        }
+
         /// <summary>
         /// Try to load a scene based on its name
         /// </summary>
