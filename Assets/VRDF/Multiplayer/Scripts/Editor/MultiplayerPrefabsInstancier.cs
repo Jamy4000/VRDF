@@ -26,11 +26,11 @@ namespace VRDF.Multiplayer
         }
 
         /// <summary>
-        /// Add a new Lobby Connection Manager to the Scene
+        /// Add a new Connection Manager to the Scene
         /// </summary>
         /// <param name="menuCommand"></param>
-        [MenuItem("VRDF/Multiplayer/Lobby/Connection Manager", priority = 0)]
-        [MenuItem("GameObject/VRDF/Multiplayer/Lobby/Connection Manager", priority = 0)]
+        [MenuItem("VRDF/Multiplayer/Connection Scene/Connection Manager", priority = 0)]
+        [MenuItem("GameObject/VRDF/Multiplayer/Connection Scene/Connection Manager", priority = 0)]
         static void InstantiateConnectionManager(MenuCommand menuCommand)
         {
             // Create a custom game object

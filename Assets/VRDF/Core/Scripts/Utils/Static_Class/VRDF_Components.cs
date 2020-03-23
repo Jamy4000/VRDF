@@ -78,5 +78,13 @@ public static class VRDF_Components
         CameraRig.transform.Rotate(Vector3.up, angle);
         SetVRCameraPosition(basePos, true);
     }
+
+    public static void DebugVRDFMessage(string message, bool isErrorMessage = false, params object[] debugParams)
+    {
+        if (!isErrorMessage)
+            Debug.LogFormat("<b>[VRDF] :</b> " + message, debugParams);
+        else
+            Debug.LogErrorFormat("<Color=Red><b>[VRDF] :</b> " + message + "</Color>", debugParams);
+    }
     #endregion
 }

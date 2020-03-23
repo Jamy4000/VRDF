@@ -347,11 +347,6 @@ PrefabInstance:
       propertyPath: _multiplayerSceneIndex
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 2279628518798762634, guid: f85b9bb0711ad4246b57ba7b71317dca,
-        type: 3}
-      propertyPath: MultiplayerSceneName
-      value: MultiplayerScene
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f85b9bb0711ad4246b57ba7b71317dca, type: 3}
 --- !u!1001 &5297190507637338689
@@ -361,11 +356,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5297190506495987287, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.000008892268
-      objectReference: {fileID: 0}
     - target: {fileID: 5297190506741931488, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
         type: 3}
       propertyPath: m_Name
@@ -474,51 +464,6 @@ PrefabInstance:
     - target: {fileID: 5297190506741931492, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
         type: 3}
       propertyPath: m_Pivot.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507062554085, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507062554085, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507062554085, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507308775723, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_textInfo.characterCount
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507308775723, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_textInfo.spaceCount
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507308775723, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_textInfo.wordCount
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507745514414, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507745514414, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5297190507745514414, guid: 0869f21d1cde7db45bfef1e650d8dbc4,
-        type: 3}
-      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using Photon.Realtime;
 using Photon.Pun;
 
 namespace VRDF.Multiplayer
@@ -13,47 +12,59 @@ namespace VRDF.Multiplayer
     /// </summary>
     public class VRDFMultiplayerGameManager : MonoBehaviourPunCallbacks
     {
-        [Header("The name of the Lobby Scene")]
+        [Tooltip("The name of the Connection Scene")]
         [SerializeField]
-        private string _lobbySceneName = "BasicVRMultiLobby";
+        private string _connectionSceneName = "ConnectionScene";
+
+        [Tooltip("Whether we send back the user in the connection Scene when he leave the room (called as well when user is disconnected)")]
+        [SerializeField]
+        private bool _sendBackInConnectionSceneOnUserLeft = true;
+
+        public static VRDFMultiplayerGameManager Instance;
+
+        protected virtual void Awake()
+        {
+            if (Instance != null)
+            {
+                VRDF_Components.DebugVRDFMessage("Another instance of VRDFConnectionManager exist. Be sure to only have one VRDFConnectionManager in your Scene.", true);
+                Destroy(this);
+                return;
+            }
+
+            Instance = this;
+        }
 
         /// <summary>
         /// MonoBehaviour method called on GameObject by Unity during initialization phase.
         /// </summary>
-        void Start()
+        protected virtual void Start()
         {
             // in case we started this demo with the wrong scene being active, simply load the menu scene
             if (!PhotonNetwork.IsConnectedAndReady)
             {
-                Debug.LogError("<Color=red><b>[VRDF] :</b> You're not connected to the Photon Network ! Sending back to Lobby.</Color>");
-                SceneManager.LoadScene(_lobbySceneName);
+                VRDF_Components.DebugVRDFMessage("You're not connected to the Photon Network ! Sending back to Connection Scene.", true);
+                SceneManager.LoadScene(_connectionSceneName);
             }
         }
 
-        /// <summary>
-        /// Called when a Photon Player got connected. We need to then load a bigger scene.
-        /// </summary>
-        /// <param name="other">Other.</param>
-        public override void OnPlayerEnteredRoom(Player other)
+        protected virtual void OnDestro()
         {
-            Debug.Log("<b>[VRDF] :</b> OnPlayerEnteredRoom() " + other.NickName); // not seen if you're the player connecting
+            if (Instance == this)
+                Instance = null;
         }
 
         /// <summary>
-        /// Called when a Photon Player got disconnected. We need to load a smaller scene.
-        /// </summary>
-        /// <param name="other">Other.</param>
-        public override void OnPlayerLeftRoom(Player other)
-        {
-            Debug.Log("<b>[VRDF] :</b> OnPlayerLeftRoom() " + other.NickName); // seen when other disconnects
-        }
-
-        /// <summary>
-        /// Called when the local player left the room. We need to load the launcher scene.
+        /// Called when the local player leave the room, send him back to the connection scene
         /// </summary>
         public override void OnLeftRoom()
         {
-            SceneManager.LoadScene(_lobbySceneName);
+            if (_sendBackInConnectionSceneOnUserLeft)
+                GoBackToConnectionScene();
+        }
+
+        public void GoBackToConnectionScene()
+        {
+            SceneManager.LoadScene(_connectionSceneName);
         }
     }
 }

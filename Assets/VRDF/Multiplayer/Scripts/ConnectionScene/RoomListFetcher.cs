@@ -9,10 +9,24 @@ namespace VRDF.Multiplayer
     /// </summary>
     public class RoomListFetcher : MonoBehaviourPunCallbacks
     {
+        [UnityEngine.Tooltip("Should we join the Lobby as soon as we are connected to the Server ?\n" +
+            "If false, you will need to join the lobby yourself to fetch the online rooms.")]
+        [UnityEngine.SerializeField] private bool _joinLobbyOnConnected = true;
+
         /// <summary>
         /// Dictionary with all available rooms for this app, with the room name as kKey
         /// </summary>
-        public static Dictionary<string, RoomInfo> AvailableRooms = new Dictionary<string, RoomInfo>();
+        private static Dictionary<string, RoomInfo> _availableRooms = new Dictionary<string, RoomInfo>();
+
+        public override void OnConnectedToMaster()
+        {
+            base.OnConnectedToMaster();
+            if (_joinLobbyOnConnected)
+            {
+                // When the user is connected to the server, we make him join a basic lobby so he can get the list of rooms and their info.
+                PhotonNetwork.JoinLobby(new TypedLobby("VRDF Lobby", LobbyType.Default));
+            }
+        }
 
         /// <summary>
         /// Callback for when we receive an update on the list of available rooms
@@ -53,6 +67,19 @@ namespace VRDF.Multiplayer
                     AvailableRooms[room.Name] =  room;
                 }
             }
+        }
+
+        public static Dictionary<string, RoomInfo> AvailableRooms
+        {
+            get
+            {
+                if (!PhotonNetwork.InLobby)
+                    VRDF_Components.DebugVRDFMessage("You need to be in a Lobby to be able to access the room List ! Returning Empty Dictionary.", true);
+
+                return _availableRooms;
+            }
+
+            private set => _availableRooms = value;
         }
     }
 }

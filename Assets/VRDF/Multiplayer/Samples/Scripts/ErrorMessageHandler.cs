@@ -6,7 +6,7 @@ using UnityEngine;
 namespace VRDF.Multiplayer
 {
     /// <summary>
-    /// used to connect the user to the Lobby and display available rooms afterwards
+    /// 
     /// </summary>
     public class ErrorMessageHandler : MonoBehaviourPunCallbacks
     {
@@ -21,7 +21,6 @@ namespace VRDF.Multiplayer
         /// <param name="message">The error message returned by photon and describing the problem</param>
         public override void OnCreateRoomFailed(short returnCode, string message)
         {
-            Debug.LogErrorFormat("<Color=Red><b>[VRDF] :</b> The room couldn't be CREATED. Here's the return code :</Color>\n{0}.<Color=Red>\nAnd here's the message :</Color>\n{1}.", returnCode, message);
             _errorPanel.SetActive(true);
         }
 
@@ -32,13 +31,11 @@ namespace VRDF.Multiplayer
         /// <param name="message">The error message returned by photon and describing the problem</param>
         public override void OnJoinRoomFailed(short returnCode, string message)
         {
-            Debug.LogErrorFormat("<Color=Red><b>[VRDF] :</b> The room couldn't be JOINED. Here's the return code :\n{0}.\nAnd here's the message :\n{1}.</Color>", returnCode, message);
             _errorPanel.SetActive(true);
         }
 
         public override void OnLobbyStatisticsUpdate(List<TypedLobbyInfo> lobbyStatistics)
         {
-            Debug.LogFormat("<b>[VRDF]:</b> {0} players are currently online in your app.", PhotonNetwork.CountOfPlayers);
             _errorPanel.SetActive(true);
         }
     }

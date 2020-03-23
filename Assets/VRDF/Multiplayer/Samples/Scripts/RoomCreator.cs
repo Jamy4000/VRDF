@@ -18,14 +18,14 @@ namespace VRDF.Multiplayer.Samples
         private string _roomName = "Room Name";
 
         /// <summary>
-        /// Callback for the Create Room Button in the Sample Lobby Scene
+        /// Callback for the Create Room Button in the Sample Connection Scene
         /// </summary>
         public void CreateRoom()
         {
             if (string.IsNullOrEmpty(_roomName))
                 Debug.LogErrorFormat("<Color=red><b>[VRDF Sample]</b> Room name is empty, please provide a room name.");
-            else 
-                new OnConnectionToRoomRequested(_roomName);
+            else
+                VRDFConnectionManager.ConnectOrCreateRoom(_roomName, new RoomOptions { MaxPlayers = 5, PlayerTtl = 10000 });
         }
 
         /// <summary>
@@ -44,12 +44,7 @@ namespace VRDF.Multiplayer.Samples
         /// <param name="roomList">The list of rooms and there info</param>
         public override void OnRoomListUpdate(List<RoomInfo> roomList)
         {
-            if (!Photon.Pun.PhotonNetwork.InLobby)
-            {
-                _createRoomButton.interactable = false;
-                return;
-            }
-
+            base.OnRoomListUpdate(roomList);
             StartCoroutine(WaitForOneFrame());
 
             IEnumerator<WaitForEndOfFrame> WaitForOneFrame()
@@ -59,9 +54,9 @@ namespace VRDF.Multiplayer.Samples
             }
         }
 
-        public override void OnJoinedLobby()
+        public override void OnConnectedToMaster()
         {
-            base.OnJoinedLobby();
+            base.OnConnectedToMaster();
             CheckCreateRoomButton();
         }
 
@@ -76,14 +71,18 @@ namespace VRDF.Multiplayer.Samples
         /// </summary>
         private void CheckCreateRoomButton()
         {
-            if (!string.IsNullOrEmpty(_roomName) && RoomListFetcher.AvailableRooms.ContainsKey(_roomName))
+            if (Photon.Pun.PhotonNetwork.InLobby && RoomListFetcher.AvailableRooms.ContainsKey(_roomName))
             {
-                Debug.LogFormat("<b>[VRDF Sample]</b> Room with name {0} already exist, disabling create room button.", _roomName);
+                VRDF_Components.DebugVRDFMessage("Room with name {0} already exist, disabling create room button.", debugParams: _roomName);
                 _createRoomButton.interactable = false;
             }
-            else if (!Photon.Pun.PhotonNetwork.IsConnectedAndReady || !Photon.Pun.PhotonNetwork.InLobby)
+            else if (!Photon.Pun.PhotonNetwork.IsConnectedAndReady)
             {
-                Debug.LogFormat("<b>[VRDF Sample]</b> The user isn't connected or isn't in the Lobby. Disabling create room button.");
+                VRDF_Components.DebugVRDFMessage("The user isn't connected to Game Server. Disabling create room button.");
+                _createRoomButton.interactable = false;
+            }
+            else if (string.IsNullOrEmpty(_roomName) || string.IsNullOrWhiteSpace(_roomName))
+            {
                 _createRoomButton.interactable = false;
             }
             else

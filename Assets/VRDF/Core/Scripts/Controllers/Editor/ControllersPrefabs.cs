@@ -7,7 +7,7 @@ namespace VRDF.Core.Controllers
     public class ControllersPrefabs : Editor
     {
         /// <summary>
-        /// Add a new Lobby Connection Manager to the Scene
+        /// 
         /// </summary>
         /// <param name="menuCommand"></param>
         [MenuItem("VRDF/Controllers/Left Controllers", priority = 0)]

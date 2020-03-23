@@ -33,6 +33,7 @@ namespace VRDF.Multiplayer
                 VRDFPlayerUtilities.PlayersInstances = new System.Collections.Generic.List<VRDFPlayer>();
                 VRDFPlayerUtilities.LocalVRDFPlayer = _thisPlayer;
                 LocalPlayerGameObjectInstance = gameObject;
+                AddFollowerScripts();
             }
 
             VRDFPlayerUtilities.PlayersInstances.Add(_thisPlayer);
@@ -41,6 +42,38 @@ namespace VRDF.Multiplayer
         protected virtual void OnDestroy()
         {
             VRDFPlayerUtilities.PlayersInstances.Remove(_thisPlayer);
+        }
+
+        /// <summary>
+        /// Setup the LocalPlayer instance Transform
+        /// </summary>
+        private void AddFollowerScripts()
+        {
+            // Add the follower scripts for the Camera, RightController and LeftController
+            AddFollowerScript(LocalPlayerGameObjectInstance, VRDF_Components.VRCamera.transform);
+            TryGetObjectWithName("RightController", VRDF_Components.RightController.transform);
+            TryGetObjectWithName("LeftController", VRDF_Components.LeftController.transform);
+
+            /// <summary>
+            /// Try to fetch an object under the LocalPlayerInstance using a name. If found, we add a FollowerScript to it.
+            /// </summary>
+            void TryGetObjectWithName(string objectName, Transform toFollow)
+            {
+                var toLookFor = LocalPlayerGameObjectInstance.transform.Find(objectName);
+                if (toLookFor == null)
+                    VRDF_Components.DebugVRDFMessage("Couldn't find object with name {0} under the Local Player Instance. Not adding any Follower Script.", true, objectName);
+                else
+                    AddFollowerScript(toLookFor.gameObject, toFollow);
+            }
+
+            /// <summary>
+            /// Add a VRDFTransformFollower to the transToFollow object, so it can follow the position and rotation of the toFollow object
+            /// </summary>
+            void AddFollowerScript(GameObject transToFollow, Transform toFollow)
+            {
+                VRDFTransformFollower transFollower = transToFollow.AddComponent<VRDFTransformFollower>();
+                transFollower.ToFollow = toFollow;
+            }
         }
     }
 }
