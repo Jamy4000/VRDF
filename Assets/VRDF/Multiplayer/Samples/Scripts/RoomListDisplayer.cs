@@ -39,14 +39,13 @@ namespace VRDF.Multiplayer.Samples
         public void JoinLobby()
         {
             if (!PhotonNetwork.InLobby)
-                PhotonNetwork.JoinLobby();
+                PhotonNetwork.JoinLobby(new TypedLobby("VRDF Lobby", LobbyType.Default));
         }
 
         public override void OnConnectedToMaster()
         {
-            base.OnConnected();
-            _joinLobbyButton.interactable = !PhotonNetwork.InLobby;
-            _roomListPanel.SetActive(PhotonNetwork.InLobby);
+            base.OnConnectedToMaster();
+            _joinLobbyButton.interactable = true;
         }
 
         /// <summary>
@@ -62,11 +61,7 @@ namespace VRDF.Multiplayer.Samples
         public override void OnJoinedLobby()
         {
             base.OnJoinedLobby();
-
-            _roomListPanel.SetActive(true);
-            _joinLobbyButton.gameObject.SetActive(false);
-            _joinLobbyButton.interactable = false;
-
+            ChangeUIElementState(true);
             // This version is using the available rooms dictionary that's available from the RoomListFetcher script
             DisplayRoomList(RoomListFetcher.AvailableRooms);
         }
@@ -101,9 +96,16 @@ namespace VRDF.Multiplayer.Samples
             foreach (Transform child in _scrollviewContent)
                 Destroy(child.gameObject);
 
-            _joinLobbyButton.gameObject.SetActive(true);
+            ChangeUIElementState(false);
+            // Shouldn't be interactable as user isn't online
             _joinLobbyButton.interactable = false;
-            _roomListPanel.SetActive(true);
+        }
+
+        private void ChangeUIElementState(bool isInLobby)
+        {
+            _joinLobbyButton.gameObject.SetActive(!isInLobby);
+            _joinLobbyButton.interactable = !isInLobby;
+            _roomListPanel.SetActive(isInLobby);
         }
     }
 }

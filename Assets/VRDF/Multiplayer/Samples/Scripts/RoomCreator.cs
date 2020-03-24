@@ -1,5 +1,4 @@
 ﻿using Photon.Realtime;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VRDF.Multiplayer.Samples
@@ -15,7 +14,17 @@ namespace VRDF.Multiplayer.Samples
         /// <summary>
         /// the name of the room we want to create
         /// </summary>
-        private string _roomName = "Room Name";
+        private string _roomName = "VRDF Test Room";
+
+        private void Awake()
+        {
+            OnVRDFRoomsListWasUpdated.Listeners += UpdateDisplayedRoomList;
+        }
+
+        private void OnDestroy()
+        {
+            OnVRDFRoomsListWasUpdated.Listeners -= UpdateDisplayedRoomList;
+        }
 
         /// <summary>
         /// Callback for the Create Room Button in the Sample Connection Scene
@@ -39,19 +48,12 @@ namespace VRDF.Multiplayer.Samples
         }
 
         /// <summary>
-        /// Called when new rooms are fetched. Wait one frame for the RoomListFetcher to update the AvailableRooms list.
+        /// Callback for when we receive an update on the list of available rooms
         /// </summary>
-        /// <param name="roomList">The list of rooms and there info</param>
-        public override void OnRoomListUpdate(List<RoomInfo> roomList)
+        /// <param name="info">The event containing the list of available rooms.</param>
+        private void UpdateDisplayedRoomList(OnVRDFRoomsListWasUpdated _)
         {
-            base.OnRoomListUpdate(roomList);
-            StartCoroutine(WaitForOneFrame());
-
-            IEnumerator<WaitForEndOfFrame> WaitForOneFrame()
-            {
-                yield return new WaitForEndOfFrame();
-                CheckCreateRoomButton();
-            }
+            CheckCreateRoomButton();
         }
 
         public override void OnConnectedToMaster()

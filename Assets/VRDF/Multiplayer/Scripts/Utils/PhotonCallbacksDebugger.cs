@@ -18,6 +18,8 @@ namespace VRDF.Multiplayer
         public override void OnConnectedToMaster()
         {
             DebugMessage("<Color=Green>Connection with Master Server established !</Color>");
+            DebugMessage("{0} players, including this instance of the game, are currently online in your app.", debugParams: PhotonNetwork.CountOfPlayers);
+            DebugMessage("{0} players, including this instance of the game, are currently on Master Server.", debugParams: PhotonNetwork.CountOfPlayersOnMaster);
         }
 
         /// <summary>
@@ -25,11 +27,9 @@ namespace VRDF.Multiplayer
         /// </summary>
         public override void OnJoinedLobby()
         {
-            DebugMessage("<Color=Green>Lobby was successfully joined !</Color>");
-            DebugMessage("{0} players, including this instance of the game, are currently online in your app.", debugParams: PhotonNetwork.CountOfPlayers);
-            DebugMessage("{0} players, including this instance of the game, are currently looking for a room.", debugParams: PhotonNetwork.CountOfPlayersOnMaster);
-            DebugMessage("{0} players are currently inside a room.", debugParams: PhotonNetwork.CountOfPlayersInRooms);
-            DebugMessage("{0} rooms are currently online.", debugParams: PhotonNetwork.CountOfRooms);
+            DebugMessage("<Color=Green>Lobby with name {0} was successfully joined !</Color>", debugParams: PhotonNetwork.CurrentLobby.Name);
+            DebugMessage("{0} players are currently inside a room accesible from this Lobby.", debugParams: PhotonNetwork.CountOfPlayersInRooms);
+            DebugMessage("{0} rooms accesible from this Lobby are currently online.", debugParams: PhotonNetwork.CountOfRooms);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace VRDF.Multiplayer
         /// </summary>
         public override void OnCreatedRoom()
         {
-            DebugMessage("<Color=Green>The room was successfully <b>CREATED</b> !</Color>");
+            DebugMessage("<Color=Green>The room {0} was successfully <b>CREATED</b> !</Color>", debugParams: PhotonNetwork.CurrentRoom.Name);
         }
 
         /// <summary>

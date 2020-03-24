@@ -26,11 +26,9 @@ namespace VRDF.Multiplayer
         public override void OnConnectedToMaster()
         {
             base.OnConnectedToMaster();
+            // When the user is connected to the server, we make him join a basic lobby so he can get the list of rooms and their info.
             if (_joinLobbyOnConnected)
-            {
-                // When the user is connected to the server, we make him join a basic lobby so he can get the list of rooms and their info.
                 PhotonNetwork.JoinLobby(new TypedLobby("VRDF Lobby", LobbyType.Default));
-            }
         }
 
         /// <summary>
@@ -64,14 +62,10 @@ namespace VRDF.Multiplayer
 
                 // Add new room info to cache
                 if (!AvailableRooms.ContainsKey(room.Name))
-                {
                     AvailableRooms.Add(room.Name, room);
-                }
                 // Update cached RoomInfo 
                 else
-                {
                     AvailableRooms[room.Name] =  room;
-                }
             }
         }
 
