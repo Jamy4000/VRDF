@@ -16,10 +16,6 @@ namespace VRDF.Multiplayer
         [SerializeField]
         private string _connectionSceneName = "ConnectionScene";
 
-        [Tooltip("Whether we send back the user in the connection Scene when he leave the room (called as well when user is disconnected)")]
-        [SerializeField]
-        private bool _sendBackInConnectionSceneOnUserLeft;
-
         public static VRDFMultiplayerGameManager Instance;
 
         protected virtual void Awake()
@@ -34,12 +30,9 @@ namespace VRDF.Multiplayer
             Instance = this;
         }
 
-        /// <summary>
-        /// MonoBehaviour method called on GameObject by Unity during initialization phase.
-        /// </summary>
         protected virtual void Start()
         {
-            // in case we started this demo with the wrong scene being active, simply load the menu scene
+            // in case we started this demo with the wrong scene being active, simply load the connection scene
             if (!PhotonNetwork.IsConnectedAndReady)
             {
                 VRDF_Components.DebugVRDFMessage("You're not connected to the Photon Network ! Sending back to Connection Scene.", true);
@@ -47,19 +40,10 @@ namespace VRDF.Multiplayer
             }
         }
 
-        protected virtual void OnDestro()
+        protected virtual void OnDestroy()
         {
             if (Instance == this)
                 Instance = null;
-        }
-
-        /// <summary>
-        /// Called when the local player leave the room, send him back to the connection scene
-        /// </summary>
-        public override void OnLeftRoom()
-        {
-            if (_sendBackInConnectionSceneOnUserLeft)
-                GoBackToConnectionScene();
         }
 
         public void GoBackToConnectionScene()

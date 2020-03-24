@@ -22,7 +22,7 @@ namespace VRDF.Multiplayer
         /// </summary>
         public override void OnCreatedRoom()
         {
-            if (_loadSceneOnRoomCreated && !TryLoadScene())
+            if (_loadSceneOnRoomCreated && !TryToLoadMultiplayerScene())
             {
                 VRDF_Components.DebugVRDFMessage("Can't load the Multiplayer Scene. Check the name and index of your multiplayer scene, and be sure that this scene was added in the Build Settings. Stopping app.", true);
                 Application.Quit();
@@ -33,7 +33,7 @@ namespace VRDF.Multiplayer
         /// Try to load a scene based on its name
         /// </summary>
         /// <returns>true if the scene was correctly loaded</returns>
-        public bool TryLoadScene()
+        public bool TryToLoadMultiplayerScene()
         {
             try
             {

@@ -22,13 +22,11 @@ namespace VRDF.Multiplayer.Samples
         {
             if (string.IsNullOrEmpty(newName))
             {
-                PhotonNetwork.NickName = _defaultNickname + Random.Range(0, 1000);
-                Debug.Log("<b>[VRDF Sample]</b> The user name is empty, using default one and adding random number to it.\n Your current Nickname is " + PhotonNetwork.NickName);
+                newName = _defaultNickname + " #" + Random.Range(0, 1000);
+                Debug.Log("<b>[VRDF Sample]</b> The user name is empty, using default one and adding random number to it.\n Your current Nickname is " + newName);
             }
-            else
-            {
-                PhotonNetwork.NickName = newName;
-            }
+
+            PhotonNetwork.NickName = newName;
         }
     }
 }

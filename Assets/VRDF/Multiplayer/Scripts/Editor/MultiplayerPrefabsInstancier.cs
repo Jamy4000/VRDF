@@ -53,7 +53,7 @@ namespace VRDF.Multiplayer
         static void InstantiateGameManager(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject newMultiObject = (GameObject)PrefabUtility.InstantiatePrefab(VRDFPrefabReferencer.GetPrefab("GameManager"));
+            GameObject newMultiObject = (GameObject)PrefabUtility.InstantiatePrefab(VRDFPrefabReferencer.GetPrefab("VRDFMultiplayerGameManager"));
 
             // Ensure it gets reparented if this was a context click (otherwise does nothing)
             GameObjectUtility.SetParentAndAlign(newMultiObject, menuCommand.context as GameObject);

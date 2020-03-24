@@ -9,7 +9,7 @@ namespace VRDF.Multiplayer
     /// </summary>
     public class VRDFPlayerInstantiater : MonoBehaviourPunCallbacks
     {
-        [Header("Photon Player Prefab and Folder")]
+        [Header("Photon Player Prefab and Folder (NEEDS TO BE IN RESOURCES FOLDER)")]
         [Tooltip("Needs to be placed in the Resources folder")]
         [SerializeField]
         private GameObject _playersPrefab;
@@ -20,12 +20,14 @@ namespace VRDF.Multiplayer
 
         public void Awake()
         {
-            OnSetupVRReady.RegisterSetupVRCallback(LocalPlayerSetup);
+            if (PhotonNetwork.IsConnectedAndReady)
+                OnSetupVRReady.RegisterSetupVRCallback(LocalPlayerSetup);
         }
 
         private void Start()
         {
-            InstantiateLocalPlayer();
+            if (PhotonNetwork.IsConnectedAndReady)
+                InstantiateLocalPlayer();
         }
 
         public void OnDestroy()
@@ -40,14 +42,9 @@ namespace VRDF.Multiplayer
         private void InstantiateLocalPlayer()
         {
             if (_playersPrefab == null)
-            {
                 VRDF_Components.DebugVRDFMessage("Missing playerPrefab Reference in VRDFPlayerInstantiater, can't instantiate local player.", true);
-            }
             else
-            {
-                VRDF_Components.DebugVRDFMessage("We are Instantiating LocalPlayer from {0}", debugParams: SceneManagerHelper.ActiveSceneName);
                 VRDFPlayerManager.LocalPlayerGameObjectInstance = PhotonNetwork.Instantiate(_playerPrefabName, Vector3.zero, Quaternion.identity);
-            }
         }
 
         /// <summary>

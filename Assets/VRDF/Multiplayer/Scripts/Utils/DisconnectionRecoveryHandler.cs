@@ -83,7 +83,7 @@ namespace VRDF.Multiplayer
                 this.HandleDisconnect(cause);
 
             // We start a side thread waiting until the player timeOut is passed, and send back the user to the connection scene.
-            if (canStartWaitingThread && _wasInRoom && cause != DisconnectCause.DisconnectByClientLogic && !_isWaitingForTask)
+            if (canStartWaitingThread && _playerTtlInRoom != 0.0f && cause != DisconnectCause.DisconnectByClientLogic && !_isWaitingForTask)
             {
                 _tokenSource = new CancellationTokenSource();
                 _token = _tokenSource.Token;
@@ -208,9 +208,16 @@ namespace VRDF.Multiplayer
                 case DisconnectCause.AuthenticationTicketExpired:
                 case DisconnectCause.DisconnectByServerReasonUnknown:
                     if (_wasInRoom)
-                        _rejoinCalled = PhotonNetwork.ReconnectAndRejoin();
+                    {
+                        if (_playerTtlInRoom > 0.0f)
+                            _rejoinCalled = PhotonNetwork.ReconnectAndRejoin();
+                        else
+                            SendBackUserToLobby();
+                    }
                     else
+                    {
                         _reconnectCalled = PhotonNetwork.Reconnect();
+                    }
                     break;
                 case DisconnectCause.OperationNotAllowedInCurrentState:
                 case DisconnectCause.CustomAuthenticationFailed:

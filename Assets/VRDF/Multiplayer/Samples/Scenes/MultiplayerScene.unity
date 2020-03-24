@@ -447,22 +447,17 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1001 &1423635504
+--- !u!1001 &1852095749
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 6976133493758874836, guid: 3ddaf1ccea5c7b54e950df840646be28,
-        type: 3}
-      propertyPath: _sendBackInConnectionSceneOnUserLeft
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6976133493758874839, guid: 3ddaf1ccea5c7b54e950df840646be28,
         type: 3}
       propertyPath: m_Name
-      value: GameManager
+      value: VRDFMultiplayerGameManager
       objectReference: {fileID: 0}
     - target: {fileID: 6976133493759025399, guid: 3ddaf1ccea5c7b54e950df840646be28,
         type: 3}

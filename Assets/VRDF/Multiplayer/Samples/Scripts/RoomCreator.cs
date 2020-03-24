@@ -36,15 +36,13 @@ namespace VRDF.Multiplayer.Samples
         /// </summary>
         public void CreateRoom()
         {
-            if (string.IsNullOrEmpty(_currentRoomName))
+            if (string.IsNullOrEmpty(_currentRoomName) || string.Equals(_currentRoomName, _defaultRoomName))
             {
-                Debug.LogErrorFormat("<b>[VRDF Sample]</b> The room name is empty, using default one and adding random number to it.");
-                VRDFConnectionManager.ConnectOrCreateRoom(_defaultRoomName + Random.Range(0, 1000), new RoomOptions { MaxPlayers = 5, PlayerTtl = 10000 });
+                _currentRoomName = _defaultRoomName + " #" + Random.Range(0, 1000);
+                Debug.Log("<b>[VRDF Sample]</b> No name for the room was provided, using default one and adding random number to it.\n Here's your Room Name: " + _currentRoomName);
             }
-            else
-            {
-                VRDFConnectionManager.ConnectOrCreateRoom(_currentRoomName, new RoomOptions { MaxPlayers = 5, PlayerTtl = 10000 });
-            }
+
+            VRDFConnectionManager.ConnectOrCreateRoom(_currentRoomName, new RoomOptions { MaxPlayers = 5, PlayerTtl = 10000 });
         }
 
         /// <summary>
