@@ -18,7 +18,7 @@ namespace VRDF.Multiplayer
 
         [Tooltip("Whether we send back the user in the connection Scene when he leave the room (called as well when user is disconnected)")]
         [SerializeField]
-        private bool _sendBackInConnectionSceneOnUserLeft = true;
+        private bool _sendBackInConnectionSceneOnUserLeft;
 
         public static VRDFMultiplayerGameManager Instance;
 

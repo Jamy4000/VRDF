@@ -5,16 +5,13 @@ using UnityEngine;
 namespace VRDF.Multiplayer
 {
     /// <summary>
-    /// used to connect the user to the Server
+    /// Used to connect the user to the Server and create a connection to a room
     /// </summary>
     public class VRDFConnectionManager : MonoBehaviourPunCallbacks
     {
-        /// <summary>
-        /// The name or index of the scene you want to load as a multiplayer scene. 
-        /// </summary>
-        [Tooltip("The name or index of the scene you want to load as a multiplayer scene.")]
-        public string MultiplayerSceneName = "MultiplayerScene";
-
+        [Header("Should we automatically sync the scene in Room ?")]
+        [Tooltip("Simply to set the PhotonNetwork.AutomaticallySyncScene on Awake")]
+        [SerializeField] private bool _automaticallySyncScene = true;
         /// <summary>
         /// Singleton creation
         /// </summary>
@@ -30,8 +27,7 @@ namespace VRDF.Multiplayer
             }
 
             Instance = this;
-
-            PhotonNetwork.AutomaticallySyncScene = true;
+            PhotonNetwork.AutomaticallySyncScene = _automaticallySyncScene;
 
             // Check for when the user just left a room and is coming back to the Connection Scene
             if (!PhotonNetwork.IsConnectedAndReady)
@@ -48,17 +44,6 @@ namespace VRDF.Multiplayer
                 Instance = null;
         }
 
-        /// <summary>
-        /// Callback for when a room was correctly created.
-        /// </summary>
-        public override void OnCreatedRoom()
-        {
-            if (!TryLoadScene())
-            {
-                VRDF_Components.DebugVRDFMessage("Can't load the Multiplayer Scene. Check the name and index of your multiplayer scene, and be sure that this scene was added in the Build Settings. Stopping app.", true);
-                Application.Quit();
-            }
-        }
         /// <summary>
         /// Event raised when we want to create or join a room
         /// </summary>
@@ -91,25 +76,6 @@ namespace VRDF.Multiplayer
             else
             {
                 JoinRoom(connectToRandomRoom, roomName);
-            }
-        }
-
-        /// <summary>
-        /// Try to load a scene based on its name
-        /// </summary>
-        /// <returns>true if the scene was correctly loaded</returns>
-        public bool TryLoadScene()
-        {
-            try
-            {
-                VRDF_Components.DebugVRDFMessage("Trying to load the scene with name '{0}'.", debugParams: MultiplayerSceneName);
-                PhotonNetwork.LoadLevel(MultiplayerSceneName);
-                return true;
-            }
-            catch
-            {
-                VRDF_Components.DebugVRDFMessage("Couldn't load scene with name '{0}'.", true, MultiplayerSceneName);
-                return false;
             }
         }
 

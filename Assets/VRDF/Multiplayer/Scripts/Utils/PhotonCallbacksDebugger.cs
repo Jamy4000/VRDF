@@ -114,6 +114,13 @@ namespace VRDF.Multiplayer
                 PhotonNetwork.NetworkingClient.LoadBalancingPeer.PeerState });
         }
 
+        public override void OnRoomListUpdate(System.Collections.Generic.List<RoomInfo> roomList)
+        {
+            base.OnRoomListUpdate(roomList);
+            foreach (var room in roomList)
+                DebugMessage("The current room has been updated, here are the info: ", debugParams: room.ToStringFull());
+        }
+
         /// <summary>
         /// Only check if the _showConsoleMessages is set at true, and if so, display a message in the Console.
         /// </summary>

@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,6 +23,16 @@ namespace VRDF.Multiplayer.Samples
         [Header("Button Allowing us to join a room")]
         [SerializeField] private GameObject _roomButton;
 
+        private void Awake()
+        {
+            OnVRDFRoomsListWasUpdated.Listeners += UpdateDisplayedRoomList;
+        }
+
+        private void OnDestroy()
+        {
+            OnVRDFRoomsListWasUpdated.Listeners -= UpdateDisplayedRoomList;
+        }
+
         /// <summary>
         /// Called from the Join Lobby button if the 
         /// </summary>
@@ -40,29 +51,47 @@ namespace VRDF.Multiplayer.Samples
 
         /// <summary>
         /// Callback for when we receive an update on the list of available rooms
-        /// WARNING : This callback does NOT provide a list of all the available room, only the one that changed and have been updated
         /// </summary>
-        /// <param name="roomList">The list of rooms and there info</param>
-        public override void OnRoomListUpdate(List<RoomInfo> roomList)
+        /// <param name="info">The event containing the list of available rooms.</param>
+        private void UpdateDisplayedRoomList(OnVRDFRoomsListWasUpdated info)
         {
-            base.OnRoomListUpdate(roomList);
-            // We wait for one frame to let the RoomListFetcher update the AvailableRooms Dictionary
-            StartCoroutine(WaitForOneFrame());
-
-            IEnumerator<WaitForEndOfFrame> WaitForOneFrame()
-            {
-                yield return new WaitForEndOfFrame();
-                DisplayRoomList();
-            }
+            // This version is using the available rooms dictionary passed as parameters of the event
+            DisplayRoomList(info.AvailableRooms);
         }
 
         public override void OnJoinedLobby()
         {
             base.OnJoinedLobby();
+
             _roomListPanel.SetActive(true);
             _joinLobbyButton.gameObject.SetActive(false);
             _joinLobbyButton.interactable = false;
-            DisplayRoomList();
+
+            // This version is using the available rooms dictionary that's available from the RoomListFetcher script
+            DisplayRoomList(RoomListFetcher.AvailableRooms);
+        }
+
+        private void DisplayRoomList(Dictionary<string, RoomInfo> availableRooms)
+        {
+            // Destroy all previous buttons
+            foreach (Transform child in _scrollviewContent)
+                Destroy(child.gameObject);
+
+            // Create a new button for each new available buttons.
+            foreach (var room in availableRooms)
+            {
+                var newRoomButton = Instantiate(_roomButton, _scrollviewContent);
+                newRoomButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Room Name: " + room.Key;
+                newRoomButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListenerExtend(() => JoinRoom(room.Key));
+            }
+
+            /// <summary>
+            /// Room button callback, simply call the ConnectOrCreateRoom method from VRDFConnectionManager
+            /// </summary>
+            void JoinRoom(string roomName)
+            {
+                VRDFConnectionManager.ConnectOrCreateRoom(roomName, roomNeedCreation: false);
+            }
         }
 
         public override void OnDisconnected(DisconnectCause cause)
@@ -75,24 +104,6 @@ namespace VRDF.Multiplayer.Samples
             _joinLobbyButton.gameObject.SetActive(true);
             _joinLobbyButton.interactable = false;
             _roomListPanel.SetActive(true);
-        }
-
-        private void DisplayRoomList()
-        {
-            foreach (Transform child in _scrollviewContent)
-                Destroy(child.gameObject);
-
-            foreach (var room in RoomListFetcher.AvailableRooms)
-            {
-                var newRoomButton = Instantiate(_roomButton, _scrollviewContent);
-                newRoomButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Room Name: " + room.Key;
-                newRoomButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => JoinRoom(room.Key));
-            }
-
-            void JoinRoom(string roomName)
-            {
-                VRDFConnectionManager.ConnectOrCreateRoom(roomName, roomNeedCreation: false);
-            }
         }
     }
 }

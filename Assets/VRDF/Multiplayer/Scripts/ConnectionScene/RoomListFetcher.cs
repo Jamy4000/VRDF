@@ -18,6 +18,11 @@ namespace VRDF.Multiplayer
         /// </summary>
         private static Dictionary<string, RoomInfo> _availableRooms = new Dictionary<string, RoomInfo>();
 
+        private void Awake()
+        {
+            _availableRooms.Clear();
+        }
+
         public override void OnConnectedToMaster()
         {
             base.OnConnectedToMaster();
@@ -37,6 +42,7 @@ namespace VRDF.Multiplayer
         {
             base.OnRoomListUpdate(roomList);
             UpdateCachedRoomList(roomList);
+            new OnVRDFRoomsListWasUpdated(_availableRooms);
         }
 
         /// <summary>
