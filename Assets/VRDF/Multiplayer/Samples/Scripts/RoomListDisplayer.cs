@@ -1,6 +1,5 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,22 +10,27 @@ namespace VRDF.Multiplayer.Samples
     /// </summary>
     public class RoomListDisplayer : MonoBehaviourPunCallbacks
     {
-        [Header("Object to activate on Join Lobby")]
-        [SerializeField] private GameObject _roomListPanel;
-
         [Header("Objects to Join the Lobby")]
         [SerializeField] private GameObject _joinLobbyPart;
         [SerializeField] private UnityEngine.UI.Button _joinLobbyButton;
 
         [Header("Object containing the room list")]
+        [SerializeField] private GameObject _roomListPanel;
         [SerializeField] private Transform _scrollviewContent;
 
-        [Header("Button Allowing us to join a room")]
+        [Header("Button to click on to join a room")]
         [SerializeField] private GameObject _roomButton;
+
+        private RoomListFetcher _roomListFetcher;
 
         private void Awake()
         {
             OnVRDFRoomsListWasUpdated.Listeners += UpdateDisplayedRoomList;
+        }
+
+        private void Start()
+        {
+            _roomListFetcher = VRDFConnectionManager.Instance.GetComponent<RoomListFetcher>();
         }
 
         private void OnDestroy()
@@ -40,13 +44,13 @@ namespace VRDF.Multiplayer.Samples
         public void JoinLobby()
         {
             if (!PhotonNetwork.InLobby)
-                PhotonNetwork.JoinLobby(new TypedLobby("VRDF Lobby", LobbyType.Default));
+                PhotonNetwork.JoinLobby(new TypedLobby(_roomListFetcher.LobbyName, LobbyType.Default));
         }
 
         public override void OnConnectedToMaster()
         {
             base.OnConnectedToMaster();
-            _joinLobbyButton.interactable = true;
+            _joinLobbyButton.interactable = !_roomListFetcher.JoinLobbyOnConnected;
         }
 
         /// <summary>
@@ -105,7 +109,7 @@ namespace VRDF.Multiplayer.Samples
         private void ChangeUIElementState(bool isInLobby)
         {
             _joinLobbyPart.SetActive(!isInLobby);
-            _joinLobbyButton.interactable = !isInLobby;
+            _joinLobbyButton.interactable = !isInLobby && !_roomListFetcher.JoinLobbyOnConnected;
             _roomListPanel.SetActive(isInLobby);
         }
     }

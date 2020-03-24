@@ -9,9 +9,12 @@ namespace VRDF.Multiplayer
     /// </summary>
     public class RoomListFetcher : MonoBehaviourPunCallbacks
     {
+        [UnityEngine.Tooltip("The name for your Lobby. If your clients have different Lobby names, they won't be able to see each others' rooms.")]
+        public string LobbyName = "VRDF Lobby";
+
         [UnityEngine.Tooltip("Should we join the Lobby as soon as we are connected to the Server ?\n" +
             "If false, you will need to join the lobby yourself to fetch the online rooms.")]
-        [UnityEngine.SerializeField] private bool _joinLobbyOnConnected = true;
+        public bool JoinLobbyOnConnected = true;
 
         /// <summary>
         /// Dictionary with all available rooms for this app, with the room name as kKey
@@ -27,8 +30,8 @@ namespace VRDF.Multiplayer
         {
             base.OnConnectedToMaster();
             // When the user is connected to the server, we make him join a basic lobby so he can get the list of rooms and their info.
-            if (_joinLobbyOnConnected)
-                PhotonNetwork.JoinLobby(new TypedLobby("VRDF Lobby", LobbyType.Default));
+            if (JoinLobbyOnConnected)
+                PhotonNetwork.JoinLobby(new TypedLobby(LobbyName, LobbyType.Default));
         }
 
         /// <summary>

@@ -20,6 +20,8 @@ namespace VRDF.Multiplayer
             DebugMessage("<Color=Green>Connection with Master Server established !</Color>");
             DebugMessage("{0} players, including this instance of the game, are currently online in your app.", debugParams: PhotonNetwork.CountOfPlayers);
             DebugMessage("{0} players, including this instance of the game, are currently on Master Server.", debugParams: PhotonNetwork.CountOfPlayersOnMaster);
+            DebugMessage("{0} players are currently inside rooms.", debugParams: PhotonNetwork.CountOfPlayersInRooms);
+            DebugMessage("{0} rooms are currently online.", debugParams: PhotonNetwork.CountOfRooms);
         }
 
         /// <summary>
@@ -28,8 +30,6 @@ namespace VRDF.Multiplayer
         public override void OnJoinedLobby()
         {
             DebugMessage("<Color=Green>Lobby with name {0} was successfully joined !</Color>", debugParams: PhotonNetwork.CurrentLobby.Name);
-            DebugMessage("{0} players are currently inside a room accesible from this Lobby.", debugParams: PhotonNetwork.CountOfPlayersInRooms);
-            DebugMessage("{0} rooms accesible from this Lobby are currently online.", debugParams: PhotonNetwork.CountOfRooms);
         }
 
         /// <summary>
@@ -119,6 +119,24 @@ namespace VRDF.Multiplayer
             base.OnRoomListUpdate(roomList);
             foreach (var room in roomList)
                 DebugMessage("The current room has been updated, here are the info: ", debugParams: room.ToStringFull());
+        }
+
+        public override void OnLobbyStatisticsUpdate(System.Collections.Generic.List<TypedLobbyInfo> lobbyStatistics)
+        {
+            // If you want to toggle lobby info updates, set the PhotonNetwork.PhotonServerSettings.EnableLobbySatistics accordingly.
+            base.OnLobbyStatisticsUpdate(lobbyStatistics);
+            foreach (var lobbyInfo in lobbyStatistics)
+            {
+                DebugMessage("The Lobby {0} has updated its info, here are the new values:\n" +
+                    "{1} players are in this lobby;\n" +
+                    "{2} rooms are avaibale from this lobby.", debugParams: new object[3] { lobbyInfo.Name, lobbyInfo.PlayerCount, lobbyInfo.RoomCount });
+            }
+        }
+
+        public override void OnMasterClientSwitched(Player newMasterClient)
+        {
+            base.OnMasterClientSwitched(newMasterClient);
+            DebugMessage("The master client has changed ! The new one is ", debugParams: newMasterClient.NickName);
         }
 
         /// <summary>

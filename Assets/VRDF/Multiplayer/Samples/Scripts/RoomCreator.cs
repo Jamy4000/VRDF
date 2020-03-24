@@ -18,12 +18,18 @@ namespace VRDF.Multiplayer.Samples
 
         private string _currentRoomName;
 
+        public string DefaultRoomName 
+        { 
+            get => _defaultRoomName + " #" + Random.Range(0, 1000); 
+        }
+
         private void Awake()
         {
             OnVRDFRoomsListWasUpdated.Listeners += UpdateDisplayedRoomList;
+
+            _currentRoomName = DefaultRoomName;
             var placeHolderText = _roomNameInputField.placeholder as TMPro.TextMeshProUGUI;
-            placeHolderText.text = _defaultRoomName;
-            _currentRoomName = _defaultRoomName;
+            placeHolderText.text = _currentRoomName;
         }
 
         private void OnDestroy()
@@ -36,9 +42,9 @@ namespace VRDF.Multiplayer.Samples
         /// </summary>
         public void CreateRoom()
         {
-            if (string.IsNullOrEmpty(_currentRoomName) || string.Equals(_currentRoomName, _defaultRoomName))
+            if (string.IsNullOrEmpty(_currentRoomName))
             {
-                _currentRoomName = _defaultRoomName + " #" + Random.Range(0, 1000);
+                _currentRoomName = DefaultRoomName;
                 Debug.Log("<b>[VRDF Sample]</b> No name for the room was provided, using default one and adding random number to it.\n Here's your Room Name: " + _currentRoomName);
             }
 

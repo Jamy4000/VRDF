@@ -13,9 +13,9 @@ namespace VRDF.Multiplayer.Samples
 
         private void Start()
         {
-            PhotonNetwork.NickName = _defaultNickname;
+            PhotonNetwork.NickName = _defaultNickname + " #" + Random.Range(0, 1000);
             var placeHolderText = _nicknameInputField.placeholder as TMPro.TextMeshProUGUI;
-            placeHolderText.text = _defaultNickname;
+            placeHolderText.text = PhotonNetwork.NickName;
         }
 
         public void OnUserNameChanged(string newName)
