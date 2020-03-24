@@ -6,10 +6,10 @@ namespace VRDF.Multiplayer
     /// <summary>
     /// Used to display a different body for the remote and local users
     /// </summary>
-    [RequireComponent(typeof(PhotonView))]
+    [RequireComponent(typeof(PhotonView), typeof(VRDFPlayerManager))]
     public class VRDFPlayerModel : MonoBehaviourPun
     {
-        [Header("Models for this PhotonView")]
+        [Header("The Body Model for this Player")]
         [Tooltip("The 3D Model to represent this photon view object if the user is a local user")]
         public GameObject LocalModel;
 
@@ -20,9 +20,9 @@ namespace VRDF.Multiplayer
         protected virtual void Start()
         {
             if (photonView.Owner.IsLocal && LocalModel != null)
-                GameObject.Instantiate(LocalModel, transform);
+                GetComponent<VRDFPlayerManager>().ThisPlayer.PlayerBodyModel = GameObject.Instantiate(LocalModel, transform);
             else if (!photonView.Owner.IsLocal && RemoteModel != null)
-                GameObject.Instantiate(RemoteModel, transform);
+                GetComponent<VRDFPlayerManager>().ThisPlayer.PlayerBodyModel = GameObject.Instantiate(RemoteModel, transform);
 
             Destroy(this);
         }

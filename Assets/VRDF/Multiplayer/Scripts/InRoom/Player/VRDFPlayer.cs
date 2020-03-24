@@ -15,18 +15,17 @@ namespace VRDF.Multiplayer
         public Player PhotonPlayer;
 
         /// <summary>
-        /// The reference to the GameObject loaded at runtime by PUN from the Resources Folder
-        /// </summary>
-        public GameObject PlayerGameObject;
-
-        /// <summary>
         /// The parent GameObject for the player's body 3D Model, instantiated using VRDFPlayerModel
         /// </summary>
         public GameObject PlayerBodyModel;
 
-        public VRDFPlayer(Player basePlayer, GameObject playerInstance)
+        /// <summary>
+        /// The reference to the GameObject loaded at runtime by PUN from the Resources Folder
+        /// </summary>
+        public GameObject PlayerGameObject;
+
+        public VRDFPlayer(GameObject playerInstance)
         {
-            PhotonPlayer = basePlayer;
             PlayerGameObject = playerInstance;
         }
 

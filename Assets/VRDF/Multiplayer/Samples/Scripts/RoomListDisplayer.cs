@@ -14,7 +14,8 @@ namespace VRDF.Multiplayer.Samples
         [Header("Object to activate on Join Lobby")]
         [SerializeField] private GameObject _roomListPanel;
 
-        [Header("Button to join Lobby")]
+        [Header("Objects to Join the Lobby")]
+        [SerializeField] private GameObject _joinLobbyPart;
         [SerializeField] private UnityEngine.UI.Button _joinLobbyButton;
 
         [Header("Object containing the room list")]
@@ -103,7 +104,7 @@ namespace VRDF.Multiplayer.Samples
 
         private void ChangeUIElementState(bool isInLobby)
         {
-            _joinLobbyButton.gameObject.SetActive(!isInLobby);
+            _joinLobbyPart.SetActive(!isInLobby);
             _joinLobbyButton.interactable = !isInLobby;
             _roomListPanel.SetActive(isInLobby);
         }

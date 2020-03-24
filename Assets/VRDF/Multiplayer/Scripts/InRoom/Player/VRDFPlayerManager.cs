@@ -8,8 +8,8 @@ namespace VRDF.Multiplayer
     /// </summary>
     [RequireComponent(typeof(PhotonView))]
     public class VRDFPlayerManager : MonoBehaviourPunCallbacks
-    {
-        private VRDFPlayer _thisPlayer;
+    { 
+        public VRDFPlayer ThisPlayer;
 
         /// <summary>
         /// The local player instance. 
@@ -19,29 +19,29 @@ namespace VRDF.Multiplayer
 
         protected virtual void Awake()
         {
-            // #Critical
             // we flag as don't destroy on load so that instance survives level synchronization, thus giving a seamless experience when levels load.
             DontDestroyOnLoad(gameObject);
+            ThisPlayer = new VRDFPlayer(gameObject);
         }
 
         protected virtual void Start()
         {
-            _thisPlayer = new VRDFPlayer(photonView.Owner, gameObject);
+            // Need to do that on Start, as photonView may not be setup on Awake.
+            ThisPlayer.PhotonPlayer = photonView.Owner;
+            VRDFPlayerUtilities.PlayersInstances.Add(ThisPlayer);
 
             if (photonView.IsMine)
             {
                 VRDFPlayerUtilities.PlayersInstances = new System.Collections.Generic.List<VRDFPlayer>();
-                VRDFPlayerUtilities.LocalVRDFPlayer = _thisPlayer;
+                VRDFPlayerUtilities.LocalVRDFPlayer = ThisPlayer;
                 LocalPlayerGameObjectInstance = gameObject;
                 AddFollowerScripts();
             }
-
-            VRDFPlayerUtilities.PlayersInstances.Add(_thisPlayer);
         }
 
         protected virtual void OnDestroy()
         {
-            VRDFPlayerUtilities.PlayersInstances.Remove(_thisPlayer);
+            VRDFPlayerUtilities.PlayersInstances.Remove(ThisPlayer);
         }
 
         /// <summary>

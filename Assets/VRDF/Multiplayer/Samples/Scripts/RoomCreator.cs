@@ -8,17 +8,22 @@ namespace VRDF.Multiplayer.Samples
     /// </summary>
     public class RoomCreator : Photon.Pun.MonoBehaviourPunCallbacks
     {
-        [Header("Button used to create a room")]
+        [Tooltip("Button used to create a room")]
         [SerializeField] private UnityEngine.UI.Button _createRoomButton;
 
-        /// <summary>
-        /// the name of the room we want to create
-        /// </summary>
-        private string _roomName = "VRDF Test Room";
+        [Tooltip("The name that would be given to a room by default")]
+        [SerializeField] private string _defaultRoomName = "VRDF Test Room";
+
+        [SerializeField] private TMPro.TMP_InputField _roomNameInputField;
+
+        private string _currentRoomName;
 
         private void Awake()
         {
             OnVRDFRoomsListWasUpdated.Listeners += UpdateDisplayedRoomList;
+            var placeHolderText = _roomNameInputField.placeholder as TMPro.TextMeshProUGUI;
+            placeHolderText.text = _defaultRoomName;
+            _currentRoomName = _defaultRoomName;
         }
 
         private void OnDestroy()
@@ -31,10 +36,15 @@ namespace VRDF.Multiplayer.Samples
         /// </summary>
         public void CreateRoom()
         {
-            if (string.IsNullOrEmpty(_roomName))
-                Debug.LogErrorFormat("<Color=red><b>[VRDF Sample]</b> Room name is empty, please provide a room name.");
+            if (string.IsNullOrEmpty(_currentRoomName))
+            {
+                Debug.LogErrorFormat("<b>[VRDF Sample]</b> The room name is empty, using default one and adding random number to it.");
+                VRDFConnectionManager.ConnectOrCreateRoom(_defaultRoomName + Random.Range(0, 1000), new RoomOptions { MaxPlayers = 5, PlayerTtl = 10000 });
+            }
             else
-                VRDFConnectionManager.ConnectOrCreateRoom(_roomName, new RoomOptions { MaxPlayers = 5, PlayerTtl = 10000 });
+            {
+                VRDFConnectionManager.ConnectOrCreateRoom(_currentRoomName, new RoomOptions { MaxPlayers = 5, PlayerTtl = 10000 });
+            }
         }
 
         /// <summary>
@@ -43,7 +53,7 @@ namespace VRDF.Multiplayer.Samples
         /// <param name="newName"></param>
         public void SetRoomName(string newName)
         {
-            _roomName = newName;
+            _currentRoomName = newName;
             CheckCreateRoomButton();
         }
 
@@ -73,18 +83,14 @@ namespace VRDF.Multiplayer.Samples
         /// </summary>
         private void CheckCreateRoomButton()
         {
-            if (Photon.Pun.PhotonNetwork.InLobby && RoomListFetcher.AvailableRooms.ContainsKey(_roomName))
+            if (Photon.Pun.PhotonNetwork.InLobby && RoomListFetcher.AvailableRooms.ContainsKey(_currentRoomName))
             {
-                VRDF_Components.DebugVRDFMessage("Room with name {0} already exist, disabling create room button.", debugParams: _roomName);
+                VRDF_Components.DebugVRDFMessage("Room with name {0} already exist, disabling create room button.", debugParams: _currentRoomName);
                 _createRoomButton.interactable = false;
             }
             else if (!Photon.Pun.PhotonNetwork.IsConnectedAndReady)
             {
                 VRDF_Components.DebugVRDFMessage("The user isn't connected to Game Server. Disabling create room button.");
-                _createRoomButton.interactable = false;
-            }
-            else if (string.IsNullOrEmpty(_roomName) || string.IsNullOrWhiteSpace(_roomName))
-            {
                 _createRoomButton.interactable = false;
             }
             else
