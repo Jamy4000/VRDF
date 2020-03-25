@@ -82,9 +82,7 @@ namespace VRDF.Multiplayer
         /// </summary>
         private void SendBackUserToConnectionRoom()
         {
-            if (_tokenSource != null)
-                _tokenSource.Cancel(true);
-
+            _tokenSource?.Cancel(true);
             _gameManager.GoBackToConnectionScene();
         }
 
