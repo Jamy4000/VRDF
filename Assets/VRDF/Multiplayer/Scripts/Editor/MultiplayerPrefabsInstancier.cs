@@ -33,8 +33,16 @@ namespace VRDF.Multiplayer
         [MenuItem("GameObject/VRDF/Multiplayer/Connection Scene/Connection Manager", priority = 0)]
         static void InstantiateConnectionManager(MenuCommand menuCommand)
         {
+            var connectionManager = FindObjectOfType<VRDFConnectionManager>();
+            if (connectionManager != null)
+            {
+                VRDF_Components.DebugVRDFMessage("A VRDFConnectionManager script is already in your scene, no need for a second one !", true);
+                Selection.activeObject = connectionManager;
+                return;
+            }
+
             // Create a custom game object
-            GameObject newMultiObject = (GameObject)PrefabUtility.InstantiatePrefab(VRDFPrefabReferencer.GetPrefab("ConnectionManager"));
+            GameObject newMultiObject = (GameObject)PrefabUtility.InstantiatePrefab(VRDFPrefabReferencer.GetPrefab("VRDFConnectionManager"));
 
             // Ensure it gets reparented if this was a context click (otherwise does nothing)
             GameObjectUtility.SetParentAndAlign(newMultiObject, menuCommand.context as GameObject);
@@ -52,6 +60,14 @@ namespace VRDF.Multiplayer
         [MenuItem("GameObject/VRDF/Multiplayer/In Room/Game Manager", priority = 0)]
         static void InstantiateGameManager(MenuCommand menuCommand)
         {
+            var connectionManager = FindObjectOfType<VRDFMultiplayerGameManager>();
+            if (connectionManager != null)
+            {
+                VRDF_Components.DebugVRDFMessage("A VRDFMultiplayerGameManager script is already in your scene, no need for a second one !", true);
+                Selection.activeObject = connectionManager;
+                return;
+            }
+
             // Create a custom game object
             GameObject newMultiObject = (GameObject)PrefabUtility.InstantiatePrefab(VRDFPrefabReferencer.GetPrefab("VRDFMultiplayerGameManager"));
 
