@@ -75,7 +75,7 @@ namespace VRDF.Multiplayer
         /// <param name="message">The error message returned by photon and describing the problem</param>
         public override void OnJoinRoomFailed(short returnCode, string message)
         {
-            DebugMessage("The room couldn't be <b>JOINED</b>. Here's the return code :\n{0}.\nAnd here's the message :\n{1}.", true, returnCode, message);
+            DebugMessage("The room couldn't be <b>JOINED</b>. Here's the message: {0}; and here's the return code: {1}.", true, message, returnCode);
             
             switch (returnCode)
             {
