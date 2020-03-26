@@ -8,7 +8,8 @@ namespace VRDF.Multiplayer
     /// </summary>
     [RequireComponent(typeof(PhotonView))]
     public class VRDFPlayerManager : MonoBehaviourPunCallbacks
-    { 
+    {
+        [SerializeField]
         public VRDFPlayer ThisPlayer;
 
         /// <summary>
@@ -28,15 +29,15 @@ namespace VRDF.Multiplayer
         {
             // Need to do that on Start, as photonView may not be setup on Awake.
             ThisPlayer.PhotonPlayer = photonView.Owner;
-            VRDFPlayerUtilities.PlayersInstances.Add(ThisPlayer);
 
             if (photonView.IsMine)
             {
-                VRDFPlayerUtilities.PlayersInstances = new System.Collections.Generic.List<VRDFPlayer>();
                 VRDFPlayerUtilities.LocalVRDFPlayer = ThisPlayer;
                 LocalPlayerGameObjectInstance = gameObject;
                 AddFollowerScripts();
             }
+
+            VRDFPlayerUtilities.PlayersInstances.Add(ThisPlayer);
         }
 
         protected virtual void OnDestroy()
@@ -47,10 +48,10 @@ namespace VRDF.Multiplayer
         /// <summary>
         /// Setup the LocalPlayer instance Transform
         /// </summary>
-        private void AddFollowerScripts()
+        protected void AddFollowerScripts()
         {
             // Add the follower scripts for the Camera, RightController and LeftController
-            AddFollowerScript(LocalPlayerGameObjectInstance, VRDF_Components.VRCamera.transform);
+            AddFollowerScriptToOneObject(LocalPlayerGameObjectInstance, VRDF_Components.VRCamera.transform);
             TryGetObjectWithName("RightController", VRDF_Components.RightController.transform);
             TryGetObjectWithName("LeftController", VRDF_Components.LeftController.transform);
 
@@ -63,17 +64,17 @@ namespace VRDF.Multiplayer
                 if (toLookFor == null)
                     VRDF_Components.DebugVRDFMessage("Couldn't find object with name {0} under the Local Player Instance. Not adding any Follower Script.", true, objectName);
                 else
-                    AddFollowerScript(toLookFor.gameObject, toFollow);
+                    AddFollowerScriptToOneObject(toLookFor.gameObject, toFollow);
             }
+        }
 
-            /// <summary>
-            /// Add a VRDFTransformFollower to the transToFollow object, so it can follow the position and rotation of the toFollow object
-            /// </summary>
-            void AddFollowerScript(GameObject transToFollow, Transform toFollow)
-            {
-                VRDFTransformFollower transFollower = transToFollow.AddComponent<VRDFTransformFollower>();
-                transFollower.ToFollow = toFollow;
-            }
+        /// <summary>
+        /// Add a VRDFTransformFollower to the transToFollow object, so it can follow the position and rotation of the toFollow object
+        /// </summary>
+        protected void AddFollowerScriptToOneObject(GameObject transToFollow, Transform toFollow)
+        {
+            VRDFTransformFollower transFollower = transToFollow.AddComponent<VRDFTransformFollower>();
+            transFollower.ToFollow = toFollow;
         }
     }
 }

@@ -57,6 +57,7 @@ namespace VRDF.Core
                 CreateFile();
 
             // We start the coroutine to check if the file is correctly created
+            // TODO Use await/async instead of coroutine, safer
             coroutineStarter.StartCoroutine(WaitUntilFileIsCreated());
 
             IEnumerator WaitUntilFileIsCreated()

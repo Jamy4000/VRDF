@@ -118,7 +118,7 @@ namespace VRDF.Multiplayer
         {
             base.OnRoomListUpdate(roomList);
             foreach (var room in roomList)
-                DebugMessage("The current room has been updated, here are the info: ", debugParams: room.ToStringFull());
+                DebugMessage("The current room has been updated, here are the info: ", debugParams: room.ToString());
         }
 
         public override void OnLobbyStatisticsUpdate(System.Collections.Generic.List<TypedLobbyInfo> lobbyStatistics)

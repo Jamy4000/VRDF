@@ -55,5 +55,31 @@ namespace VRDF.Multiplayer
             else if (PhotonNetwork.NetworkingClient.State == ClientState.Disconnected)
                 HandleDisconnect(cause);
         }
+
+        protected override void HandleDisconnect(DisconnectCause cause)
+        {
+            switch (cause)
+            {
+                case DisconnectCause.AuthenticationTicketExpired:
+                case DisconnectCause.DisconnectByServerReasonUnknown:
+                    VRDF_Components.DebugVRDFMessage("Trying to rejoin the server ...");
+                    TryToReconnect();
+                    break;
+                case DisconnectCause.ServerTimeout:
+                case DisconnectCause.ClientTimeout:
+                case DisconnectCause.Exception:
+                case DisconnectCause.ExceptionOnConnect:
+                case DisconnectCause.OperationNotAllowedInCurrentState:
+                case DisconnectCause.CustomAuthenticationFailed:
+                case DisconnectCause.DisconnectByClientLogic:
+                case DisconnectCause.InvalidAuthentication:
+                case DisconnectCause.MaxCcuReached:
+                case DisconnectCause.InvalidRegion:
+                case DisconnectCause.None:
+                    break;
+                default:
+                    throw new System.ArgumentOutOfRangeException("cause", cause, "cause not supported");
+            }
+        }
     }
 }

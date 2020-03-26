@@ -24,13 +24,16 @@ namespace VRDF.Multiplayer
         private void Awake()
         {
             _availableRooms.Clear();
+            // If the user came back to the Connection Scene
+            if (JoinLobbyOnConnected && !PhotonNetwork.OfflineMode && PhotonNetwork.IsConnectedAndReady)
+                PhotonNetwork.JoinLobby(new TypedLobby(LobbyName, LobbyType.Default));
         }
 
         public override void OnConnectedToMaster()
         {
             base.OnConnectedToMaster();
             // When the user is connected to the server, we make him join a basic lobby so he can get the list of rooms and their info.
-            if (JoinLobbyOnConnected)
+            if (JoinLobbyOnConnected && !PhotonNetwork.OfflineMode)
                 PhotonNetwork.JoinLobby(new TypedLobby(LobbyName, LobbyType.Default));
         }
 
@@ -76,7 +79,7 @@ namespace VRDF.Multiplayer
         {
             get
             {
-                if (!PhotonNetwork.InLobby)
+                if (!PhotonNetwork.InLobby && !PhotonNetwork.InRoom)
                     VRDF_Components.DebugVRDFMessage("You need to be in a Lobby to be able to access the room List ! Returning Empty Dictionary.", true);
 
                 return _availableRooms;

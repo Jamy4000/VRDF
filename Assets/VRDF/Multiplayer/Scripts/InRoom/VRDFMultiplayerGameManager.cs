@@ -10,7 +10,7 @@ namespace VRDF.Multiplayer
     /// Deals with quiting the room and the game
     /// Deals with level loading (outside the in room synchronization)
     /// </summary>
-    public class VRDFMultiplayerGameManager : MonoBehaviourPunCallbacks
+    public class VRDFMultiplayerGameManager : MonoBehaviour
     {
         [Tooltip("The name of the Connection Scene")]
         [SerializeField]

@@ -7,15 +7,18 @@ namespace VRDF.Multiplayer
     /// <summary>
     /// Used to connect the user to the Server and create a connection to a room
     /// </summary>
-    public class VRDFConnectionManager : MonoBehaviourPunCallbacks
+    public class VRDFConnectionManager : MonoBehaviour
     {
-        [Header("Should we automatically sync the scene in Room ?")]
+        [Header("Photon Parameters")]
+        [Tooltip("Do you want to connect to photon servers using settings on awake ?")]
+        [SerializeField] private bool _connectToServerOnAwake = true;
         [Tooltip("Simply to set the PhotonNetwork.AutomaticallySyncScene on Awake")]
         [SerializeField] private bool _automaticallySyncScene = true;
+
         /// <summary>
         /// Singleton creation
         /// </summary>
-        public static VRDFConnectionManager Instance; 
+        public static VRDFConnectionManager Instance;
 
         protected virtual void Awake()
         {
@@ -30,7 +33,7 @@ namespace VRDF.Multiplayer
             PhotonNetwork.AutomaticallySyncScene = _automaticallySyncScene;
 
             // Check for when the user just left a room and is coming back to the Connection Scene
-            if (!PhotonNetwork.IsConnectedAndReady)
+            if (!PhotonNetwork.IsConnectedAndReady && _connectToServerOnAwake)
             {
                 // Connect to Photon Online Server
                 VRDF_Components.DebugVRDFMessage("Connecting with Photon Server ...");

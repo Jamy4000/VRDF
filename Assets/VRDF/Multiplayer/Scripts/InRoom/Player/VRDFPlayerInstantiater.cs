@@ -11,26 +11,23 @@ namespace VRDF.Multiplayer
     {
         [Header("Photon Player Prefab and Folder (NEEDS TO BE IN RESOURCES FOLDER)")]
         [Tooltip("Needs to be placed in the Resources folder")]
-        [SerializeField]
-        private GameObject _playersPrefab;
+        public GameObject PlayersPrefab;
 
         [Tooltip("OPTIONAL: Folder in the Resources where the Player Prefab is placed.")]
-        [SerializeField]
-        private string _playersPrefabResourcesFolder = "PhotonPrefabs";
+        public string PlayersPrefabResourcesFolder = "PhotonPrefabs";
 
-        public void Awake()
+        protected virtual void Awake()
         {
-            if (PhotonNetwork.IsConnectedAndReady)
-                OnSetupVRReady.RegisterSetupVRCallback(LocalPlayerSetup);
-        }
+            VRDFPlayerUtilities.PlayersInstances.Clear();
 
-        private void Start()
-        {
             if (PhotonNetwork.IsConnectedAndReady)
+            {
                 InstantiateLocalPlayer();
+                OnSetupVRReady.RegisterSetupVRCallback(LocalPlayerSetup);
+            }
         }
 
-        public void OnDestroy()
+        protected virtual void OnDestroy()
         {
             OnSetupVRReady.UnregisterSetupVRCallback(LocalPlayerSetup);
         }
@@ -39,9 +36,9 @@ namespace VRDF.Multiplayer
         /// Instantiate the local player using PhotonNetwork.Instantiate.
         /// Only needs to be done localy, as Photon automatically instantiate a Player GameObject for the remote players.
         /// </summary>
-        private void InstantiateLocalPlayer()
+        protected void InstantiateLocalPlayer()
         {
-            if (_playersPrefab == null)
+            if (PlayersPrefab == null)
                 VRDF_Components.DebugVRDFMessage("Missing playerPrefab Reference in VRDFPlayerInstantiater, can't instantiate local player.", true);
             else
                 VRDFPlayerManager.LocalPlayerGameObjectInstance = PhotonNetwork.Instantiate(_playerPrefabName, Vector3.zero, Quaternion.identity);
@@ -50,12 +47,14 @@ namespace VRDF.Multiplayer
         /// <summary>
         /// Set the local player's device in its custom properties.
         /// </summary>
-        private void LocalPlayerSetup(OnSetupVRReady _)
+        protected void LocalPlayerSetup(OnSetupVRReady _)
         {
             PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable
             {
                 { VRDFPlayer.DEVICE_USED, VRDF_Components.DeviceLoaded }
             });
+
+            Destroy(this);
         }
 
         /// <summary>
@@ -65,7 +64,7 @@ namespace VRDF.Multiplayer
         {
             get
             {
-                return string.IsNullOrEmpty(_playersPrefabResourcesFolder) ? _playersPrefab.name : System.IO.Path.Combine(_playersPrefabResourcesFolder, _playersPrefab.name);
+                return string.IsNullOrEmpty(PlayersPrefabResourcesFolder) ? PlayersPrefab.name : System.IO.Path.Combine(PlayersPrefabResourcesFolder, PlayersPrefab.name);
             }
         }
     }

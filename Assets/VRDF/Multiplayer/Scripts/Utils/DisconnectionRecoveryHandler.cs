@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -31,33 +29,7 @@ namespace VRDF.Multiplayer
             Application.runInBackground = true;
         }
 
-        public void HandleDisconnect(DisconnectCause cause)
-        {
-            VRDF_Components.DebugVRDFMessage("Trying to rejoin the server ...");
-
-            switch (cause)
-            {
-                case DisconnectCause.Exception:
-                case DisconnectCause.ServerTimeout:
-                case DisconnectCause.ClientTimeout:
-                case DisconnectCause.DisconnectByServerLogic:
-                case DisconnectCause.AuthenticationTicketExpired:
-                case DisconnectCause.DisconnectByServerReasonUnknown:
-                    TryToReconnect();
-                    break;
-                case DisconnectCause.OperationNotAllowedInCurrentState:
-                case DisconnectCause.CustomAuthenticationFailed:
-                case DisconnectCause.DisconnectByClientLogic:
-                case DisconnectCause.InvalidAuthentication:
-                case DisconnectCause.ExceptionOnConnect:
-                case DisconnectCause.MaxCcuReached:
-                case DisconnectCause.InvalidRegion:
-                case DisconnectCause.None:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("cause", cause, "cause not supported");
-            }
-        }
+        protected abstract void HandleDisconnect(DisconnectCause cause);
 
         public abstract void TryToReconnect();
 

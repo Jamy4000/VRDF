@@ -19,6 +19,11 @@ namespace VRDF.Multiplayer
         public static List<VRDFPlayer> PlayersInstances = new List<VRDFPlayer>();
 
         /// <summary>
+        /// If the player requested to go back to the connection room, or if it happened after a time out
+        /// </summary>
+        public static bool LocalPlayerHasRequestedToLeave = false;
+
+        /// <summary>
         /// Find a Player in the PlayersInstances list
         /// </summary>
         /// <param name="playerID">The id of the player to look for</param>
