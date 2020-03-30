@@ -15,8 +15,6 @@ For more info about the Event System we are using, please check the Github Repos
 
 If you have any in question on how to use this tool, you can either check the Wiki page, or I'll be glad to answer you, just send me an email to arnaudbriche1994@gmail.com ! :)
 
-**WARNING**: I won't work on this repository for the next months as I'm gonna travel a lot, but I'll still try to keep the packages up-to-date, as well as my code according to the update from Unity.
-
 
 # Releases
 The stable versions are placed in [the Releases section](https://github.com/Jamy4000/VRDF/releases) of this repository. Multiple packages are available, with extensions depending on your use. The only one you absolutely need to use the framework is the VRDF_Core package.
